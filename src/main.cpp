@@ -41,8 +41,6 @@ int main(int argc, char* argv[]) {
 	infoWdt.getShape()->setY(40);
 
 	char buffer[128];
-	bool dir = false;
-	uint8_t pos = 0;
 	while(1) {
 		uint32_t render = System_getUptimeMs();
 		baseLayer.render();
@@ -55,11 +53,6 @@ int main(int argc, char* argv[]) {
 		testWdt.setText(buffer);
 		timeWdt.setText(timeWdt.getText());
 		infoWdt.setText(infoWdt.getText());
-
-		testWdt.getShape()->setY(pos);
-		pos += dir ? -1 : +1;
-		if ((pos > 60) || (!pos))
-			dir = !dir;
 	}
 
 	return 0;

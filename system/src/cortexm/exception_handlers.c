@@ -54,7 +54,6 @@ void __attribute__ ((section(".after_vectors"),weak))
 NMI_Handler (void)
 {
 #if defined(DEBUG)
-	uint32_t ipsr = __get_IPSR();
   __DEBUG_BKPT();
 #endif
   while (1)

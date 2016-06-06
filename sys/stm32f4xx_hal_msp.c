@@ -1,119 +1,172 @@
-/**
-  ******************************************************************************
-  * @file    stm32f4xx_hal_msp_template.c
-  * @author  MCD Application Team
-  * @version V1.4.1
-  * @date    09-October-2015
-  * @brief   This file contains the HAL System and Peripheral (PPP) MSP initialization
-  *          and de-initialization functions.
-  *          It should be copied to the application folder and renamed into 'stm32f4xx_hal_msp.c'.           
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
-  ******************************************************************************
-  */ 
+/*
+ * hal.c
+ *
+ *  Created on: Mar 20, 2016
+ *      Author: shapa
+ */
 
-/* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 
-/** @addtogroup STM32F4xx_HAL_Driver
-  * @{
-  */
+static void initGPIO_USART1_Trace(void);
+static void initGPIO_USART2(void);
+static void initGPIO_UART4(void);
+static void initGPIO_CAN(void);
+static void initGPIO_PWM(void);
+static void initGPIO_USB(void);
 
-/** @defgroup HAL_MSP HAL MSP
-  * @brief HAL MSP module.
-  * @{
-  */
+void HAL_USART_MspInit(USART_HandleTypeDef *husart) {
 
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-/* Private function prototypes -----------------------------------------------*/
-/* Private functions ---------------------------------------------------------*/
-
-/** @defgroup HAL_MSP_Private_Functions HAL MSP Private Functions
-  * @{
-  */
-
-/**
-  * @brief  Initializes the Global MSP.
-  * @note   This function is called from HAL_Init() function to perform system
-  *         level initialization (GPIOs, clock, DMA, interrupt).
-  * @retval None
-  */
-void HAL_MspInit(void)
-{
-
+	if (husart->Instance == USART1) {
+		__HAL_RCC_GPIOA_CLK_ENABLE();
+		__HAL_RCC_USART1_CLK_ENABLE();
+		__HAL_RCC_DMA2_CLK_ENABLE();
+		initGPIO_USART1_Trace();
+	} else if (husart->Instance == USART2) {
+		__HAL_RCC_GPIOD_CLK_ENABLE();
+		__HAL_RCC_USART2_CLK_ENABLE();
+		initGPIO_USART2();
+	}
 }
 
-/**
-  * @brief  DeInitializes the Global MSP.
-  * @note   This functiona is called from HAL_DeInit() function to perform system
-  *         level de-initialization (GPIOs, clock, DMA, interrupt).
-  * @retval None
-  */
-void HAL_MspDeInit(void)
-{
+void HAL_UART_MspInit(UART_HandleTypeDef *husart) {
 
+	if (husart->Instance == UART4) {
+		__HAL_RCC_GPIOC_CLK_ENABLE();
+		__HAL_RCC_UART4_CLK_ENABLE();
+		initGPIO_UART4();
+	}
 }
 
-/**
-  * @brief  Initializes the PPP MSP.
-  * @note   This functiona is called from HAL_PPP_Init() function to perform 
-  *         peripheral(PPP) system level initialization (GPIOs, clock, DMA, interrupt)
-  * @retval None
-  */
-void HAL_PPP_MspInit(void)
-{
+void HAL_CAN_MspInit(CAN_HandleTypeDef *hcan) {
 
+	if (hcan->Instance == CAN1) {
+		__HAL_RCC_GPIOA_CLK_ENABLE();
+		__HAL_RCC_CAN1_CLK_ENABLE();
+		initGPIO_CAN();
+	}
 }
 
-/**
-  * @brief  DeInitializes the PPP MSP.
-  * @note   This functiona is called from HAL_PPP_DeInit() function to perform 
-  *         peripheral(PPP) system level de-initialization (GPIOs, clock, DMA, interrupt)
-  * @retval None
-  */
-void HAL_PPP_MspDeInit(void)
-{
-
+void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim) {
+	if (htim->Instance == TIM1) {
+		__HAL_RCC_GPIOA_CLK_ENABLE();
+		__HAL_RCC_TIM1_CLK_ENABLE();
+		initGPIO_PWM();
+	}
 }
 
-/**
-  * @}
-  */
+void HAL_PCD_MspInit(PCD_HandleTypeDef *hpcd) {
+	if (hpcd->Instance == USB_OTG_FS) {
+		__HAL_RCC_USB_OTG_FS_CLK_ENABLE();
+	} else if (hpcd->Instance == USB_OTG_HS) {
+		__HAL_RCC_USB_OTG_HS_CLK_ENABLE();
+	}
+	__HAL_RCC_GPIOB_CLK_ENABLE();
+	__HAL_RCC_GPIOC_CLK_ENABLE();
+	initGPIO_USB();
+}
 
-/**
-  * @}
-  */
+void HAL_PCD_MspDeInit(PCD_HandleTypeDef *hpcd) {
+	if (hpcd->Instance == USB_OTG_FS) {
+		__HAL_RCC_USB_OTG_FS_CLK_DISABLE();
+	} else if (hpcd->Instance == USB_OTG_HS) {
+		__HAL_RCC_USB_OTG_HS_CLK_DISABLE();
+	} else {
+		__HAL_RCC_USB_OTG_FS_CLK_DISABLE();
+		__HAL_RCC_USB_OTG_HS_CLK_DISABLE();
+	}
+}
 
-/**
-  * @}
-  */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+static void initGPIO_USART1_Trace(void) {
+
+	GPIO_InitTypeDef iface = {
+			GPIO_PIN_9 | GPIO_PIN_10,
+			GPIO_MODE_AF_PP,
+			GPIO_NOPULL,
+			GPIO_SPEED_FREQ_HIGH,
+			GPIO_AF7_USART1
+	};
+	HAL_GPIO_Init(GPIOA, &iface);
+}
+
+static void initGPIO_USART2(void) {
+
+	GPIO_InitTypeDef iface = {
+			GPIO_PIN_5 | GPIO_PIN_6,
+			GPIO_MODE_AF_PP,
+			GPIO_NOPULL,
+			GPIO_SPEED_FREQ_HIGH,
+			GPIO_AF7_USART2
+	};
+	HAL_GPIO_Init(GPIOD, &iface);
+}
+
+static void initGPIO_UART4(void) {
+
+	GPIO_InitTypeDef iface = {
+			GPIO_PIN_10 | GPIO_PIN_11,
+			GPIO_MODE_AF_PP,
+			GPIO_NOPULL,
+			GPIO_SPEED_FREQ_HIGH,
+			GPIO_AF8_UART4
+	};
+	HAL_GPIO_Init(GPIOC, &iface);
+}
+
+static void initGPIO_CAN() {
+
+	GPIO_InitTypeDef iface = {
+			GPIO_PIN_11 | GPIO_PIN_12,
+			GPIO_MODE_AF_PP,
+			GPIO_NOPULL,
+			GPIO_SPEED_FREQ_LOW,
+			GPIO_AF9_CAN1
+	};
+	HAL_GPIO_Init(GPIOA, &iface);
+}
+
+static void initGPIO_USB(void) {
+//	PB12 - USB_OTG_ID
+//	PB13 - USB_OTG_VBUS
+//	PB14 - USB_OTG_DM
+//	PB15 - USB_OTG_DP
+//	PC4 - USB_PSO
+//	PC5 - USB_OC
+
+	GPIO_InitTypeDef iface = {
+			GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15,
+			GPIO_MODE_AF_PP,
+			GPIO_NOPULL,
+			GPIO_SPEED_FREQ_VERY_HIGH,
+			GPIO_AF12_OTG_HS_FS
+	};
+	GPIO_InitTypeDef ifacePSO = {
+			GPIO_PIN_4,
+			GPIO_MODE_OUTPUT_PP,
+			GPIO_NOPULL,
+			GPIO_SPEED_FREQ_LOW,
+			0
+	};
+	GPIO_InitTypeDef ifaceOC = {
+			GPIO_PIN_5,
+			GPIO_MODE_INPUT,
+			GPIO_NOPULL,
+			GPIO_SPEED_FREQ_LOW,
+			0
+	};
+	HAL_GPIO_Init(GPIOB, &iface);
+	HAL_GPIO_Init(GPIOC, &ifacePSO);
+	HAL_GPIO_Init(GPIOC, &ifaceOC);
+}
+
+static void initGPIO_PWM(void) {
+	GPIO_InitTypeDef iface = {
+			GPIO_PIN_8,
+			GPIO_MODE_AF_PP,
+			GPIO_NOPULL,
+			GPIO_SPEED_FREQ_LOW,
+			GPIO_AF1_TIM1
+	};
+	HAL_GPIO_Init(GPIOA, &iface);
+}
+

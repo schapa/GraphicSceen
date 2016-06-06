@@ -10,6 +10,7 @@
 #include "bsp.h"
 #include "system.h"
 #include "ssd1322.h"
+#include "pwmWrapper.h"
 
 static void initGPIO_LED(void);
 
@@ -18,6 +19,8 @@ void BSP_Init(void) {
 	System_setStatus(INFORM_IDLE);
 	System_setLedControl(BSP_LedGreenSet);
 
+	PWM_Init();
+	PWM_Configure(TIM_CHANNEL_1, 30);
 //	OLED_GpioInitParallel();
 	OLED_GpioInitSpi();
 	SSD1322_InitDisplay();
