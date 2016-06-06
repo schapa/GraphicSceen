@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
 	TextWidget infoWdt(FONT_CENTURY_SCOOLBOOK, 12, "The quick brown fox jumps over the lazy dog");
 
 	timeWdt.setSurface(new GfxSurface(ColorDepth_4, 256, 20));
-	testWdt.setSurface(new GfxSurface(ColorDepth_4, 100, 20));
+	testWdt.setSurface(new GfxSurface(ColorDepth_4, 128, 20));
 	infoWdt.setSurface(new GfxSurface(ColorDepth_4, 256, 20));
 
 	timeWdt.setVisible(true);

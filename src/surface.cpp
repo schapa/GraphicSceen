@@ -52,6 +52,31 @@ void GfxSurface::fill(uint32_t val) {
 	}
 }
 
+void GfxSurface::drawPixel(uint16_t x, uint16_t y, uint8_t brightness) {
+	if (x >= width || y >= heigth)
+		return;
+
+	brightness &= 0x0F;
+	if (x % 2) {
+		line[y][x/2] &= 0xF0;
+		line[y][x/2] |= brightness;
+	} else {
+		line[y][x/2] &= 0x0F;
+		line[y][x/2] |= brightness<<4;
+	}
+}
+
+uint32_t GfxSurface::getPixel(uint16_t x, uint16_t y) {
+	if (x >= width || y >= heigth)
+		return 0;
+	switch (bitsDepth) {
+	case ColorDepth_4:
+		return (x % 2) ? line[y][x/2] & 0x0F : line[y][x/2]>>4;
+	default:
+		return 0;
+	}
+}
+
 void GfxSurface::create(void) {
 	if (bitsDepth > 32) {
 //		assert() here

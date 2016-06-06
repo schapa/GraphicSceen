@@ -31,6 +31,11 @@ public:
 	const uint16_t &getWidth(void) { return width; }
 	const uint16_t &getHeigth(void) { return heigth; }
 	const ColorDepth &getBitsDepth(void) { return bitsDepth; }
+public:
+	void drawPixel(uint16_t x, uint16_t y, uint8_t brightness);
+	void drawPixel(uint16_t x, uint16_t y, uint32_t argb);
+
+	uint32_t getPixel(uint16_t x, uint16_t y);
 private:
 	void create(void);
 private:

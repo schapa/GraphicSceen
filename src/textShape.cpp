@@ -59,25 +59,17 @@ void GfxTextShape::renderGrayScale4Bit(fontItem_p font, const char *text) {
 		return;
 	uint16_t xPos = 0;
 	fontLookupItem_p lookup = font->lookup;
-	const uint8_t *pixel = font->pixelData;
-	uint8_t **frame = surface->getFrameBuffer();
 	while (*text) {
 		fontLookupItem_t character = lookup[(size_t)*text];
-	    uint16_t y;
-	    for (y = 0; (y < character.heigth) && (y < surface->getHeigth()); ++y) {
-	    	uint16_t lineCnt = xPos;
-	    	uint16_t xStart = character.offset + y * character.width;
-		    uint16_t x = 0;
-	    	while ((x < character.width) && (x < surface->getWidth())) {
-	    		uint8_t pix = pixel[xStart++]>>4;
-	    		uint8_t pix2 = (x+1 < character.width) ? pixel[xStart++]>>4 : 0;
-	    		frame[y + character.top][lineCnt++] = pix<<4 | pix2;
-	    		x += 2;
-	    	}
+	    for (uint16_t y = 0; (y < character.heigth) && (y < surface->getHeigth()); ++y) {
+	    	const uint8_t *pixel = &font->pixelData[character.offset + y * character.width];
+		    for (uint16_t x = 0; (x < character.width) && (x < surface->getWidth()); ++x) {
+		    	uint8_t pix = pixel[x]>>4;
+		    	surface->drawPixel(x + xPos, y + character.top, pix);
+		    }
 	    }
-//	    xPos += character.advance/2 + character.advance%2;
-	    xPos += (character.advance - character.left)/2 + (character.advance - character.left)%2;
-	    if (xPos > surface->getWidth()/2)
+	    xPos += character.advance - character.left;
+	    if (xPos > surface->getWidth())
 	    	break;
 	    text++;
 	}
