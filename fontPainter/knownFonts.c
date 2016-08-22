@@ -10,7 +10,6 @@
 #include "fontPainter.h"
 //#include "century_schoolbook_l_bold_8_font.h"
 #include "century_schoolbook_l_bold_12_font.h"
-//#include "creampuff_regular_12_font.h"
 #include "digital_7_regular_12_font.h"
 #include "digital_7_regular_18_font.h"
 
@@ -28,10 +27,14 @@ static const fontItem_p s_digital_7_regular_font[] = {
 static const fontItem_p s_century_schoolbook_bold_font[] = {
 		(const fontItem_p)&century_schoolbook_l_bold_12_font,
 };
+static const fontItem_p s_creampuff_regular_font[] = {
+};
+
 
 static const fontSizeMap_t s_knownFonts[] = {
-		[FONT_DIGITAL_7SEGMENT] = { s_digital_7_regular_font, sizeof(s_digital_7_regular_font)/sizeof(*s_digital_7_regular_font) },
-		[FONT_CENTURY_SCOOLBOOK] = { s_century_schoolbook_bold_font, sizeof(s_century_schoolbook_bold_font)/sizeof(*s_century_schoolbook_bold_font) },
+	[FONT_DIGITAL_7SEGMENT] = { s_digital_7_regular_font, sizeof(s_digital_7_regular_font)/sizeof(*s_digital_7_regular_font) },
+	[FONT_CENTURY_SCOOLBOOK] = { s_century_schoolbook_bold_font, sizeof(s_century_schoolbook_bold_font)/sizeof(*s_century_schoolbook_bold_font) },
+	[FONT_CREAMPUFF] = { s_creampuff_regular_font, sizeof(s_creampuff_regular_font)/sizeof(*s_creampuff_regular_font) },
 };
 
 

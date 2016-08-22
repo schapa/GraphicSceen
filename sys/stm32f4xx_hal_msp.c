@@ -13,6 +13,7 @@ static void initGPIO_UART4(void);
 static void initGPIO_CAN(void);
 static void initGPIO_PWM(void);
 static void initGPIO_USB(void);
+static void initGPIO_Spi5(void);
 
 void HAL_USART_MspInit(USART_HandleTypeDef *husart) {
 
@@ -76,6 +77,13 @@ void HAL_PCD_MspDeInit(PCD_HandleTypeDef *hpcd) {
 	}
 }
 
+void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi) {
+	if (hspi->Instance == SPI5) {
+		initGPIO_Spi5();
+		__HAL_RCC_SPI5_CLK_ENABLE();
+	}
+}
+
 
 static void initGPIO_USART1_Trace(void) {
 
@@ -125,6 +133,17 @@ static void initGPIO_CAN() {
 	HAL_GPIO_Init(GPIOA, &iface);
 }
 
+static void initGPIO_PWM(void) {
+	GPIO_InitTypeDef iface = {
+			GPIO_PIN_8,
+			GPIO_MODE_AF_PP,
+			GPIO_NOPULL,
+			GPIO_SPEED_FREQ_LOW,
+			GPIO_AF1_TIM1
+	};
+	HAL_GPIO_Init(GPIOA, &iface);
+}
+
 static void initGPIO_USB(void) {
 //	PB12 - USB_OTG_ID
 //	PB13 - USB_OTG_VBUS
@@ -159,14 +178,16 @@ static void initGPIO_USB(void) {
 	HAL_GPIO_Init(GPIOC, &ifaceOC);
 }
 
-static void initGPIO_PWM(void) {
+static void initGPIO_Spi5(void) {
 	GPIO_InitTypeDef iface = {
-			GPIO_PIN_8,
+			GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9,
 			GPIO_MODE_AF_PP,
 			GPIO_NOPULL,
-			GPIO_SPEED_FREQ_LOW,
-			GPIO_AF1_TIM1
+			GPIO_SPEED_FREQ_HIGH,
+			GPIO_AF5_SPI5
 	};
-	HAL_GPIO_Init(GPIOA, &iface);
+
+	__HAL_RCC_GPIOF_CLK_ENABLE();
+	HAL_GPIO_Init(GPIOF, &iface);
 }
 

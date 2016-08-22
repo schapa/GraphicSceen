@@ -11,11 +11,14 @@
 
 void drawSurface(uint8_t **line, uint16_t heigth, uint8_t bytesPerLine);
 
+extern "C" void DiscoLCDInit(void) ;
+
 int main(int argc, char* argv[]) {
 	(void)argc;
 	(void)argv;
 
 	BSP_Init();
+	DiscoLCDInit();
 	SSD1322_ClearDisplay();
 
 	GfxLayer baseLayer(ColorDepth_4, 256, 64);
