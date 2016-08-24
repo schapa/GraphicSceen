@@ -29,11 +29,22 @@ void GfxLayer::render() {
 }
 
 void GfxLayer::blend() {
+	switch (getPixelFormat()) {
+		case PixelFormat_GrayScale:
+			if (getBitsDepth() == ColorDepth_4)
+				blendGrayScale_4();
+			break;
+		default:
+			blendTransparent();
+	}
+}
+
+void GfxLayer::blendGrayScale_4() {
+	uint8_t *fb = getFrameBuffer();
+	uint16_t surfWidth = getWidth()/2;
 	fill(0x00);
 	for (size_t i = 0; i < shapes.size(); i++) {
-		uint8_t **fb = getFrameBuffer();
 		GfxSurface *surface = shapes[i]->getSurface();
-		uint16_t surfWidth = getWidth()/2;
 		uint16_t xStart = shapes[i]->getX()/2;
 		uint16_t yStart = shapes[i]->getY();
 		uint16_t shpWidth = shapes[i]->getWidth()/2;
@@ -41,10 +52,10 @@ void GfxLayer::blend() {
 		if (!surface || xStart >= surfWidth)
 			continue;
 		for (size_t y = 0; (y < shpHeigth) && (yStart + y < getHeigth()); y++) {
-			uint8_t *start = &fb[yStart + y][xStart];
-			uint16_t len = (xStart + shpWidth) <= surfWidth ? surface->getBytesPerLine() :
-					(xStart < surfWidth) ? (surfWidth - xStart) : 0;
-			memcpy(start, surface->getFrameBuffer()[y], len);
+//			uint8_t *start = &fb[yStart + y][xStart];
+//			uint16_t len = (xStart + shpWidth) <= surfWidth ? surface->getBytesPerLine() :
+//					(xStart < surfWidth) ? (surfWidth - xStart) : 0;
+//			memcpy(start, surface->getFrameBuffer()[y], len);
 		}
 	}
 }
@@ -62,7 +73,7 @@ void GfxLayer::blendTransparent() {
 			continue;
 		for (size_t y = 0; (y < shpHeigth) && (yStart + y < getHeigth()); y++) {
 			for (size_t x = 0; (x < shpWidth) && (xStart + x < getWidth()); x++) {
-				uint8_t pixel = surface->getPixel(x, y);
+				uint32_t pixel = surface->getPixel(x, y);
 				if (pixel) {
 					drawPixel(xStart + x, yStart + y, pixel);
 				}

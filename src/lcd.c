@@ -41,13 +41,14 @@
 
 #include "stm32f4xx_hal.h"
 #include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 #include "bsp.h"
 #include "system.h"
 #include "ili9341.h"
 
 static void initGPIO_Ctrl(void);
 static void initSpi(void);
-static void initGPIO_LcdRgb(void);
 
 static void chipSelect(_Bool mode);
 static void setDataMode(_Bool mode);
@@ -57,49 +58,50 @@ static void sendLcd(uint8_t val);
 
 static void initILI9341(void);
 
+static void initLayer(uint8_t *buff);
+
 static SPI_HandleTypeDef s_spi;
+static LTDC_HandleTypeDef s_ltdc;
 
-void DiscoLCDInit(void) {
 
-//	LTDC_InitTypeDef iface = {
-//			LTDC_HSPOLARITY_AL,
-//			LTDC_VSPOLARITY_AL,
-//			LTDC_DEPOLARITY_AL,
-//			LTDC_PCPOLARITY_IPC,
-//			9,
-//			1,
-//			29,
-//			3,
-//			269,
-//			323,
-//			279,
-//			327,
-//	};
+static const uint16_t s_lcdWidth = 240;
+static const uint16_t s_lcdHeigth = 320;
+
+void DiscoLCDInit(uint8_t *buff) {
+
+	LTDC_InitTypeDef iface = {
+			LTDC_HSPOLARITY_AL,
+			LTDC_VSPOLARITY_AL,
+			LTDC_DEPOLARITY_AL,
+			LTDC_PCPOLARITY_IPC,
+			.HorizontalSync = 9,
+			.VerticalSync = 1,
+			.AccumulatedHBP = 29,
+			.AccumulatedVBP = 3,
+//			.AccumulatedActiveW = s_lcdWidth + 29,
+//			.AccumulatedActiveH = s_lcdHeigth + 3,
+//			.TotalWidth = s_lcdWidth + 39,
+//			.TotalHeigh = s_lcdHeigth + 7,
+			.Backcolor.Red = 0,
+			.Backcolor.Green = 0,
+			.Backcolor.Blue = 0,
+	};
+
+	iface.AccumulatedActiveW = s_lcdWidth + iface.AccumulatedHBP;
+	iface.AccumulatedActiveH = s_lcdHeigth + iface.AccumulatedVBP;
+	iface.TotalWidth = s_lcdWidth + iface.HorizontalSync + iface.VerticalSync + iface.AccumulatedHBP;
+	iface.TotalHeigh = s_lcdHeigth + 7;
+
+	s_ltdc.Init = iface;
+	s_ltdc.Instance = LTDC;
 
 	initGPIO_Ctrl();
-
 	initSpi();
-
 	initILI9341();
 
-	initGPIO_LcdRgb();
-
-	setDataMode(true);
-	chipSelect(true);
-//	for (uint32_t i = 0; i < 0xFFFFFF; i++) {
-//		HAL_SPI_Transmit(&s_spi, &i, 1, 0xFFFF);
-//	}
-	uint32_t i = 0;
-	while(1) {
-		HAL_SPI_Transmit(&s_spi, &i, 1, 0xFFFF);
-		i++;
-	}
-	chipSelect(false);
-
-//	  LCD_AF_GPIOConfig();
-
-
-//  LTDC_Init(&iface);
+	HAL_LTDC_Init(&s_ltdc);
+	HAL_LTDC_EnableDither(&s_ltdc);
+	initLayer(buff);
 }
 
 
@@ -145,65 +147,6 @@ static void initSpi(void) {
 	HAL_SPI_Init(&s_spi);
 }
 
-static void initGPIO_LcdRgb(void) {
-/* GPIOs Configuration */
-/*
- +------------------------+-----------------------+----------------------------+
- +                       LCD pins assignment                                   +
- +------------------------+-----------------------+----------------------------+
- |  LCD_TFT R2 <-> PC.10  |  LCD_TFT G2 <-> PA.06 |  LCD_TFT B2 <-> PD.06      |
- |  LCD_TFT R3 <-> PB.00  |  LCD_TFT G3 <-> PG.10 |  LCD_TFT B3 <-> PG.11      |
- |  LCD_TFT R4 <-> PA.11  |  LCD_TFT G4 <-> PB.10 |  LCD_TFT B4 <-> PG.12      |
- |  LCD_TFT R5 <-> PA.12  |  LCD_TFT G5 <-> PB.11 |  LCD_TFT B5 <-> PA.03      |
- |  LCD_TFT R6 <-> PB.01  |  LCD_TFT G6 <-> PC.07 |  LCD_TFT B6 <-> PB.08      |
- |  LCD_TFT R7 <-> PG.06  |  LCD_TFT G7 <-> PD.03 |  LCD_TFT B7 <-> PB.09      |
- -------------------------------------------------------------------------------
-		  |  LCD_TFT HSYNC <-> PC.06  | LCDTFT VSYNC <->  PA.04 |
-		  |  LCD_TFT CLK   <-> PG.07  | LCD_TFT DE   <->  PF.10 |
-		   -----------------------------------------------------
-
-*/
-	GPIO_InitTypeDef iface = {
-			GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_6 | GPIO_PIN_11 | GPIO_PIN_12,
-			GPIO_MODE_OUTPUT_PP,
-			GPIO_NOPULL,
-			GPIO_SPEED_FREQ_HIGH,
-			GPIO_AF14_LTDC
-	};
-
-	__HAL_RCC_GPIOA_CLK_ENABLE();
-	__HAL_RCC_GPIOB_CLK_ENABLE();
-	__HAL_RCC_GPIOC_CLK_ENABLE();
-	__HAL_RCC_GPIOD_CLK_ENABLE();
-	__HAL_RCC_GPIOF_CLK_ENABLE();
-	__HAL_RCC_GPIOG_CLK_ENABLE();
-
-	HAL_GPIO_Init(GPIOA, &iface);
-
-	iface.Pin = GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11;
-	HAL_GPIO_Init(GPIOB, &iface);
-	iface.Pin = GPIO_PIN_0 | GPIO_PIN_1;
-	iface.Alternate = GPIO_AF9_LTDC;
-	HAL_GPIO_Init(GPIOB, &iface);
-
-	iface.Pin = GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_10;
-	iface.Alternate = GPIO_AF14_LTDC;
-	HAL_GPIO_Init(GPIOC, &iface);
-
-	iface.Pin = GPIO_PIN_3 | GPIO_PIN_6;
-	HAL_GPIO_Init(GPIOD, &iface);
-
-	iface.Pin = GPIO_PIN_10 | GPIO_PIN_6;
-	HAL_GPIO_Init(GPIOF, &iface);
-
-	iface.Pin = GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_11;
-	HAL_GPIO_Init(GPIOG, &iface);
-
-	iface.Pin = GPIO_PIN_10 | GPIO_PIN_12;
-	iface.Alternate = GPIO_AF9_LTDC;
-	HAL_GPIO_Init(GPIOG, &iface);
-}
-
 static void chipSelect(_Bool mode) {
 	GPIO_PinState val = mode ? GPIO_PIN_RESET : GPIO_PIN_SET;
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, val);
@@ -227,6 +170,31 @@ static void sendLcd(uint8_t val)  {
 	chipSelect(true);
 	HAL_SPI_Transmit(&s_spi, &val, 1, 0xFFFF);
 	chipSelect(false);
+}
+
+static void initLayer(uint8_t *buff) {
+	const uint16_t width = s_lcdWidth;
+	const uint16_t heigth = 64;
+
+	uintptr_t fb = (uintptr_t)buff;
+
+	LTDC_LayerCfgTypeDef layer = {
+			.WindowX0 = 0,
+			.WindowX1 = width - 1,
+			.WindowY0 = 0,
+			.WindowY1 = heigth - 1,
+			.PixelFormat = LTDC_PIXEL_FORMAT_RGB565,
+			.Alpha = 255,
+			.Alpha0 = 255,
+			.BlendingFactor1 = LTDC_BLENDING_FACTOR1_CA,
+			.BlendingFactor2 = LTDC_BLENDING_FACTOR2_CA,
+			.FBStartAdress = fb,
+			.ImageWidth = width,
+			.ImageHeight = heigth,
+			.Backcolor = s_ltdc.Init.Backcolor
+	};
+
+	HAL_LTDC_ConfigLayer(&s_ltdc, &layer, 0);
 }
 
 static void initILI9341(void) {
@@ -297,13 +265,13 @@ static void initILI9341(void) {
 	sendLcd(0x00);
 	sendLcd(0x01);
 	sendLcd(0x3F);
-//	sendLcdCmd(ILI9341_IFACE_CTRL);
-//	sendLcd(0x01);
-//	sendLcd(0x00);
-//	sendLcd(0x06);
+	sendLcdCmd(ILI9341_IFACE_CTRL);
+	sendLcd(0x01);
+	sendLcd(0x00);
+	sendLcd(0x06);
 
 	sendLcdCmd(ILI9341_MEMORY_WRITE);
-	System_delayMsDummy(10);
+	System_delayMsDummy(200);
 
 	sendLcdCmd(ILI9341_SET_GAMMA);
 	sendLcd(0x01);
@@ -342,7 +310,7 @@ static void initILI9341(void) {
 	sendLcd(0x0F);
 
 	sendLcdCmd(ILI9341_SLEEP_OUT);
-	System_delayMsDummy(10);
+	System_delayMsDummy(200);
 	sendLcdCmd(ILI9341_DISPLAY_ON);
 	/* GRAM start writing */
 	sendLcdCmd(ILI9341_MEMORY_WRITE);

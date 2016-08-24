@@ -62,7 +62,7 @@ public:
 
 	virtual bool Draw();
 private:
-	void renderGrayScale4Bit(fontItem_p font, const char *text);
+	void renderGrayScale(fontItem_p font, const char *text);
 private:
 	FontType font;
 	uint8_t textSize;

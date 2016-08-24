@@ -43,18 +43,19 @@ bool GfxTextShape::Draw(void) {
 		return false;
 	}
 	surface->fill(0);
-	switch (surface->getBitsDepth()) {
-		case ColorDepth_4:
-			renderGrayScale4Bit(fontItem, text);
+	switch (surface->getPixelFormat()) {
+		case PixelFormat_GrayScale:
+			renderGrayScale(fontItem, text);
 			break;
 		default:
+			renderGrayScale(fontItem, text);
 			break;
 	}
 	dirty = false;
 	return true;
 }
 
-void GfxTextShape::renderGrayScale4Bit(fontItem_p font, const char *text) {
+void GfxTextShape::renderGrayScale(fontItem_p font, const char *text) {
 	if (!font || !text || !surface || !visible)
 		return;
 	uint16_t xPos = 0;
@@ -64,8 +65,7 @@ void GfxTextShape::renderGrayScale4Bit(fontItem_p font, const char *text) {
 	    for (uint16_t y = 0; (y < character.heigth) && (y < surface->getHeigth()); ++y) {
 	    	const uint8_t *pixel = &font->pixelData[character.offset + y * character.width];
 		    for (uint16_t x = 0; (x < character.width) && (x < surface->getWidth()); ++x) {
-		    	uint8_t pix = pixel[x]>>4;
-		    	surface->drawPixel(x + xPos, y + character.top, pix);
+		    	surface->drawPixel(x + xPos, y + character.top, (uint8_t)pixel[x]);
 		    }
 	    }
 	    xPos += character.advance - character.left;

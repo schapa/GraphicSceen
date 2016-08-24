@@ -16,6 +16,7 @@
 class GfxLayer : public GfxSurface {
 public:
 	GfxLayer(ColorDepth bitsDepth, uint16_t width, uint16_t heigth) : GfxSurface(bitsDepth, width, heigth), tranparentBlend(true) {};
+	GfxLayer(PixelFormat pixFormat, uint16_t width, uint16_t heigth) : GfxSurface(pixFormat, width, heigth), tranparentBlend(true) {};
 	virtual ~GfxLayer() { };
 public:
 	void addShape(GfxShape *shape);
@@ -24,6 +25,7 @@ public:
 	void setTransparentBlendingMode(const bool &mode) { tranparentBlend = mode; }
 private:
 	void blend();
+	void blendGrayScale_4();
 	void blendTransparent();
 private:
 	std::vector <GfxShape*>shapes;
