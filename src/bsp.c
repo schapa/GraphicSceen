@@ -11,10 +11,20 @@
 #include "system.h"
 #include "ssd1322.h"
 #include "pwmWrapper.h"
+#include "canWrapper.h"
+#include "tracer.h"
 
 static void initGPIO_LED(void);
 
+static volatile EventQueue_p s_eventQueue;
+static USART_HandleTypeDef s_traceUsart;
+static DMA_HandleTypeDef s_traceTxDma;
+static CAN_HandleTypeDef s_can1;
+
 void BSP_Init(void) {
+	USART_HandleTypeDef *pTraceUsart = &s_traceUsart;
+	DMA_HandleTypeDef *pTraceTxDma = &s_traceTxDma;
+	HAL_StatusTypeDef initResult = HAL_OK;
 	initGPIO_LED();
 	System_setStatus(INFORM_IDLE);
 	System_setLedControl(BSP_LedGreenSet);
@@ -24,6 +34,33 @@ void BSP_Init(void) {
 //	OLED_GpioInitParallel();
 	OLED_GpioInitSpi();
 	SSD1322_InitDisplay();
+
+	initResult &= Trace_InitUSART1(pTraceUsart, pTraceTxDma);
+	initResult &= CAN_init(&s_can1);
+}
+
+void BSP_queuePush(Event_p pEvent) {
+	uint32_t primask = __get_PRIMASK();
+	__disable_irq();
+	s_eventQueue = Queue_pushEvent(s_eventQueue, pEvent);
+	if (!primask) {
+		__enable_irq();
+	}
+}
+
+void BSP_pendEvent(Event_p pEvent) {
+	while (!s_eventQueue);
+	uint32_t primask = __get_PRIMASK();
+	__disable_irq();
+	s_eventQueue = Queue_getEvent(s_eventQueue, pEvent);
+	if (!primask) {
+		__enable_irq();
+	}
+}
+
+_Bool BSP_queueIsEventPending(Event_p pEvent) {
+	s_eventQueue = Queue_getEvent(s_eventQueue, pEvent);
+	return !!s_eventQueue;
 }
 
 void BSP_LedRedSet(FunctionalState state) {

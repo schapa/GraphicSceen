@@ -42,7 +42,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *husart) {
 void HAL_CAN_MspInit(CAN_HandleTypeDef *hcan) {
 
 	if (hcan->Instance == CAN1) {
-		__HAL_RCC_GPIOA_CLK_ENABLE();
+		__HAL_RCC_GPIOD_CLK_ENABLE();
 		__HAL_RCC_CAN1_CLK_ENABLE();
 		initGPIO_CAN();
 	}
@@ -137,15 +137,14 @@ static void initGPIO_UART4(void) {
 }
 
 static void initGPIO_CAN() {
-
 	GPIO_InitTypeDef iface = {
-			GPIO_PIN_11 | GPIO_PIN_12,
+			GPIO_PIN_0 | GPIO_PIN_1,
 			GPIO_MODE_AF_PP,
 			GPIO_NOPULL,
 			GPIO_SPEED_FREQ_LOW,
 			GPIO_AF9_CAN1
 	};
-	HAL_GPIO_Init(GPIOA, &iface);
+	HAL_GPIO_Init(GPIOD, &iface);
 }
 
 static void initGPIO_PWM(void) {

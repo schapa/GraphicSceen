@@ -104,6 +104,15 @@ void DiscoLCDInit(uint8_t *buff) {
 	initLayer(buff);
 }
 
+void DiscoLCD_setState(_Bool state) {
+	if (state) {
+		HAL_LTDC_SetAlpha(&s_ltdc, 255, 0);
+	}
+	else {
+		HAL_LTDC_SetAlpha(&s_ltdc, 0, 0);
+	}
+}
+
 
 static void initGPIO_Ctrl(void) {
 

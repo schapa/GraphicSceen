@@ -51,6 +51,8 @@ void SysTick_Handler(void) {
 
 	if (!(s_uptimeTicks++ % BSP_TICKS_PER_SECOND)) {
 		s_uptimeSeconds++;
+		Event_t seconds = { EVENT_SYSTICK, { ES_SYSTICK_SECOND_ELAPSED }, .data.intptr = s_uptimeSeconds };
+		BSP_queuePush(&seconds);
 	}
 #if defined(USE_HAL_DRIVER)
 	HAL_IncTick();

@@ -42,6 +42,10 @@ GfxSurface::~GfxSurface(void) {
 }
 
 void GfxSurface::fill(uint32_t val) {
+	if (!val) {
+		memset(line, 0, heigth*bytesPerLine);
+		return;
+	}
 	switch (bitsDepth) {
 		case ColorDepth_4:
 			val &= 0x0F;
