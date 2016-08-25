@@ -9,6 +9,7 @@
 
 #include "cmsis_device.h"
 #include "diag/Trace.h"
+#include "tracer.h"
 
 // ----------------------------------------------------------------------------
 
@@ -73,7 +74,9 @@ trace_write (const char* buf __attribute__((unused)),
 #elif defined(OS_USE_TRACE_SEMIHOSTING_STDOUT)
   return _trace_write_semihosting_stdout(buf, nbyte);
 #elif defined(OS_USE_TRACE_SEMIHOSTING_DEBUG)
-  return _trace_write_semihosting_debug(buf, nbyte);
+//  return _trace_write_semihosting_debug(buf, nbyte);
+  Trace_dataSync(buf, nbyte);
+  return nbyte;
 #endif
 
   return -1;

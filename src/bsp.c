@@ -21,7 +21,7 @@ static USART_HandleTypeDef s_traceUsart;
 static DMA_HandleTypeDef s_traceTxDma;
 static CAN_HandleTypeDef s_can1;
 
-void BSP_Init(void) {
+HAL_StatusTypeDef BSP_Init(void) {
 	USART_HandleTypeDef *pTraceUsart = &s_traceUsart;
 	DMA_HandleTypeDef *pTraceTxDma = &s_traceTxDma;
 	HAL_StatusTypeDef initResult = HAL_OK;
@@ -37,6 +37,7 @@ void BSP_Init(void) {
 
 	initResult &= Trace_InitUSART1(pTraceUsart, pTraceTxDma);
 	initResult &= CAN_init(&s_can1);
+	return initResult;
 }
 
 void BSP_queuePush(Event_p pEvent) {

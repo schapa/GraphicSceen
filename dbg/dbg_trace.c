@@ -49,5 +49,7 @@ void dbgmsg(const char *color, const char *siverity, const char *file, const cha
 	if (!primask) {
 		__enable_irq();
 	}
-	Trace_dataAsync(newBuff, occupied);
+	if (newBuff) {
+		Trace_dataAsync(newBuff, occupied);
+	}
 }

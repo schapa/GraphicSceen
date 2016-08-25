@@ -11,8 +11,9 @@
 #include "ssd1322.h"
 #include "gfx.hpp"
 #include "dbg_base.h"
+#include "memman.h"
 
-#if 01
+#if 0
 #include "dbg_trace.h"
 #endif
 
@@ -24,33 +25,33 @@ int main(int argc, char* argv[]) {
 	(void)argc;
 	(void)argv;
 
-	BSP_Init();
+	HAL_StatusTypeDef status = BSP_Init();
 	SSD1322_ClearDisplay();
-	DBGMSG_L("hello!");
+	DBGMSG_INFO("\nStart. Init %d", status);
 
-//	GfxLayer baseLayer(PixelFormat_RGB565, 240, 64);
-//
-//	DiscoLCDInit(baseLayer.getFrameBuffer());
-//
-//	TextWidget timeWdt(FONT_DIGITAL_7SEGMENT, 18, "0123456789");
-//	TextWidget testWdt(FONT_CENTURY_SCOOLBOOK, 12, "H Hello [xxxx]");
-//	TextWidget infoWdt(FONT_CENTURY_SCOOLBOOK, 12, "The quick brown fox jumps over the lazy dog");
-//
-//	timeWdt.setSurface(new GfxSurface(PixelFormat_RGB565, 240, 20));
-//	testWdt.setSurface(new GfxSurface(PixelFormat_RGB565, 128, 20));
-//	infoWdt.setSurface(new GfxSurface(PixelFormat_RGB565, 240, 20));
-//
-//	timeWdt.setVisible(true);
-//	testWdt.setVisible(true);
-//	infoWdt.setVisible(true);
-//
-//	baseLayer.addWidget(&timeWdt);
-//	baseLayer.addWidget(&testWdt);
-//	baseLayer.addWidget(&infoWdt);
-//
-//	testWdt.getShape()->setX(20);
-//	testWdt.getShape()->setY(20);
-//	infoWdt.getShape()->setY(40);
+	GfxLayer baseLayer(PixelFormat_RGB565, 240, 64);
+
+	DiscoLCDInit(baseLayer.getFrameBuffer());
+
+	TextWidget timeWdt(FONT_DIGITAL_7SEGMENT, 18, "0123456789");
+	TextWidget testWdt(FONT_CENTURY_SCOOLBOOK, 12, "H Hello [xxxx]");
+	TextWidget infoWdt(FONT_CENTURY_SCOOLBOOK, 12, "The quick brown fox jumps over the lazy dog");
+
+	timeWdt.setSurface(new GfxSurface(PixelFormat_RGB565, 240, 20));
+	testWdt.setSurface(new GfxSurface(PixelFormat_RGB565, 128, 20));
+	infoWdt.setSurface(new GfxSurface(PixelFormat_RGB565, 240, 20));
+
+	timeWdt.setVisible(true);
+	testWdt.setVisible(true);
+	infoWdt.setVisible(true);
+
+	baseLayer.addWidget(&timeWdt);
+	baseLayer.addWidget(&testWdt);
+	baseLayer.addWidget(&infoWdt);
+
+	testWdt.getShape()->setX(20);
+	testWdt.getShape()->setY(20);
+	infoWdt.getShape()->setY(40);
 
 	char buffer[128];
 	while(1) {
@@ -59,8 +60,8 @@ int main(int argc, char* argv[]) {
 		switch (event.type) {
 			case EVENT_SYSTICK:
 				if (event.subType.systick == ES_SYSTICK_SECOND_ELAPSED) {
-//					sprintf(buffer, "Uptime is %lu", System_getUptime());
-//					testWdt.setText(buffer);
+					sprintf(buffer, "Uptime is %lu", System_getUptime());
+					testWdt.setText(buffer);
 					static uint32_t StdId = 0x50;
 					CanTxMsgTypeDef txMSg = {
 							StdId++,
@@ -71,21 +72,16 @@ int main(int argc, char* argv[]) {
 							{ 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }
 
 					};
-					CAN_write(&txMSg);
-					DBGMSG_INFO("Send Can %d", StdId-1);
-					DBGMSG_INFO("Send Can %d", StdId-1);
-					DBGMSG_INFO("Send Can %d", StdId-1);
-					DBGMSG_INFO("Send Can %d", StdId-1);
-					DBGMSG_INFO("Send Can %d", StdId-1);
-					DBGMSG_INFO("Send Can %d", StdId-1);
+					HAL_StatusTypeDef stat = CAN_write(&txMSg);
+					DBGMSG_INFO("Send Can %d. %d", StdId-1, stat);
 				}
 				break;
 			case EVENT_CAN:
 				if (event.subType.can == ES_CAN_RX) {
 					CanRxMsgTypeDef *rx = event.data.can.rxMsg;
 					if (rx->StdId == 0x135) {
-//						sprintf(buffer, "Rx Can %d on %lu", rx->Data[0], System_getUptime());
-//						infoWdt.setText(buffer);
+						sprintf(buffer, "Rx Can %d on %lu", rx->Data[0], System_getUptime());
+						infoWdt.setText(buffer);
 					}
 				}
 				CAN_handleEvent(&event);
@@ -93,7 +89,7 @@ int main(int argc, char* argv[]) {
 			default:
 				break;
 		}
-//		baseLayer.render();
+		baseLayer.render();
 	}
 
 	return 0;

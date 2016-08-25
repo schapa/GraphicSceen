@@ -65,10 +65,10 @@ void Trace_dataAsync(char *buff, size_t size) {
 		elt->next = NULL;
 		elt->string = buff;
 		elt->size = size;
-		send = true;
-		if (!s_traceHead)
+		if (!s_traceHead) {
 			s_traceHead = s_traceTail = elt;
-		else {
+			send = true;
+		} else {
 			s_traceTail->next = elt;
 			s_traceTail = elt;
 		}
@@ -80,6 +80,26 @@ void Trace_dataAsync(char *buff, size_t size) {
 	if (s_tracerHandle && send) {
 		sendNextItem();
 	}
+}
+
+void Trace_dataAsyncFlush(void) {
+	if (s_traceHead) {
+		HAL_USART_DMAStop(s_tracerHandle);
+		while (s_traceHead) {
+			HAL_USART_Transmit(s_tracerHandle, (uint8_t*)s_traceHead->string, s_traceHead->size, 0xFF);
+			traceNode_p cur = s_traceHead;
+			s_traceHead = cur->next;
+			MEMMAN_free(cur->string);
+			MEMMAN_free(cur);
+		}
+	}
+}
+
+void Trace_dataSync(const char *buff, size_t size) {
+	if (!buff || !size)
+		return;
+	Trace_dataAsyncFlush();
+	HAL_USART_Transmit(s_tracerHandle, (uint8_t*)buff, size, 0xFF);
 }
 
 _Bool Trace_onTxComplete(USART_HandleTypeDef *handle) {
@@ -101,13 +121,6 @@ _Bool Trace_onTxComplete(USART_HandleTypeDef *handle) {
 		handled = true;
 	}
 	return handled;
-}
-
-int trace_write_usart_blocking(const char *buf, size_t nbyte) {
-	if (s_tracerHandle) {
-		HAL_USART_Transmit(s_tracerHandle, (uint8_t*)buf, nbyte, 0xFF);
-	}
-	return nbyte;
 }
 
 void USART1_IRQHandler(void) {

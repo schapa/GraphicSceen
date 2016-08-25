@@ -19,7 +19,7 @@ extern "C" {
 
 #define BSP_TICKS_PER_SECOND 1000
 
-void BSP_Init(void);
+HAL_StatusTypeDef BSP_Init(void);
 
 void BSP_queuePush(Event_p pEvent);
 void BSP_pendEvent(Event_p pEvent);

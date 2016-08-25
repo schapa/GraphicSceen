@@ -51,6 +51,7 @@ HAL_StatusTypeDef CAN_init(CAN_HandleTypeDef *handle) {
 	if (handle) {
 		MEMMAN_free(handle->pRxMsg);
 		MEMMAN_free(handle->pTxMsg);
+		handle->pRxMsg = handle->pTxMsg = NULL;
 		memset(handle, 0, sizeof(*handle));
 		handle->Instance = CAN1;
 		handle->Init = ifaceParams;
@@ -113,7 +114,8 @@ void CAN_handleEvent(Event_p event) {
 			MEMMAN_free(tx);
 			} break;
 		case ES_CAN_ERROR: {
-//			CAN_HandleTypeDef *hcan = event->data.can.hCan;
+			CAN_HandleTypeDef *hcan = event->data.can.hCan;
+			DBGMSG_ERR("CAN state %p errno %d", HAL_CAN_GetState(hcan), HAL_CAN_GetError(hcan));
 //			DBGMSG_ERR("id [%d] state %p errno %d",
 //					HELP_getCanIdByHandle(hcan), HAL_CAN_GetState(hcan), HAL_CAN_GetError(hcan));
 			break;
@@ -129,6 +131,7 @@ void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan) {
 						.txMsg = hcan->pTxMsg
 				}
 		};
+		hcan->pTxMsg = NULL;
 		BSP_queuePush(&event);
 	}
 }
@@ -141,8 +144,8 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan) {
 						.rxMsg = hcan->pRxMsg
 				}
 		};
-		BSP_queuePush(&event);
 		hcan->pRxMsg = MEMMAN_malloc(sizeof(*hcan->pRxMsg));
+		BSP_queuePush(&event);
 		HAL_CAN_Receive_IT(hcan, CAN_FIFO0);
 	}
 }
@@ -167,4 +170,20 @@ void CAN1_RX1_IRQHandler(void) {
 }
 void CAN1_SCE_IRQHandler(void) {
 	HAL_CAN_IRQHandler(s_can1Handle);
+}
+
+void CAN_EMULATE_RX(void) {
+	CanRxMsgTypeDef *msg = MEMMAN_malloc(sizeof(CanRxMsgTypeDef));
+	if (msg) {
+		Event_t event = { EVENT_CAN, { ES_CAN_RX },
+				.data.can = {
+						s_can1Handle,
+						.rxMsg = msg
+				}
+		};
+		msg->DLC = 8;
+		msg->StdId = 0x50;
+		msg->IDE = CAN_ID_STD;
+		BSP_queuePush(&event);
+	}
 }
