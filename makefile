@@ -22,6 +22,6 @@ firmware emulator:
 
 clean::
 	$(MAKE) -f firmware.mk $@
-#	$(MAKE) -f emulator.mk $@
+	$(MAKE) -f emulator.mk $@
 	
 include build.mk

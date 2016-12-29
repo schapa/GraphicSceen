@@ -8,16 +8,18 @@
 #include "dbg_trace.h"
 #include "system.h"
 #include "memman.h"
+
 #include <stdarg.h>
 #include <string.h>
-#include "tracer.h"
+#include <stdio.h>
 
 static char s_msgBuffer[4096];
 static int s_msgBufferSize = sizeof(s_msgBuffer);
 
+void Trace_dataAsync(char *buff, size_t size);
+
 void dbgmsg(const char *color, const char *siverity, const char *file, const char *func, int line, const char *fmt, ...) {
-	uint32_t primask = __get_PRIMASK();
-	__disable_irq();
+	uint32_t primask = System_Lock();
 
 	int occupied = 0;
 	if (line) {
@@ -45,9 +47,8 @@ void dbgmsg(const char *color, const char *siverity, const char *file, const cha
 	if (newBuff) {
 		memcpy((void*)newBuff, (void*)s_msgBuffer, occupied);
 	}
-	if (!primask) {
-		__enable_irq();
-	}
+	System_Unlock(primask);
+
 	if (newBuff) {
 		Trace_dataAsync(newBuff, occupied);
 	}

@@ -12,7 +12,6 @@
 extern "C" {
 #endif
 
-#include "diag/Trace.h"
 #include "dbg_base.h"
 
 #define DBGMSG_L_COLOR ANSI_ESC_COLOR_BLUE
