@@ -19,27 +19,22 @@ extern "C" {
 
 #define BSP_TICKS_PER_SECOND 1000
 
-HAL_StatusTypeDef BSP_Init(void);
+_Bool BSP_Init(void);
 
 void BSP_queuePush(Event_p pEvent);
 void BSP_pendEvent(Event_p pEvent);
 _Bool BSP_queueIsEventPending(Event_p pEvent);
 
-void OLED_GpioInitParallel(void);
-void OLED_ResetParallel(_Bool state);
-void OLED_WriteParallel(uint8_t val);
-uint8_t OLED_ReadParallel(void);
-void OLED_CmdParallel(uint8_t val);
+void BSP_LedRedSet(const _Bool state);
+void BSP_LedGreenSet(const _Bool state);
 
-void OLED_GpioInitSpi(void);
-void OLED_ResetSpi(_Bool state);
-void OLED_CsSpi(_Bool state);
-void OLED_WriteSpi(uint8_t *buff, uint16_t size);
-void OLED_CmdSpi(uint8_t val);
-void OLED_drawSurface(uint8_t *line, uint16_t heigth, uint8_t bytesPerLine);
+void BSP_LcdInit(void);
+void BSP_LcdReset(const _Bool state);
+void BSP_LcdCs(const _Bool state);
+void BSP_LcdWrite(const uint8_t *buff, uint16_t size);
+void BSP_LcdCmd(const uint8_t val);
+void BSP_LcdDrawSurface(const uint8_t *line, const uint16_t heigth, const uint8_t bytesPerLine);
 
-void BSP_LedRedSet(FunctionalState state);
-void BSP_LedGreenSet(FunctionalState state);
 
 #ifdef __cplusplus
 }

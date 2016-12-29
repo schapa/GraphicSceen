@@ -20,7 +20,8 @@
 
 static CAN_HandleTypeDef *s_can1Handle = NULL;
 
-HAL_StatusTypeDef CAN_init(CAN_HandleTypeDef *handle) {
+_Bool CAN_init(void *data) {
+	CAN_HandleTypeDef *handle = data;
 
 	HAL_StatusTypeDef result = HAL_ERROR;
 	const uint32_t baudRate = 125000;
@@ -51,7 +52,8 @@ HAL_StatusTypeDef CAN_init(CAN_HandleTypeDef *handle) {
 	if (handle) {
 		MEMMAN_free(handle->pRxMsg);
 		MEMMAN_free(handle->pTxMsg);
-		handle->pRxMsg = handle->pTxMsg = NULL;
+		handle->pRxMsg = NULL;
+		handle->pTxMsg = NULL;
 		memset(handle, 0, sizeof(*handle));
 		handle->Instance = CAN1;
 		handle->Init = ifaceParams;
@@ -68,23 +70,35 @@ HAL_StatusTypeDef CAN_init(CAN_HandleTypeDef *handle) {
 		}
 		s_can1Handle = handle;
 	}
-	return result;
+	return result == HAL_OK;
 }
 
-HAL_StatusTypeDef CAN_write(CanTxMsgTypeDef *txMsg) {
-	HAL_StatusTypeDef status = HAL_ERROR;
-	size_t msgSize = sizeof(CanTxMsgTypeDef);
+_Bool CAN_write(const CanMsg_t *data) {
+	HAL_StatusTypeDef result = HAL_ERROR;
+	static const size_t msgSize = sizeof(CanTxMsgTypeDef);
+	if (!data)
+		return false;
+	CanTxMsgTypeDef txMsg = {
+		data->id,
+		data->id,
+		data->isExtended ? CAN_ID_EXT : CAN_ID_STD,
+		data->isRemoteFrame ? CAN_RTR_REMOTE : CAN_RTR_DATA,
+		data->isRemoteFrame ? 0 :
+				data->size > 8 ? 8 : data->size,
+	};
+
 	do {
-		if (!s_can1Handle || !txMsg)
+		if (!s_can1Handle)
 			break;
+		memcpy(txMsg.Data, data->buff, txMsg.DLC);
 		MEMMAN_free(s_can1Handle->pTxMsg);
 		s_can1Handle->pTxMsg = MEMMAN_malloc(msgSize);
 		if (!s_can1Handle->pTxMsg)
 			break;
-		memcpy(s_can1Handle->pTxMsg, txMsg, msgSize);
-		status = HAL_CAN_Transmit_IT(s_can1Handle);
+		memcpy(s_can1Handle->pTxMsg, &txMsg, msgSize);
+		result = HAL_CAN_Transmit_IT(s_can1Handle);
 	} while (0);
-	return status;
+	return result == HAL_OK;
 }
 
 void CAN_handleEvent(Event_p event) {

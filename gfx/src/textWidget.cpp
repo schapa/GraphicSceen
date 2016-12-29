@@ -21,4 +21,5 @@ TextWidget::TextWidget(const FontType &font, const uint8_t &textSize, const char
 }
 
 TextWidget::~TextWidget() {
+	delete shape;
 }

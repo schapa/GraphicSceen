@@ -9,11 +9,9 @@
 #define GFX_HPP_
 
 #include "surface.hpp"
-#include "shape.hpp"
-#include "textWidget.hpp"
 #include "layer.hpp"
 
-
-void drawSurface(uint8_t **line, uint16_t heigth, uint8_t bytesPerLine);
+#include "shape.hpp"
+#include "textWidget.hpp"
 
 #endif /* GFX_HPP_ */

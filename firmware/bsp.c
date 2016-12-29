@@ -21,7 +21,7 @@ static USART_HandleTypeDef s_traceUsart;
 static DMA_HandleTypeDef s_traceTxDma;
 static CAN_HandleTypeDef s_can1;
 
-HAL_StatusTypeDef BSP_Init(void) {
+_Bool BSP_Init(void) {
 	USART_HandleTypeDef *pTraceUsart = &s_traceUsart;
 	DMA_HandleTypeDef *pTraceTxDma = &s_traceTxDma;
 	HAL_StatusTypeDef initResult = HAL_OK;
@@ -31,13 +31,12 @@ HAL_StatusTypeDef BSP_Init(void) {
 
 	PWM_Init();
 	PWM_Configure(TIM_CHANNEL_1, 30);
-//	OLED_GpioInitParallel();
-	OLED_GpioInitSpi();
+	BSP_LcdInit();
 	SSD1322_InitDisplay();
 
 	initResult &= Trace_InitUSART1(pTraceUsart, pTraceTxDma);
 	initResult &= CAN_init(&s_can1);
-	return initResult;
+	return initResult == HAL_OK;
 }
 
 void BSP_queuePush(Event_p pEvent) {
@@ -64,13 +63,13 @@ _Bool BSP_queueIsEventPending(Event_p pEvent) {
 	return !!s_eventQueue;
 }
 
-void BSP_LedRedSet(FunctionalState state) {
-	GPIO_PinState val = (state == DISABLE) ? GPIO_PIN_RESET : GPIO_PIN_SET;
+void BSP_LedRedSet(const _Bool state) {
+	GPIO_PinState val = state ? GPIO_PIN_SET : GPIO_PIN_RESET;
 	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_14, val);
 }
 
-void BSP_LedGreenSet(FunctionalState state) {
-	GPIO_PinState val = (state == DISABLE) ? GPIO_PIN_RESET : GPIO_PIN_SET;
+void BSP_LedGreenSet(const _Bool state) {
+	GPIO_PinState val = state ? GPIO_PIN_SET : GPIO_PIN_RESET;
 	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, val);
 }
 

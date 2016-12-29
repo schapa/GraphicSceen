@@ -5,7 +5,6 @@
  *      Author: shapa
  */
 
-//#include "usartWrapper.h"
 #include "dbg_trace.h"
 #include "system.h"
 #include "memman.h"

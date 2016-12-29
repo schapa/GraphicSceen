@@ -5,16 +5,6 @@
  *      Author: shapa
  */
 
-
-
-
-/*
- * bsp.c
- *
- *  Created on: May 18, 2016
- *      Author: shapa
- */
-
 #include "stm32f4xx_hal.h"
 #include <stdbool.h>
 #include "bsp.h"
@@ -27,30 +17,30 @@ static void initGPIO_Oled(void);
 static void initSpi_Oled(void);
 static void setDataMode(_Bool mode);
 
-void OLED_GpioInitSpi(void) {
+void BSP_LcdInit(void) {
 	initGPIO_Oled();
-	OLED_ResetSpi(false);
-	OLED_CsSpi(false);
+	BSP_LcdReset(false);
+	BSP_LcdCs(false);
 	initSpi_Oled();
 }
-void OLED_ResetSpi(_Bool state) {
+void BSP_LcdReset(_Bool state) {
 	GPIO_PinState val = state ? GPIO_PIN_RESET : GPIO_PIN_SET;
 	HAL_GPIO_WritePin(GPIOF, GPIO_PIN_7, val);
 }
-void OLED_CsSpi(_Bool state) {
+void BSP_LcdCs(_Bool state) {
 	GPIO_PinState val = state ? GPIO_PIN_RESET : GPIO_PIN_SET;
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, val);
 }
-void OLED_WriteSpi(uint8_t *buff, uint16_t size) {
+void BSP_LcdWrite(const uint8_t *buff, uint16_t size) {
 	setDataMode(true);
-	HAL_SPI_Transmit(&s_spi, buff, size, 0xFFFF);
+	HAL_SPI_Transmit(&s_spi, (uint8_t*)buff, size, 0xFFFF);
 }
-void OLED_CmdSpi(uint8_t val) {
+void BSP_LcdCmd(uint8_t val) {
 	setDataMode(false);
 	HAL_SPI_Transmit(&s_spi, &val, 1, 0xFFFF);
 }
 
-void OLED_drawSurface(uint8_t *line, uint16_t heigth, uint8_t bytesPerLine) {
+void BSP_LcdDrawSurface(const uint8_t *line, const uint16_t heigth, const uint8_t bytesPerLine) {
     uint32_t i = 0;
     uint32_t j = 0;
     const uint8_t offset = 27;
@@ -58,15 +48,15 @@ void OLED_drawSurface(uint8_t *line, uint16_t heigth, uint8_t bytesPerLine) {
 	SSD1322_SetColumnRange(offset +1, offset + heigth);
 	SSD1322_SetRowRange(0, 70);
 
-	OLED_CsSpi(true);
-	OLED_CmdSpi(SSD1322_WRITE_RAM);
+	BSP_LcdCs(true);
+	BSP_LcdCmd(SSD1322_WRITE_RAM);
 	for (i = 0; i < heigth; i++) {
 		for (j = 0; j < bytesPerLine; j++) {
 			buffer[j] = line[i*bytesPerLine + j];
 		}
-		OLED_WriteSpi(buffer, bytesPerLine);
+		BSP_LcdWrite(buffer, bytesPerLine);
 	}
-	OLED_CsSpi(false);
+	BSP_LcdCs(false);
 }
 
 static void initGPIO_Oled(void) {

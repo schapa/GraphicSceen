@@ -6,12 +6,22 @@ extern "C" {
 
 
 #include "stm32f4xx_hal.h"
+#include <stdbool.h>
+#include <stdint.h>
 #include "Queue.h"
 
-HAL_StatusTypeDef CAN_init(CAN_HandleTypeDef *handle);
-HAL_StatusTypeDef CAN_write(CanTxMsgTypeDef *txMsg);
+typedef struct {
+	uint32_t id;
+	_Bool isExtended;
+	_Bool isRemoteFrame;
+	size_t size;
+	uint8_t buff[8];
+} CanMsg_t;
 
-void CAN_handleEvent(Event_p event);
+_Bool CAN_init(void *handle);
+_Bool CAN_write(const CanMsg_t *data);
+
+void CAN_handleEvent(const Event_p event);
 
 #ifdef __cplusplus
 }

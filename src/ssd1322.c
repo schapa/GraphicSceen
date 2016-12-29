@@ -12,39 +12,16 @@
 #define COLUMN_MAX 119
 #define ROW_MAX 127
 
-#define Delay System_delayMsDummy
-#if 0
-	#define Reset OLED_ResetParallel
-	//#define CS 1
-	#define CMD OLED_CmdParallel
-	#define Data OLED_WriteParallel
-#else
-	#define Reset OLED_ResetSpi
-	#define CS OLED_CsSpi
-	#define CMD OLED_CmdSpi
-	#define Data OLED_WriteSpi
-#endif
-
-#ifndef Delay
-#define Delay(...)
-#endif
-#ifndef Reset
-#define Reset(...)
-#endif
-#ifndef CS
-#define CS(...)
-#endif
-#ifndef CMD
-#define CMD(...)
-#endif
-#ifndef Data
-#define Data(...)
-#endif
+static void (*Delay)(uint32_t delay) = System_delayMsDummy;
+static void (*Reset)(_Bool state) = BSP_LcdReset;
+static void (*CS)(_Bool state) = BSP_LcdCs;
+static void (*CMD)(uint8_t val) = BSP_LcdCmd;
+static void (*Data)(const uint8_t *buff, uint16_t size) = BSP_LcdWrite;
 
 static void UpdateGrayScaleTable(void);
 
 static void SendCmd_Simple(uint8_t cmd);
- void SendCmd_One(uint8_t cmd, uint8_t val);
+static void SendCmd_One(uint8_t cmd, uint8_t val);
 static void SendCmd_Two(uint8_t cmd, uint8_t valA, uint8_t valB);
 
 void SSD1322_InitDisplay(void) {
@@ -76,7 +53,9 @@ void SSD1322_InitDisplay(void) {
 
 	SendCmd_Simple(SSD1322_SET_DISPLAY_ON_TEST);
 	SendCmd_Simple(SSD1322_SET_DISPLAY_ON_NORMAL);
-//	UpdateGrayScaleTable();
+	//todo: check
+	if (0)
+		UpdateGrayScaleTable();
 }
 
 void SSD1322_SetCmdLock(_Bool state) {

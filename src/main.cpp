@@ -1,5 +1,6 @@
 
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -25,7 +26,7 @@ int main(int argc, char* argv[]) {
 	(void)argc;
 	(void)argv;
 
-	HAL_StatusTypeDef status = BSP_Init();
+	_Bool status = BSP_Init();
 	SSD1322_ClearDisplay();
 	DBGMSG_INFO("\nStart. Init %d", status);
 
@@ -63,16 +64,14 @@ int main(int argc, char* argv[]) {
 					sprintf(buffer, "Uptime is %lu", System_getUptime());
 					testWdt.setText(buffer);
 					static uint32_t StdId = 0x50;
-					CanTxMsgTypeDef txMSg = {
+					CanMsg_t msg = {
 							StdId++,
-							0,
-							CAN_ID_STD, // CAN_ID_EXT
-							CAN_RTR_DATA, // CAN_RTR_REMOTE
+							false,
+							false,
 							8,
 							{ 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }
-
 					};
-					HAL_StatusTypeDef stat = CAN_write(&txMSg);
+					_Bool stat = CAN_write(&msg);
 					DBGMSG_INFO("Send Can %d. %d", StdId-1, stat);
 				}
 				break;

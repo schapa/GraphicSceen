@@ -7,7 +7,6 @@
 
 #include "Queue.h"
 #include <stdlib.h>
-#include "stm32f4xx_hal.h"
 #include "memman.h"
 
 static EventQueue_p newNode(Event_p pEvent);

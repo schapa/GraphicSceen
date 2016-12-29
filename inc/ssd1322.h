@@ -50,11 +50,6 @@ typedef enum {
 
 } SSD1322_command_t;
 
-
-typedef void (*iFaceSelect_t) (_Bool val);
-typedef void (*iFaceWrite_t) (uint8_t val);
-typedef void (*iFaceDalayMs_t) (uint32_t val);
-
 void SSD1322_InitDisplay(void);
 void SSD1322_SetCmdLock(_Bool state);
 void SSD1322_SetColumnRange(uint8_t start, uint8_t end);
