@@ -1,56 +1,72 @@
 /*
  * Queue.c
  *
- *  Created on: Apr 20, 2016
- *      Author: shapa
+ *	Created on: Apr 20, 2016
+ *		Author: shapa
  */
 
 #include "Queue.h"
 #include <stdlib.h>
+#include <string.h>
+#include "system.h"
 #include "memman.h"
 
-static EventQueue_p newNode(Event_p pEvent);
+typedef struct Node {
+	struct Node *next;
+	Event_t evt;
+} Node_t;
 
-EventQueue_p Queue_pushEvent(EventQueue_p pQueue, Event_p pEvent) {
-	do {
-		if (!pEvent)
-			break;
-		if (!pQueue) {
-			pQueue = newNode(pEvent);
-			break;
-		}
-		EventQueue_p node = newNode(pEvent);
-		if (!node)
-			break;
-		if (pQueue->last) {
-			pQueue->last->next = node;
-			pQueue->last = node;
-		} else {
-			pQueue->last = node;
-			pQueue->next = pQueue->last;
-		}
-	} while (0);
-	return pQueue;
-}
+struct {
+	Node_t *head;
+} s_queue;
 
-EventQueue_p Queue_getEvent(EventQueue_p pQueue, Event_p pEvent) {
-	if (!pQueue || !pEvent)
-		return pQueue;
-	do {
-		EventQueue_p cur = pQueue;
-		*pEvent = pQueue->event;
-		pQueue = pQueue->next;
-		MEMMAN_free(cur);
-	} while (0);
-	return pQueue;
-}
+static Node_t *newNode(EventTypes_e type, void *data, onEvtDispose_f dispose);
+static Node_t *getTail(Node_t *node);
 
-static EventQueue_p newNode(Event_p pEvent) {
-	EventQueue_p node = MEMMAN_malloc(sizeof(EventQueue_t));
-	if (node) {
-		node->event = *pEvent;
-		node->next = NULL;
-		node->last = NULL;
+void EventQueue_Push(EventTypes_e type, void *data, onEvtDispose_f dispose) {
+	if (!s_queue.head) {
+		s_queue.head = newNode(type, data, dispose);
+	} else {
+		Node_t *tail = getTail(s_queue.head);
+		if (!tail)
+			return;
+		Node_t *node = newNode(type, data, dispose);
+		if (node)
+			tail->next = node;
 	}
+}
+
+void EventQueue_Pend(Event_t *event) {
+	while (!s_queue.head)
+		System_Poll();
+
+	event ?
+		*event = s_queue.head->evt :
+		EventQueue_Dispose(&s_queue.head->evt);
+	s_queue.head = s_queue.head->next;
+}
+
+void EventQueue_Dispose(Event_t *event) {
+	if (event && event->dispose) {
+		event->dispose(event->data);
+		event->data = NULL;
+		event->dispose = NULL;
+	}
+}
+
+static Node_t *newNode(EventTypes_e type, void *data, onEvtDispose_f dispose) {
+	Node_t *node = MEMMAN_malloc(sizeof(node));
+	if (node){
+		node->evt.type = type;
+		node->evt.data = data;
+		node->evt.dispose = dispose;
+		node->next = NULL;
+	}
+	return node;
+}
+
+static Node_t *getTail(Node_t *node) {
+	while (node && node->next)
+		node = node->next;
 	return node;
 }

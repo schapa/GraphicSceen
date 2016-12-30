@@ -38,6 +38,7 @@ void System_delayMsDummy(uint32_t delay);
 
 int System_Lock(void);
 void System_Unlock(int primask);
+void System_Poll(void);
 
 #ifdef __cplusplus
 }

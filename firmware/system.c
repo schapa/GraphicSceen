@@ -19,3 +19,7 @@ void System_Unlock(int primask) {
 		__enable_irq();
 	}
 }
+
+void System_Poll(void) {
+    __WFI();
+}

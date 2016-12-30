@@ -10,6 +10,18 @@
 #include "bsp.h"
 #include "memman.h"
 
+typedef enum {
+	USART_EVENT_RX,
+	USART_EVENT_TX,
+	USART_EVENT_RXTX,
+	USART_EVENT_ERROR
+} UsartEventType_e;
+
+typedef struct {
+	UsartEventType_e type;
+	void *handle;
+} UsartMsg_t;
+
 typedef struct traceNode {
 	struct traceNode *next;
 	char *string;
@@ -129,10 +141,10 @@ void USART1_IRQHandler(void) {
 
 void HAL_USART_TxCpltCallback(USART_HandleTypeDef *husart) {
 	if (!Trace_onTxComplete(husart)) {
-		Event_t event = { EVENT_USART, { ES_UxART_TX },
-				.data.uxart.hUsart = husart
-		};
-		BSP_queuePush(&event);
+		EventQueue_Push(
+				EVENT_USART,
+				NULL, //UsartMsg_t(USART_EVENT_TX, husart, ...)
+				NULL);
 	}
 }
 

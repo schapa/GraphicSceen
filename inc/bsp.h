@@ -21,10 +21,6 @@ extern "C" {
 
 _Bool BSP_Init(void);
 
-void BSP_queuePush(Event_p pEvent);
-void BSP_pendEvent(Event_p pEvent);
-_Bool BSP_queueIsEventPending(Event_p pEvent);
-
 void BSP_LedRedSet(const _Bool state);
 void BSP_LedGreenSet(const _Bool state);
 

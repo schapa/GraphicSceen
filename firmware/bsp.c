@@ -16,7 +16,6 @@
 
 static void initGPIO_LED(void);
 
-static volatile EventQueue_p s_eventQueue;
 static USART_HandleTypeDef s_traceUsart;
 static DMA_HandleTypeDef s_traceTxDma;
 static CAN_HandleTypeDef s_can1;
@@ -37,30 +36,6 @@ _Bool BSP_Init(void) {
 	initResult &= Trace_InitUSART1(pTraceUsart, pTraceTxDma);
 	initResult &= CAN_init(&s_can1);
 	return initResult == HAL_OK;
-}
-
-void BSP_queuePush(Event_p pEvent) {
-	uint32_t primask = __get_PRIMASK();
-	__disable_irq();
-	s_eventQueue = Queue_pushEvent(s_eventQueue, pEvent);
-	if (!primask) {
-		__enable_irq();
-	}
-}
-
-void BSP_pendEvent(Event_p pEvent) {
-	while (!s_eventQueue);
-	uint32_t primask = __get_PRIMASK();
-	__disable_irq();
-	s_eventQueue = Queue_getEvent(s_eventQueue, pEvent);
-	if (!primask) {
-		__enable_irq();
-	}
-}
-
-_Bool BSP_queueIsEventPending(Event_p pEvent) {
-	s_eventQueue = Queue_getEvent(s_eventQueue, pEvent);
-	return !!s_eventQueue;
 }
 
 void BSP_LedRedSet(const _Bool state) {

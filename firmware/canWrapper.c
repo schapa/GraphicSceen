@@ -13,12 +13,18 @@
 #include "bsp.h"
 #include "memman.h"
 #include "dbg_base.h"
+#include "Queue.h"
+
+#include "stm32f4xx_hal.h"
 
 #if 01
 #include "dbg_trace.h"
 #endif
 
 static CAN_HandleTypeDef *s_can1Handle = NULL;
+
+static CanMgsEvent_t *newEvent(CanEventType_e type, CanMsg_t *msg, uint32_t errCode);
+static void onEventDispose(void *data);
 
 _Bool CAN_init(void *data) {
 	CAN_HandleTypeDef *handle = data;
@@ -101,37 +107,32 @@ _Bool CAN_write(const CanMsg_t *data) {
 	return result == HAL_OK;
 }
 
-void CAN_handleEvent(Event_p event) {
+void CAN_handleEvent(const Event_t *event) {
 
 	if (!event)
 		return;
-	switch (event->subType.can) {
-		case ES_CAN_RX: {
-			CanRxMsgTypeDef *rx = event->data.can.rxMsg;
+	CanMgsEvent_t *evt = event->data;
+	switch (evt->type) {
+		case CAN_EVENT_RX: {
 			char buffer[256];
-			uint32_t id = rx->IDE ? rx->ExtId : rx->StdId;
 			int occupied = 0;
-			if (rx->RTR) {
-				occupied = snprintf(buffer, sizeof(buffer), "RTR [%p]", (void*)id);
-			} else {
-				occupied = snprintf(buffer, sizeof(buffer), "DLC [%p] = [", (void*)id);
-				for (uint32_t i = 0; i < rx->DLC; i++)
-					occupied += snprintf(&buffer[occupied], sizeof(buffer) - occupied, " %d", rx->Data[i]);
-				occupied += snprintf(&buffer[occupied], sizeof(buffer) - occupied, "] = %lu", rx->DLC);
+			if (evt->mgs->isRemoteFrame)
+				occupied = snprintf(buffer, sizeof(buffer), "RTR [%p]", (void*)evt->mgs->id);
+			else {
+				occupied = snprintf(buffer, sizeof(buffer), "DLC [%p] = [", (void*)evt->mgs->id);
+				for (uint32_t i = 0; i < evt->mgs->size; i++)
+					occupied += snprintf(&buffer[occupied], sizeof(buffer) - occupied, " %d", evt->mgs->buff[i]);
+				occupied += snprintf(&buffer[occupied], sizeof(buffer) - occupied, "] = %u", evt->mgs->size);
 			}
 			DBGMSG_INFO("Can %s", buffer);
-			MEMMAN_free(rx);
-			} break;
-		case ES_CAN_TX: {
-			CanTxMsgTypeDef *tx = event->data.can.txMsg;
-			DBGMSG_H("tx [%p] ok", tx->IDE ? tx->ExtId : tx->StdId);
-			MEMMAN_free(tx);
-			} break;
-		case ES_CAN_ERROR: {
-			CAN_HandleTypeDef *hcan = event->data.can.hCan;
-			DBGMSG_ERR("CAN state %p errno %d", HAL_CAN_GetState(hcan), HAL_CAN_GetError(hcan));
-//			DBGMSG_ERR("id [%d] state %p errno %d",
-//					HELP_getCanIdByHandle(hcan), HAL_CAN_GetState(hcan), HAL_CAN_GetError(hcan));
+			break;
+		}
+		case CAN_EVENT_TX: {
+			DBGMSG_H("tx [%p] ok",  (void*)evt->mgs->id);
+			break;
+		}
+		case CAN_EVENT_ERROR: {
+			DBGMSG_ERR("%d", evt->errCode);
 			break;
 		}
 	}
@@ -139,37 +140,41 @@ void CAN_handleEvent(Event_p event) {
 
 void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan) {
 	if (hcan && hcan->pTxMsg) {
-		Event_t event = { EVENT_CAN, { ES_CAN_TX },
-				.data.can = {
-						hcan,
-						.txMsg = hcan->pTxMsg
-				}
+		CanMsg_t mgs = {
+				hcan->pTxMsg->IDE == CAN_ID_STD ? hcan->pTxMsg->StdId : hcan->pTxMsg->ExtId,
 		};
 		hcan->pTxMsg = NULL;
-		BSP_queuePush(&event);
+		EventQueue_Push(
+				EVENT_CAN,
+				newEvent(CAN_EVENT_TX, &mgs, HAL_CAN_GetError(hcan)),
+				onEventDispose);
 	}
 }
 
 void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan) {
 	if (hcan && hcan->pRxMsg) {
-		Event_t event = { EVENT_CAN, { ES_CAN_RX },
-				.data.can = {
-						hcan,
-						.rxMsg = hcan->pRxMsg
-				}
+
+		CanMsg_t mgs = {
+				hcan->pRxMsg->IDE == CAN_ID_STD ? hcan->pTxMsg->StdId : hcan->pTxMsg->ExtId,
+				hcan->pRxMsg->IDE == CAN_ID_EXT,
+				hcan->pTxMsg->RTR == CAN_RTR_REMOTE,
+				hcan->pTxMsg->RTR == CAN_RTR_DATA ? hcan->pTxMsg->DLC : 0,
 		};
-		hcan->pRxMsg = MEMMAN_malloc(sizeof(*hcan->pRxMsg));
-		BSP_queuePush(&event);
+		memcpy(mgs.buff, hcan->pTxMsg->Data, mgs.size);
+		EventQueue_Push(
+				EVENT_CAN,
+				newEvent(CAN_EVENT_RX, &mgs, HAL_CAN_GetError(hcan)),
+				onEventDispose);
 		HAL_CAN_Receive_IT(hcan, CAN_FIFO0);
 	}
 }
 
 void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan) {
 	if (hcan) {
-		Event_t event = { EVENT_CAN, { ES_CAN_ERROR },
-				.data.can.hCan = hcan
-		};
-		BSP_queuePush(&event);
+		EventQueue_Push(
+				EVENT_CAN,
+				newEvent(CAN_EVENT_ERROR, NULL, HAL_CAN_GetError(hcan)),
+				onEventDispose);
 	}
 }
 
@@ -186,18 +191,31 @@ void CAN1_SCE_IRQHandler(void) {
 	HAL_CAN_IRQHandler(s_can1Handle);
 }
 
-void CAN_EMULATE_RX(void) {
-	CanRxMsgTypeDef *msg = MEMMAN_malloc(sizeof(CanRxMsgTypeDef));
-	if (msg) {
-		Event_t event = { EVENT_CAN, { ES_CAN_RX },
-				.data.can = {
-						s_can1Handle,
-						.rxMsg = msg
-				}
-		};
-		msg->DLC = 8;
-		msg->StdId = 0x50;
-		msg->IDE = CAN_ID_STD;
-		BSP_queuePush(&event);
+
+static CanMgsEvent_t *newEvent(CanEventType_e type, CanMsg_t *msg, uint32_t errCode) {
+	CanMgsEvent_t *evt = MEMMAN_malloc(sizeof(CanMgsEvent_t));
+	if (evt) {
+		evt->type = type;
+		if (type == CAN_EVENT_ERROR) {
+			evt->mgs = NULL;
+			evt->errCode = errCode;
+		} else {
+			evt->mgs = MEMMAN_malloc(sizeof(CanMsg_t));
+			if (evt->mgs)
+				*evt->mgs = *msg;
+			else {
+				MEMMAN_free(evt);
+				evt = NULL;
+			}
+		}
 	}
+	return evt;
 }
+
+static void onEventDispose(void *data) {
+	CanMgsEvent_t *arg = data;
+	MEMMAN_free(arg->mgs);
+	arg->mgs = NULL;
+	MEMMAN_free(arg);
+}
+

@@ -1,41 +1,39 @@
 /*
  * Queue.h
  *
- *  Created on: Apr 20, 2016
+ *  Created on: Oct 13, 2016
  *      Author: shapa
  */
 
 #ifndef QUEUE_H_
 #define QUEUE_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdint.h>
 #include <stdbool.h>
 #include "Events.h"
 
-typedef struct Event Event_t, *Event_p;
-typedef struct Queue EventQueue_t, *EventQueue_p;
+/**
+ * @brief Push event to Queue
+ * @param[in] type     event type
+ * @param[in] data     data for event. This must be static or allocated and must NOT be a pointer to stack data
+ * @param[in] dispose  dispose method. Could be Null
+ *
+ * \note uses Ql_OS_SendMessage if there is no messages in queue.
+ * This allow task to get out of pending
+ */
+void EventQueue_Push(EventTypes_e type, void *data, onEvtDispose_f dispose);
 
-struct Event {
-	EventTypes_t type;
-	EventSubTypes_t subType;
-	EventDataTypes_t data;
-};
+/**
+ * @brief Pend event on Queue
+ * @param[out] pointer to event
+ *
+ * \note uses Ql_OS_GetMessage when queue is empty, so could lock
+ */
+void EventQueue_Pend(Event_t *event);
 
-struct Queue {
-	Event_t event;
-	EventQueue_p next;
-	EventQueue_p last;
-};
-
-EventQueue_p Queue_pushEvent(EventQueue_p pQueue, Event_p pEvent);
-EventQueue_p Queue_getEvent(EventQueue_p pQueue, Event_p pEvent);
-
-#ifdef __cplusplus
-}
-#endif
+/**
+ * @brief Dispose event
+ */
+void EventQueue_Dispose(Event_t *event);
 
 #endif /* QUEUE_H_ */

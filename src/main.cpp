@@ -8,6 +8,7 @@
 #include "canWrapper.h"
 
 #include "bsp.h"
+#include "Queue.h"
 #include "system.h"
 #include "ssd1322.h"
 #include "gfx.hpp"
@@ -57,37 +58,37 @@ int main(int argc, char* argv[]) {
 	char buffer[128];
 	while(1) {
 		Event_t event;
-		BSP_pendEvent(&event);
+		EventQueue_Pend(&event);
 		switch (event.type) {
-			case EVENT_SYSTICK:
-				if (event.subType.systick == ES_SYSTICK_SECOND_ELAPSED) {
-					sprintf(buffer, "Uptime is %lu", System_getUptime());
-					testWdt.setText(buffer);
-					static uint32_t StdId = 0x50;
-					CanMsg_t msg = {
-							StdId++,
-							false,
-							false,
-							8,
-							{ 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }
-					};
-					_Bool stat = CAN_write(&msg);
-					DBGMSG_INFO("Send Can %d. %d", StdId-1, stat);
-				}
+			case EVENT_SYSTICK: {
+				sprintf(buffer, "Uptime is %lu", System_getUptime());
+				testWdt.setText(buffer);
+				static uint32_t StdId = 0x50;
+				CanMsg_t msg = {
+						StdId++,
+						false,
+						false,
+						8,
+						{ 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }
+				};
+				_Bool stat = CAN_write(&msg);
+				DBGMSG_INFO("Send Can %d. %d", StdId-1, stat);
 				break;
+			}
 			case EVENT_CAN:
-				if (event.subType.can == ES_CAN_RX) {
-					CanRxMsgTypeDef *rx = event.data.can.rxMsg;
-					if (rx->StdId == 0x135) {
-						sprintf(buffer, "Rx Can %d on %lu", rx->Data[0], System_getUptime());
-						infoWdt.setText(buffer);
-					}
-				}
+//				if (event.subType.can == ES_CAN_RX) {
+//					CanRxMsgTypeDef *rx = event.data.can.rxMsg;
+//					if (rx->StdId == 0x135) {
+//						sprintf(buffer, "Rx Can %d on %lu", rx->Data[0], System_getUptime());
+//						infoWdt.setText(buffer);
+//					}
+//				}
 				CAN_handleEvent(&event);
 				break;
 			default:
 				break;
 		}
+		EventQueue_Dispose(&event);
 		baseLayer.render();
 	}
 
