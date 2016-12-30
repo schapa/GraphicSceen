@@ -6,17 +6,27 @@
  */
 
 #include <stdint.h>
+#include <stdbool.h>
+#include <unistd.h>
+
+#include "canWrapper.h"
 
 
-void BSP_LcdReset(const _Bool state) {
+ssize_t trace_write(const char* buf, size_t nbyte) {
+	return write(STDOUT_FILENO, buf, nbyte);
 
 }
-void BSP_LcdCs(const _Bool state) {
+
+
+void DiscoLCDInit(uint8_t *buff) {
 
 }
-void BSP_LcdWrite(const uint8_t *buff, uint16_t size) {
 
+
+_Bool CAN_write(const CanMsg_t *data) {
+	return true;
 }
-void BSP_LcdCmd(const uint8_t val) {
+
+void CAN_handleEvent(const Event_t *event) {
 
 }

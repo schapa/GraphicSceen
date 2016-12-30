@@ -14,6 +14,7 @@ SRC += \
 	./emulator/bsp.c \
 	./emulator/system.c \
 	./emulator/emulator.c \
+	./emulator/cortex.c \
 
 # emulator specific CFLAGS
 CFLAGS += \
