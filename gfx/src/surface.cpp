@@ -42,10 +42,6 @@ GfxSurface::~GfxSurface(void) {
 }
 
 void GfxSurface::fill(uint32_t val) {
-	if (!val) {
-		memset(line, 0, heigth*bytesPerLine);
-		return;
-	}
 	switch (bitsDepth) {
 		case ColorDepth_4:
 			val &= 0x0F;
@@ -219,9 +215,10 @@ void GfxSurface::create(void) {
 //		assert() here
 		return;
 	}
-	bytesPerPixel = (bitsDepth == ColorDepth_4) ? 1 : bitsDepth/8;
+	bytesPerPixel = ColorDepth_4/8;
 
-	bytesPerLine = width*bytesPerPixel /*+ width%(bitsDepth/8)*/;
+	bytesPerLine = (bitsDepth == ColorDepth_4) ?
+			width/2 + width%2 : width*bytesPerPixel /*+ width%(bitsDepth/8)*/;
 	line = (uint8_t*)malloc(heigth * bytesPerLine);
 	if (line) {
 		fill(0);
@@ -232,7 +229,7 @@ ColorDepth GfxSurface::format2depth(const PixelFormat &fmt) {
 	ColorDepth depth = ColorDepth_32;
 	switch (fmt) {
 		case PixelFormat_GrayScale:
-			depth = ColorDepth_8; //TODO:
+			depth = ColorDepth_4; //TODO:
 			break;
 		case PixelFormat_ARGB8888:
 			depth = ColorDepth_32;

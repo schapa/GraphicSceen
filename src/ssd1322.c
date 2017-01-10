@@ -88,6 +88,25 @@ void SSD1322_ClearDisplay(void) {
 	CS(false);
 }
 
+void SSD1322_DrawSurface(const uint8_t *line, const uint16_t heigth, const uint8_t bytesPerLine) {
+    uint32_t i = 0;
+    uint32_t j = 0;
+    const uint8_t offset = 27;
+    uint8_t buffer[128];
+	SSD1322_SetColumnRange(offset +1, offset + heigth);
+	SSD1322_SetRowRange(0, 70);
+
+	CS(true);
+	SendCmd_Simple(SSD1322_WRITE_RAM);
+	for (i = 0; i < heigth; i++) {
+		for (j = 0; j < bytesPerLine; j++) {
+			buffer[j] = line[i*bytesPerLine + j];
+		}
+		Data(buffer, bytesPerLine);
+	}
+	CS(false);
+}
+
 static void UpdateGrayScaleTable(void) {
 	uint8_t i;
 	const uint8_t grayScaleMax = 180;

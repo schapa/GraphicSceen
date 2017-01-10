@@ -29,8 +29,6 @@ void BSP_LcdReset(const _Bool state);
 void BSP_LcdCs(const _Bool state);
 void BSP_LcdWrite(const uint8_t *buff, uint16_t size);
 void BSP_LcdCmd(const uint8_t val);
-void BSP_LcdDrawSurface(const uint8_t *line, const uint16_t heigth, const uint8_t bytesPerLine);
-
 
 #ifdef __cplusplus
 }

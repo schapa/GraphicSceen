@@ -12,6 +12,7 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <cairo.h>
 #include <gtk/gtk.h>
@@ -75,7 +76,7 @@ static void createWidgets(void) {
 	gtk_widget_override_background_color(g_draw_widget, GTK_STATE_FLAG_NORMAL, &white);
 	gtk_widget_set_size_request(g_draw_widget, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	//gtk_drawing_area_size (GTK_DRAWING_AREA (darea), 200, 200);
+//	gtk_drawing_area_size (GTK_DRAWING_AREA (g_draw_widget), SCREEN_WIDTH, SCREEN_HEIGHT);
 	gtk_box_pack_start(GTK_BOX(vbox), g_draw_widget, TRUE, TRUE, 0);
 	gtk_widget_show(g_draw_widget);
 
@@ -121,17 +122,18 @@ static void onButtonReleased(GtkWidget *widget, gpointer param1) {
 
 static gboolean onDrawEvent(GtkWidget *widget, cairo_t *cr, gpointer arg) {
 
-//	static uint8_t buffer[SCREEN_SIZE];
-//	int stride = cairo_format_stride_for_width(CAIRO_FORMAT_A1, SCREEN_WIDTH);
+	static uint8_t buffer[SCREEN_WIDTH*SCREEN_HEIGHT];
+	printf("Draw\n");
+	int stride = cairo_format_stride_for_width(CAIRO_FORMAT_A8, SCREEN_WIDTH);
 	G_LOCK(s_lock);
-//	fixBuffer(Screen_GetFB(0), buffer);
-//
-//	cairo_surface_t * sf = cairo_image_surface_create_for_data(buffer,
-//			CAIRO_FORMAT_A1, SCREEN_WIDTH, SCREEN_HEIGHT, stride);
-//	cairo_set_source_surface(cr, sf, 0, 0);
-//	cairo_paint(cr);
-//	cairo_fill(cr);
-//	cairo_surface_destroy(sf);
+	memset(buffer, 0x1F, SCREEN_SIZE);
+
+	cairo_surface_t * sf = cairo_image_surface_create_for_data(buffer,
+			CAIRO_FORMAT_A8, SCREEN_WIDTH, SCREEN_HEIGHT, stride);
+	cairo_set_source_surface(cr, sf, 0, 0);
+	cairo_paint(cr);
+	cairo_fill(cr);
+	cairo_surface_destroy(sf);
 	G_UNLOCK(s_lock);
 	return FALSE;
 }

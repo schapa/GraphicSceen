@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
 	SSD1322_ClearDisplay();
 	DBGMSG_INFO("\nStart. Init %d", status);
 
-	GfxLayer baseLayer(PixelFormat_RGB565, 240, 64);
+	GfxLayer baseLayer(PixelFormat_GrayScale, 256, 64);
 
 	DiscoLCDInit(baseLayer.getFrameBuffer());
 
@@ -39,9 +39,9 @@ int main(int argc, char* argv[]) {
 	TextWidget testWdt(FONT_CENTURY_SCOOLBOOK, 12, "H Hello [xxxx]");
 	TextWidget infoWdt(FONT_CENTURY_SCOOLBOOK, 12, "The quick brown fox jumps over the lazy dog");
 
-	timeWdt.setSurface(new GfxSurface(PixelFormat_RGB565, 240, 20));
-	testWdt.setSurface(new GfxSurface(PixelFormat_RGB565, 128, 20));
-	infoWdt.setSurface(new GfxSurface(PixelFormat_RGB565, 240, 20));
+	timeWdt.setSurface(new GfxSurface(PixelFormat_GrayScale, 240, 20));
+	testWdt.setSurface(new GfxSurface(PixelFormat_GrayScale, 128, 20));
+	infoWdt.setSurface(new GfxSurface(PixelFormat_GrayScale, 240, 20));
 
 	timeWdt.setVisible(true);
 	testWdt.setVisible(true);
@@ -90,6 +90,8 @@ int main(int argc, char* argv[]) {
 		}
 		EventQueue_Dispose(&event);
 		baseLayer.render();
+
+		SSD1322_DrawSurface(baseLayer.getFrameBuffer(), baseLayer.getHeigth(), baseLayer.getBytesPerLine());
 	}
 
 	return 0;

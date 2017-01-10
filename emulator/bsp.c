@@ -34,10 +34,11 @@ void BSP_LcdWrite(const uint8_t *buff, uint16_t size) {
 
 }
 void BSP_LcdCmd(const uint8_t val) {
-
+//	if (val == SSD1322_WRITE_RAM)
 }
 
 _Bool BSP_Init(void) {
+#if 0
 	static _Bool lock = false;
 	if (!lock) {
 		lock = true;
@@ -46,6 +47,7 @@ _Bool BSP_Init(void) {
 		exit(0);
 		return false;
 	}
+#endif
 	startSysTick();
 	System_setStatus(INFORM_IDLE);
 
