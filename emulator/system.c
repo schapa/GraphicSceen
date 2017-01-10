@@ -7,9 +7,10 @@
 
 #include <unistd.h>
 #include <pthread.h>
+#include "memman.h"
 
-pthread_mutex_t s_comMutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t s_comCond = PTHREAD_COND_INITIALIZER;
+static pthread_mutex_t s_comMutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t s_comCond = PTHREAD_COND_INITIALIZER;
 
 int System_Lock(void) {
 	return pthread_mutex_trylock(&s_comMutex);
@@ -31,4 +32,5 @@ void System_Poll(void) {
 
 void Trace_dataAsync(char *buff, size_t size) {
 	write(STDOUT_FILENO, buff, size);
+	MEMMAN_free(buff);
 }

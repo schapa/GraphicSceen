@@ -18,6 +18,8 @@ SRC += \
 
 # emulator specific CFLAGS
 CFLAGS += \
+	-g \
+	-O0 \
 	-m32 \
 	-DEMULATOR \
 	-I./emulator/ \

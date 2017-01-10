@@ -39,11 +39,13 @@ void EventQueue_Push(EventTypes_e type, void *data, onEvtDispose_f dispose) {
 void EventQueue_Pend(Event_t *event) {
 	while (!s_queue.head)
 		System_Poll();
+	Node_t *node = s_queue.head;
 
 	event ?
-		*event = s_queue.head->evt :
-		EventQueue_Dispose(&s_queue.head->evt);
-	s_queue.head = s_queue.head->next;
+		*event = node->evt :
+		EventQueue_Dispose(&node->evt);
+	s_queue.head = node->next;
+	MEMMAN_free(node);
 }
 
 void EventQueue_Dispose(Event_t *event) {
@@ -55,7 +57,7 @@ void EventQueue_Dispose(Event_t *event) {
 }
 
 static Node_t *newNode(EventTypes_e type, void *data, onEvtDispose_f dispose) {
-	Node_t *node = MEMMAN_malloc(sizeof(node));
+	Node_t *node = MEMMAN_malloc(sizeof(Node_t));
 	if (node){
 		node->evt.type = type;
 		node->evt.data = data;
