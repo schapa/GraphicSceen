@@ -2,35 +2,32 @@
 export CPP := g++
 export LD := g++
 
-OUT_SFX := emulator
+OUT_SFX := ui
 BUILD_DIR :=$(BUILD_DIR)/$(OUT_SFX)
 
-PROGNAME := scr-$(OUT_SFX)
+PROGNAME := gui
 
 CFLAGS += \
 	-I./emulator/ \
 	
-SRC += \
-	./emulator/bsp.c \
-	./emulator/system.c \
-	./emulator/emulator.c \
-	./emulator/cortex.c \
+SRC := \
+	./emulator/ui.c
 
 # emulator specific CFLAGS
 CFLAGS += \
 	-ggdb \
 	-O0 \
-	-m32 \
 	-DEMULATOR \
 	-Wno-deprecated-declarations \
 	-Wall -Wformat=0 \
+	$(shell pkg-config --cflags gtk+-3.0) \
 
 # emulator specific LIBS
 LDLIBS += \
 	-lc \
 	-lpthread \
 	-lrt \
-	-m32 \
+	$(shell pkg-config --libs gtk+-3.0) \
 
 .PHONY: all clean info
 

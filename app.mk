@@ -31,6 +31,8 @@ export SRC := \
 	./sys/_write.c \
 	./sys/stm32f4xx_hal_msp.c \
 	\
+	./system/src/cortexm/exception_handlers.c \
+	\
 	./system/src/stm32f4-hal/stm32f4xx_hal.c \
 	./system/src/stm32f4-hal/stm32f4xx_hal_cortex.c \
 	./system/src/stm32f4-hal/stm32f4xx_hal_rcc.c \

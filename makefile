@@ -17,8 +17,12 @@ config:
 	@echo " BUILD_TYPE = $(BUILD_TYPE)"
 	@echo "=================================="
 
-firmware emulator:
-	$(MAKE) -f $@.mk
+firmware:
+	$(MAKE) -f firmware.mk
+
+emulator:
+	$(MAKE) -f emulator.mk
+	$(MAKE) -f ui.mk
 
 clean::
 	$(MAKE) -f firmware.mk $@

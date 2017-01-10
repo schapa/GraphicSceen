@@ -8,17 +8,20 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
 #include <stdio.h>
 
 #include "bsp.h"
 #include "system.h"
+#include "dbg_trace.h"
 
 extern int pthread_setname_np (pthread_t __target_thread, const char *__name)
 	     __THROW __nonnull ((2));
 
 static void* sysTick (void *arg);
+
 static void startSysTick (void);
 
 void BSP_LcdReset(const _Bool state) {
@@ -35,6 +38,14 @@ void BSP_LcdCmd(const uint8_t val) {
 }
 
 _Bool BSP_Init(void) {
+	static _Bool lock = false;
+	if (!lock) {
+		lock = true;
+		extern void Reset_Handler(void);
+		Reset_Handler();
+		exit(0);
+		return false;
+	}
 	startSysTick();
 	System_setStatus(INFORM_IDLE);
 
@@ -62,3 +73,4 @@ static void* sysTick (void *arg) {
 	}
 	return NULL;
 }
+

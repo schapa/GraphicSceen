@@ -23,7 +23,7 @@ _start (void);
 // handler routines in your application code.
 // ----------------------------------------------------------------------------
 
-#if defined(DEBUG)
+#if defined(DEBUG) || defined(EMULATOR)
 
 // The DEBUG version is not naked, but has a proper stack frame,
 // to allow setting breakpoints at Reset_Handler.
