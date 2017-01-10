@@ -28,16 +28,24 @@ extern "C" {
 #define ANSI_ESC_STYLE_UNDERLINE "\x1b[4m"
 #define ANSI_ESC_STYLE_STRIKE "\x1b[9m"
 
+#define DBGMSG_L_COLOR 		ANSI_ESC_COLOR_BLUE
+#define DBGMSG_M_COLOR 		ANSI_ESC_COLOR_MAGENTA
+#define DBGMSG_H_COLOR 		ANSI_ESC_COLOR_GREEN
+#define DBGMSG_WARN_COLOR 	ANSI_ESC_COLOR_YELLOW
+#define DBGMSG_ERR_COLOR 	ANSI_ESC_COLOR_RED
+
 #define DBGMSG_L(...)
 #define DBGMSG_M(...)
 #define DBGMSG_H(...)
-#define DBGMSG_WARN(...)
-#define DBGMSG_ERR(...)
 #define DBG_ENTRY
 #define DBG_EXIT
 
 #define DBGMSG_INFO(fmt, ...) \
 	dbgmsg(ANSI_ESC_COLOR_WHITE, "", "", "", 0, fmt, ##__VA_ARGS__)
+#define DBGMSG_WARN(fmt, ...) \
+	dbgmsg(DBGMSG_WARN_COLOR, "WARN", __FILE__, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
+#define DBGMSG_ERR(fmt, ...) \
+	dbgmsg(DBGMSG_ERR_COLOR, "ERR!", __FILE__, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
 
 void dbgmsg(const char *clr, const char *siv, const char *file, const char *func, int line, const char *fmt, ...);
 
