@@ -12,12 +12,17 @@
 extern "C" {
 #endif
 
-#include "stm32f4xx_hal.h"
 #include <stdint.h>
 #include <stdbool.h>
 #include "Queue.h"
 
 #define BSP_TICKS_PER_SECOND 1000
+
+#define SCREEN_WIDTH 256
+#define SCREEN_HEIGHT 64
+
+#define SCREEN_BYTES_PERLINE (SCREEN_WIDTH/2)
+#define SCREEN_SIZE (SCREEN_BYTES_PERLINE*SCREEN_HEIGHT)
 
 _Bool BSP_Init(void);
 

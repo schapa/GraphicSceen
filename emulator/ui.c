@@ -1,5 +1,5 @@
 /*
- * bsp.c
+ * ui.c
  *
  *  Created on: Dec 29, 2016
  *      Author: shapa
@@ -16,13 +16,14 @@
 
 #include <cairo.h>
 #include <gtk/gtk.h>
-#include "glib.h"
+#include <glib.h>
 
-#define SCREEN_WIDTH 256
-#define SCREEN_HEIGHT 64
+#include "bsp.h"
 
-#define SCREEN_BYTES_PERLINE (SCREEN_WIDTH/2)
-#define SCREEN_SIZE (SCREEN_BYTES_PERLINE*SCREEN_HEIGHT)
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 static GtkWidget* g_draw_widget = NULL;
 G_LOCK_DEFINE_STATIC(s_lock);
@@ -34,6 +35,10 @@ static gboolean onDrawEvent(GtkWidget *widget, cairo_t *cr, gpointer arg);
 
 static void* readerThread (void *arg);
 
+static int mmapPerform(char *path);
+
+static uint8_t *s_fb = NULL;
+
 int main(int argc, char* argv[]) {
 	(void)argc;
 	(void)argv;
@@ -43,6 +48,10 @@ int main(int argc, char* argv[]) {
 	gdk_threads_init();
 	gdk_threads_enter();
 	gtk_init(NULL, NULL);
+
+	int fb = mmapPerform(argv[1]);
+	if (fb < 0)
+		exit(0);
 
 	createWidgets();
 
@@ -136,4 +145,38 @@ static gboolean onDrawEvent(GtkWidget *widget, cairo_t *cr, gpointer arg) {
 	cairo_surface_destroy(sf);
 	G_UNLOCK(s_lock);
 	return FALSE;
+}
+
+static int mmapPerform(char *path) {
+	char cmd[256];
+	snprintf(cmd, sizeof(cmd), "chmod 777 %s", path);
+	system(cmd);
+	int fd = -1;
+	do {
+		fd = open(path, O_RDONLY);
+		printf("Open [%s] fd %d\n", path, fd);
+		if (fd < 0) {
+			usleep((1000*1000));
+			continue;
+		}
+	} while (fd < 0);
+	lseek (fd, SCREEN_SIZE + 1, SEEK_SET);
+	write (fd, "", 1);
+	lseek (fd, 0, SEEK_SET);
+
+	void *p = mmap (0, SCREEN_SIZE, PROT_READ, MAP_SHARED, fd, 0);
+	if (p == MAP_FAILED) {
+		perror("mmap");
+		close(fd);
+		return -1;
+	}
+
+	struct stat sb;
+	if (fstat(fd, &sb) == -1)  {
+		perror("fstat");
+		close(fd);
+		return -1;
+	}
+	s_fb = (uint8_t*)p;
+	return fd;
 }

@@ -96,8 +96,8 @@ void SSD1322_DrawSurface(const uint8_t *line, const uint16_t heigth, const uint8
 	SSD1322_SetColumnRange(offset +1, offset + heigth);
 	SSD1322_SetRowRange(0, 70);
 
-	CS(true);
 	SendCmd_Simple(SSD1322_WRITE_RAM);
+	CS(true);
 	for (i = 0; i < heigth; i++) {
 		for (j = 0; j < bytesPerLine; j++) {
 			buffer[j] = line[i*bytesPerLine + j];
