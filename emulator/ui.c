@@ -25,7 +25,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-static GtkWidget* g_draw_widget = NULL;
+static GtkWidget* s_drawPane = NULL;
 G_LOCK_DEFINE_STATIC(s_lock);
 
 static void createWidgets(void);
@@ -63,8 +63,13 @@ int main(int argc, char* argv[]) {
 
 static void* readerThread (void *arg) {
 	do {
-
-	} while (0);
+		if (s_drawPane) {
+			gdk_threads_enter();
+			gtk_widget_queue_draw(s_drawPane);
+			gdk_threads_leave();
+		}
+		usleep((1000));
+	} while (1);
 	return NULL;
 }
 
@@ -80,14 +85,14 @@ static void createWidgets(void) {
 	gtk_container_add(GTK_CONTAINER(window), vbox);
 	gtk_widget_show(vbox);
 
-	g_draw_widget = gtk_drawing_area_new();
+	s_drawPane = gtk_drawing_area_new();
 	GdkRGBA white = {1.0, 1.0, 1.0, 1.0};
-	gtk_widget_override_background_color(g_draw_widget, GTK_STATE_FLAG_NORMAL, &white);
-	gtk_widget_set_size_request(g_draw_widget, SCREEN_WIDTH, SCREEN_HEIGHT);
+	gtk_widget_override_background_color(s_drawPane, GTK_STATE_FLAG_NORMAL, &white);
+	gtk_widget_set_size_request(s_drawPane, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 //	gtk_drawing_area_size (GTK_DRAWING_AREA (g_draw_widget), SCREEN_WIDTH, SCREEN_HEIGHT);
-	gtk_box_pack_start(GTK_BOX(vbox), g_draw_widget, TRUE, TRUE, 0);
-	gtk_widget_show(g_draw_widget);
+	gtk_box_pack_start(GTK_BOX(vbox), s_drawPane, TRUE, TRUE, 0);
+	gtk_widget_show(s_drawPane);
 
 	btnPlus = gtk_button_new_with_label("+");
 	gtk_box_pack_start(GTK_BOX(vbox), btnPlus, FALSE, FALSE, 0);
@@ -104,7 +109,7 @@ static void createWidgets(void) {
 	gtk_window_set_resizable (GTK_WINDOW(window), FALSE);
 	gtk_widget_show(window);
 
-	g_signal_connect(G_OBJECT(g_draw_widget), "draw", G_CALLBACK(onDrawEvent),
+	g_signal_connect(G_OBJECT(s_drawPane), "draw", G_CALLBACK(onDrawEvent),
 			NULL);
 	g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(gtk_main_quit),
 			NULL);
@@ -132,12 +137,19 @@ static void onButtonReleased(GtkWidget *widget, gpointer param1) {
 static gboolean onDrawEvent(GtkWidget *widget, cairo_t *cr, gpointer arg) {
 
 	static uint8_t buffer[SCREEN_WIDTH*SCREEN_HEIGHT];
-	printf("Draw\n");
 	int stride = cairo_format_stride_for_width(CAIRO_FORMAT_A8, SCREEN_WIDTH);
 	G_LOCK(s_lock);
-	memset(buffer, 0x1F, SCREEN_SIZE);
-
-	cairo_surface_t * sf = cairo_image_surface_create_for_data(buffer,
+	if (s_fb) {
+		size_t k = 0;
+		memset(buffer, 0xFF, sizeof(buffer));
+		for (size_t i = 0; i < SCREEN_SIZE; i++) {
+			buffer[k] = 0xFF - (s_fb[i] & 0xF0);
+			buffer[k+1] = 0xFF - ((s_fb[i] & 0x0F) << 4);
+			k += 2;
+//			buffer[k++] = (s_fb[i] & 0xF0);
+		}
+	}
+	cairo_surface_t *sf = cairo_image_surface_create_for_data(buffer,
 			CAIRO_FORMAT_A8, SCREEN_WIDTH, SCREEN_HEIGHT, stride);
 	cairo_set_source_surface(cr, sf, 0, 0);
 	cairo_paint(cr);
