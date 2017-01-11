@@ -88,7 +88,7 @@ void GfxSurface::drawPixel(uint16_t x, uint16_t y, uint8_t alpha) {
 
 	switch (bitsDepth) {
 		case ColorDepth_4: {
-			alpha &= 0x0F;
+			alpha /= 16;
 			if (x % 2) {
 				*ptrRaw &= 0xF0;
 				*ptrRaw |= alpha;
