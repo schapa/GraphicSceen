@@ -153,6 +153,7 @@ static void* uiThread (void *arg) {
 
 	DBGMSG_H("Call [%s]", path);
 	system(path);
+	free(arg);
 	munmap((void*)s_lcd.fb, SCREEN_SIZE);
 	close(fd);
 	exit(0);

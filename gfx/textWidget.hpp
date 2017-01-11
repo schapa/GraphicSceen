@@ -19,6 +19,7 @@ public:
 	const bool &isVisible() { return shape->isVisible(); }
 	void setVisible(const bool& val) { shape->setVisible(val); }
 
+	virtual void setSurface(GfxSurface *surface) { getShape()->setSurface(surface); }
 	virtual GfxShape *getShape(void) { return shape; }
 protected:
 	GfxShape *shape;
@@ -39,11 +40,24 @@ public:
 	void setFontSize(const uint8_t &size) { getShape()->setFontSize(size); }
 	void setText(const char *text) { getShape()->setText(text); }
 
-	void setSurface(GfxSurface *surface) { getShape()->setSurface(surface); }
-
 	virtual GfxTextShape *getShape(void) { return static_cast<GfxTextShape*>(shape); }
 };
 
+class SegmentDisplayWidget : public Widget {
+public:
+	enum Type {
+		Full,
+		Single,
+	};
+public:
+	SegmentDisplayWidget(Type type);
+	virtual ~SegmentDisplayWidget();
 
+	const uint8_t &getValue() { return value; }
+	void setValue(const uint8_t &value) { this->value = value; }
+private:
+	Type type;
+	uint8_t value;
+};
 
 #endif /* TEXTWIDGET_HPP_ */
