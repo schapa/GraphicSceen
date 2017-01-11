@@ -24,21 +24,24 @@ static Node_t *newNode(EventTypes_e type, void *data, onEvtDispose_f dispose);
 static Node_t *getTail(Node_t *node);
 
 void EventQueue_Push(EventTypes_e type, void *data, onEvtDispose_f dispose) {
+	int primask = System_Lock();
 	if (!s_queue.head) {
 		s_queue.head = newNode(type, data, dispose);
 	} else {
 		Node_t *tail = getTail(s_queue.head);
-		if (!tail)
-			return;
-		Node_t *node = newNode(type, data, dispose);
-		if (node)
-			tail->next = node;
+		if (tail) {
+			Node_t *node = newNode(type, data, dispose);
+			if (node)
+				tail->next = node;
+		}
 	}
+	System_Unlock(primask);
 }
 
 void EventQueue_Pend(Event_t *event) {
 	while (!s_queue.head)
 		System_Poll();
+	int primask = System_Lock();
 	Node_t *node = s_queue.head;
 
 	event ?
@@ -46,14 +49,17 @@ void EventQueue_Pend(Event_t *event) {
 		EventQueue_Dispose(&node->evt);
 	s_queue.head = node->next;
 	MEMMAN_free(node);
+	System_Unlock(primask);
 }
 
 void EventQueue_Dispose(Event_t *event) {
+	int primask = System_Lock();
 	if (event && event->dispose) {
 		event->dispose(event->data);
 		event->data = NULL;
 		event->dispose = NULL;
 	}
+	System_Unlock(primask);
 }
 
 static Node_t *newNode(EventTypes_e type, void *data, onEvtDispose_f dispose) {
