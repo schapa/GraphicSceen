@@ -45,6 +45,7 @@ CFLAGS += \
 	-I./firmware/ \
 
 CFLAGS += -Os \
+	-ggdb \
 	-mcpu=cortex-m4 \
 	-mthumb -mabi=aapcs \
 	-mfloat-abi=soft \

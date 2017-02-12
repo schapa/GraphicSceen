@@ -29,7 +29,10 @@ _Bool BSP_Init(void) {
 	System_setLedControl(BSP_LedGreenSet);
 
 	PWM_Init();
-	PWM_Configure(TIM_CHANNEL_1, 30);
+	PWM_Configure(TIM_CHANNEL_1, 15);
+	PWM_Configure(TIM_CHANNEL_2, 40);
+	PWM_Configure(TIM_CHANNEL_3, 65);
+	PWM_Configure(TIM_CHANNEL_4, 90);
 	BSP_LcdInit();
 	SSD1322_InitDisplay();
 

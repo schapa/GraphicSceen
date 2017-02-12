@@ -52,6 +52,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim) {
 	if (htim->Instance == TIM1) {
 		__HAL_RCC_GPIOA_CLK_ENABLE();
 		__HAL_RCC_TIM1_CLK_ENABLE();
+		__HAL_RCC_TIM2_CLK_ENABLE();
 		initGPIO_PWM();
 	}
 }
@@ -102,14 +103,14 @@ void HAL_LTDC_MspInit(LTDC_HandleTypeDef* hltdc) {
 
 static void initGPIO_USART1_Trace(void) {
 
-	GPIO_InitTypeDef iface = {
-			GPIO_PIN_9 | GPIO_PIN_10,
-			GPIO_MODE_AF_PP,
-			GPIO_NOPULL,
-			GPIO_SPEED_FREQ_HIGH,
-			GPIO_AF7_USART1
-	};
-	HAL_GPIO_Init(GPIOA, &iface);
+//	GPIO_InitTypeDef iface = {
+//			GPIO_PIN_9 | GPIO_PIN_10,
+//			GPIO_MODE_AF_PP,
+//			GPIO_NOPULL,
+//			GPIO_SPEED_FREQ_HIGH,
+//			GPIO_AF7_USART1
+//	};
+//	HAL_GPIO_Init(GPIOA, &iface);
 }
 
 static void initGPIO_USART2(void) {
@@ -149,7 +150,7 @@ static void initGPIO_CAN() {
 
 static void initGPIO_PWM(void) {
 	GPIO_InitTypeDef iface = {
-			GPIO_PIN_8,
+			GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11,
 			GPIO_MODE_AF_PP,
 			GPIO_NOPULL,
 			GPIO_SPEED_FREQ_LOW,
@@ -209,7 +210,7 @@ static void initGPIO_Spi5(void) {
 
 static void initGPIO_LTDC(void) {
 	GPIO_InitTypeDef iface = {
-			GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_6 | GPIO_PIN_11 | GPIO_PIN_12,
+			GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_6 | /*GPIO_PIN_11 |*/ GPIO_PIN_12,
 			GPIO_MODE_AF_PP,
 			GPIO_NOPULL,
 			GPIO_SPEED_FREQ_HIGH,
