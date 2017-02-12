@@ -48,7 +48,6 @@ void SysTick_Handler(void) {
 	}
 	if (s_delayDecrement)
 		s_delayDecrement--;
-
 	if (!(s_uptimeTicks++ % BSP_TICKS_PER_SECOND)) {
 		s_uptimeSeconds++;
 		EventQueue_Push(EVENT_SYSTICK, (void*)s_uptimeSeconds, NULL);

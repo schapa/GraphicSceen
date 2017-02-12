@@ -40,7 +40,10 @@ _Bool BSP_Init(void) {
 	HAL_StatusTypeDef initResult = HAL_OK;
 
 	PWM_Init();
-	PWM_Configure(TIM_CHANNEL_1, 30);
+	PWM_Configure(TIM_CHANNEL_1, 15);
+	PWM_Configure(TIM_CHANNEL_2, 40);
+	PWM_Configure(TIM_CHANNEL_3, 65);
+	PWM_Configure(TIM_CHANNEL_4, 90);
 	BSP_LcdInit();
 	SSD1322_InitDisplay();
 
