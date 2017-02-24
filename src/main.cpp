@@ -17,10 +17,10 @@
 
 #include "shape.hpp"
 #include "textWidget.hpp"
-#include "dbg_base.h"
 #include "memman.h"
-#include "sprite.hpp"
+#include "widget7Seg.hpp"
 
+#include "dbg_base.h"
 #if 0
 #include "dbg_trace.h"
 #endif
@@ -41,44 +41,50 @@ int main(int argc, char* argv[]) {
 
 	DiscoLCDInit(baseLayer.getFrameBuffer());
 
-	TextWidget timeWdt(FONT_DIGITAL_7SEGMENT, 18, "0123456789");
-	TextWidget testWdt(FONT_CENTURY_SCOOLBOOK, 12, "H Hello [xxxx]");
-	TextWidget infoWdt(FONT_CENTURY_SCOOLBOOK, 12, "The quick brown fox jumps over the lazy dog");
+//	TextWidget infoWdt(FONT_CENTURY_SCOOLBOOK, 12, "The quick brown fox jumps over the lazy dog");
+//	TextWidget timeWdt(FONT_DIGITAL_7SEGMENT, 18, "0123456789");
+//	TextWidget testWdt(FONT_CENTURY_SCOOLBOOK, 12, "H Hello [xxxx]");
 
-	timeWdt.setSurface(new GfxSurface(PixelFormat_GrayScale, 240, 20));
-	testWdt.setSurface(new GfxSurface(PixelFormat_GrayScale, 128, 20));
-	infoWdt.setSurface(new GfxSurface(PixelFormat_GrayScale, 240, 20));
+	SegmentDisplayWidget test7(SegmentDisplayWidget::Full);
+	test7.setSurface(new GfxSurface(PixelFormat_GrayScale, 100, 100));
+	test7.setVisible(true);
+	test7.getShape()->setY(40);
+	baseLayer.addWidget(&test7);
 
-	timeWdt.setVisible(true);
-	testWdt.setVisible(true);
-	infoWdt.setVisible(true);
 
-	baseLayer.addWidget(&timeWdt);
-	baseLayer.addWidget(&testWdt);
-	baseLayer.addWidget(&infoWdt);
+//	infoWdt.setSurface(new GfxSurface(PixelFormat_GrayScale, 240, 20));
+//	timeWdt.setSurface(new GfxSurface(PixelFormat_GrayScale, 240, 20));
+//	testWdt.setSurface(new GfxSurface(PixelFormat_GrayScale, 128, 20));
+//	infoWdt.setVisible(true);
+//	timeWdt.setVisible(true);
+//	testWdt.setVisible(true);
 
-	testWdt.getShape()->setX(20);
-	testWdt.getShape()->setY(20);
-	infoWdt.getShape()->setY(40);
+//	baseLayer.addWidget(&infoWdt);
+//	baseLayer.addWidget(&timeWdt);
+//	baseLayer.addWidget(&testWdt);
 
-	char buffer[128];
+//	infoWdt.getShape()->setY(40);
+//	testWdt.getShape()->setX(20);
+//	testWdt.getShape()->setY(20);
+
 	while(1) {
 		Event_t event;
 		EventQueue_Pend(&event);
 		switch (event.type) {
 			case EVENT_SYSTICK: {
-				sprintf(buffer, "Uptime is %lu", System_getUptime());
-				testWdt.setText(buffer);
-				static uint32_t StdId = 0x50;
-				CanMsg_t msg = {
-						StdId++,
-						false,
-						false,
-						8,
-						{ 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }
-				};
-				_Bool stat = CAN_write(&msg);
-				DBGMSG_INFO("Send Can %d. %d", StdId-1, stat);
+//				char buffer[128];
+//				sprintf(buffer, "Uptime is %lu", System_getUptime());
+//				testWdt.setText(buffer);
+//				static uint32_t StdId = 0x50;
+//				CanMsg_t msg = {
+//						StdId++,
+//						false,
+//						false,
+//						8,
+//						{ 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }
+//				};
+//				_Bool stat = CAN_write(&msg);
+//				DBGMSG_INFO("Send Can %d. %d", StdId-1, stat);
 				break;
 			}
 			case EVENT_CAN:

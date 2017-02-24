@@ -9,7 +9,6 @@
 #define SHAPE_HPP_
 
 #include "surface.hpp"
-#include "fontPainter.h"
 
 class GfxShape {
 public:
@@ -45,28 +44,6 @@ protected:
 	bool dirty;
 	uint16_t x;
 	uint16_t y;
-};
-
-class GfxTextShape : public GfxShape {
-public:
-	GfxTextShape();
-	virtual ~GfxTextShape();
-
-	const FontType &getFont() { return font; }
-	const uint8_t &getFontSize() { return textSize; }
-	const char *getText() { return text; }
-
-	void setFont(const FontType &font);
-	void setFontSize(const uint8_t &size);
-	void setText(const char *text);
-
-	virtual bool Draw();
-private:
-	void renderGrayScale(fontItem_p font, const char *text);
-private:
-	FontType font;
-	uint8_t textSize;
-	const char *text;
 };
 
 #endif /* SHAPE_HPP_ */

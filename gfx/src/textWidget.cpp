@@ -23,11 +23,3 @@ TextWidget::TextWidget(const FontType &font, const uint8_t &textSize, const char
 TextWidget::~TextWidget() {
 	delete shape;
 }
-
-
-SegmentDisplayWidget::SegmentDisplayWidget(Type type): type(type), value(0) {
-	shape = new GfxTextShape();
-}
-SegmentDisplayWidget::~SegmentDisplayWidget() {
-	delete shape;
-}

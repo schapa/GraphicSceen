@@ -2,6 +2,7 @@
 CFLAGS += \
 	-I./dbg \
 	-I./gfx \
+	-I./gfx/sprites \
 	-I./gfx/fontPainter \
 	-I./gfx/fontPainter/fonts \
 	-I./inc \

@@ -10,7 +10,7 @@
 
 #include "surface.hpp"
 #include "shape.hpp"
-#include "textWidget.hpp"
+#include "widget.hpp"
 #include <vector>
 
 class GfxLayer : public GfxSurface {

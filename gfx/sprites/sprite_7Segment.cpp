@@ -28,7 +28,7 @@ static const uint8_t s_7segmentHorizontal[] = {
 const Sprite Sprite_7SegmentHorizontal(
 	ColorDepth_4,
 	6,
-	sizeof(s_7segmentHorizontal) / 6,
+	sizeof(s_7segmentHorizontal) / 3,
 	sizeof(s_7segmentHorizontal),
 	s_7segmentHorizontal
 );

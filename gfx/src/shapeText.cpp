@@ -5,8 +5,7 @@
  *      Author: shapa
  */
 
-#include "shape.hpp"
-#include "fontPainter.h"
+#include "shapeText.hpp"
 
 GfxTextShape::GfxTextShape(void) {
 	font = FONT_DIGITAL_7SEGMENT;

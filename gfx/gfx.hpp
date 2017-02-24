@@ -26,17 +26,3 @@ enum PixelFormat {
 	PixelFormat_AL44,
 	PixelFormat_AL88,
 };
-
-//class Pixel {
-//public:
-//	Pixel();
-//	virtual ~Pixel();
-//
-//	const ColorDepth& getDepth() const { return depth; }
-//	const PixelFormat& getformat() const { return format; }
-//private:
-//	uint32_t value;
-//
-//	ColorDepth depth;
-//	PixelFormat format;
-//};
