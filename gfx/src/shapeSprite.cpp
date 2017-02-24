@@ -31,8 +31,8 @@ bool GfxSpriteShape::Draw() {
 		const SpriteItem& item = sprites[i];
 		DBGMSG_H("Draw %d", i);
 		if (item.isVisible) {
-			const uint16_t& ix = x + item.getX();
-			const uint16_t& iy = y + item.getY();
+			const uint16_t& ix = item.getX();
+			const uint16_t& iy = item.getY();
 			const uint16_t& height = item.sprite.getHeight();
 			const uint16_t& width = item.sprite.getWidth();
 			for (size_t dy = 0; dy < height; dy++)

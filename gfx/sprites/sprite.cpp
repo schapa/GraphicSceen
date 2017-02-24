@@ -19,9 +19,10 @@ const uint32_t Sprite::getPixel(const uint16_t& x, const uint16_t& y) const {
 		case ColorDepth_4: {
 			const uint8_t*val = static_cast<const uint8_t*>(data);
 			const uint32_t result = (x % 2) ?
-					val[y*width + x/2] >> 4 :
-					val[y*width + x/2] & 0x0F;
-			DBGMSG_M("offset %d %d, %d. val %x", x, y, y*width + (x % 2) + x/2, result);
+					val[(y*width + x)/2] >> 4 :
+					val[(y*width + x)/2] & 0x0F;
+
+			DBGMSG_M("x:y %d:%d calc off %d + %d = 0x%x", x, y, y*width + x/2, (x % 2), result);
 			return result;
 			break;
 		}

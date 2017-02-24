@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
 //	TextWidget testWdt(FONT_CENTURY_SCOOLBOOK, 12, "H Hello [xxxx]");
 
 	SegmentDisplayWidget test7(SegmentDisplayWidget::Full);
-	test7.setSurface(new GfxSurface(PixelFormat_GrayScale, 100, 100));
+	test7.setSurface(new GfxSurface(PixelFormat_GrayScale, 100, 20));
 	test7.setVisible(true);
 	test7.getShape()->setY(40);
 	baseLayer.addWidget(&test7);
