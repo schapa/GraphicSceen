@@ -5,13 +5,38 @@
  *      Author: shapa
  */
 
-#ifndef GFX_HPP_
-#define GFX_HPP_
+#pragma once
 
-#include "surface.hpp"
-#include "layer.hpp"
+enum ColorDepth {
+	ColorDepth_4 = 4,
+	ColorDepth_8 = 8,
+	ColorDepth_16 = 16,
+	ColorDepth_24 = 24,
+	ColorDepth_32 = 32,
+};
 
-#include "shape.hpp"
-#include "textWidget.hpp"
+enum PixelFormat {
+	PixelFormat_GrayScale,
+	PixelFormat_ARGB8888,
+	PixelFormat_RGB888,
+	PixelFormat_RGB565,
+	PixelFormat_ARGB1555,
+	PixelFormat_ARGB4444,
+	PixelFormat_L8,
+	PixelFormat_AL44,
+	PixelFormat_AL88,
+};
 
-#endif /* GFX_HPP_ */
+//class Pixel {
+//public:
+//	Pixel();
+//	virtual ~Pixel();
+//
+//	const ColorDepth& getDepth() const { return depth; }
+//	const PixelFormat& getformat() const { return format; }
+//private:
+//	uint32_t value;
+//
+//	ColorDepth depth;
+//	PixelFormat format;
+//};

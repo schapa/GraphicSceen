@@ -47,14 +47,6 @@ protected:
 	uint16_t y;
 };
 
-class GfxPixmapShape : public GfxShape {
-public:
-	GfxPixmapShape();
-	virtual ~GfxPixmapShape();
-
-	virtual bool Draw();
-};
-
 class GfxTextShape : public GfxShape {
 public:
 	GfxTextShape();

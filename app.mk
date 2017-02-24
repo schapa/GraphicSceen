@@ -48,6 +48,7 @@ export SRC := \
 	./system/src/stm32f4-hal/stm32f4xx_hal_ltdc.c \
 	\
 	$(wildcard ./gfx/src/*.cpp) \
+	$(wildcard ./gfx/sprites/*.cpp) \
 	$(wildcard ./gfx/fontPainter/fonts/*.c) \
 	./gfx/fontPainter/knownFonts.c \
 	

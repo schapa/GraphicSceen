@@ -11,9 +11,15 @@
 #include "Queue.h"
 #include "system.h"
 #include "ssd1322.h"
-#include "gfx.hpp"
+
+#include "surface.hpp"
+#include "layer.hpp"
+
+#include "shape.hpp"
+#include "textWidget.hpp"
 #include "dbg_base.h"
 #include "memman.h"
+#include "sprite.hpp"
 
 #if 0
 #include "dbg_trace.h"

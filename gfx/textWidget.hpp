@@ -43,6 +43,7 @@ public:
 	virtual GfxTextShape *getShape(void) { return static_cast<GfxTextShape*>(shape); }
 };
 
+#include "shapeSprite.hpp"
 class SegmentDisplayWidget : public Widget {
 public:
 	enum Type {
@@ -55,6 +56,8 @@ public:
 
 	const uint8_t &getValue() { return value; }
 	void setValue(const uint8_t &value) { this->value = value; }
+
+	virtual GfxSpriteShape *getShape(void) { return static_cast<GfxSpriteShape*>(shape); }
 private:
 	Type type;
 	uint8_t value;
