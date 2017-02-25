@@ -56,7 +56,9 @@ void SegmentDisplayWidget::setValue(const int8_t &value) {
 	};
 	uint8_t mask = 0;
 	this->value = value;
-	if (value < -1)
+	if (value < -2)
+		mask = 0x00;
+	else if (value == -2)
 		mask = 0x01;
 	else if (value == -1)
 		mask = 0x31;
@@ -66,4 +68,5 @@ void SegmentDisplayWidget::setValue(const int8_t &value) {
 	for (size_t i = 0; i < sprites.size(); i++) {
 		sprites[i].isVisible = (mask & (0x40>>i));
 	}
+	shape->setDirty();
 }

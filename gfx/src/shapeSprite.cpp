@@ -21,7 +21,7 @@ GfxSpriteShape::~GfxSpriteShape() {
 }
 
 bool GfxSpriteShape::Draw() {
-	if (!surface || !visible)
+	if (!surface || !visible || !dirty)
 		return false;
 	surface->fill(0);
 	for (size_t i = 0; i < sprites.size(); i++) {
