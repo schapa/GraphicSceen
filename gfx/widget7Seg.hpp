@@ -11,6 +11,14 @@
 #include "widget.hpp"
 #include "shapeSprite.hpp"
 
+
+class Gfx7SegShape : public GfxSpriteShape {
+public:
+	Gfx7SegShape();
+	virtual ~Gfx7SegShape() {};
+};
+
+
 class SegmentDisplayWidget : public Widget {
 public:
 	enum Type {
@@ -21,11 +29,11 @@ public:
 	SegmentDisplayWidget(Type type);
 	virtual ~SegmentDisplayWidget();
 
-	const uint8_t &getValue() { return value; }
-	void setValue(const uint8_t &value) { this->value = value; }
+	const int8_t &getValue() const { return value; }
+	void setValue(const int8_t &value);
 
 	virtual GfxSpriteShape *getShape(void) { return static_cast<GfxSpriteShape*>(shape); }
 private:
 	Type type;
-	uint8_t value;
+	int8_t value;
 };

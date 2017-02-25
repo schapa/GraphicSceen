@@ -9,4 +9,10 @@
 
 #include "sprite.hpp"
 
-extern const Sprite Sprite_7SegmentHorizontal;
+extern const Sprite Sprite_7SegmentA;
+extern const Sprite Sprite_7SegmentB;
+extern const Sprite Sprite_7SegmentC;
+extern const Sprite Sprite_7SegmentD;
+extern const Sprite Sprite_7SegmentE;
+extern const Sprite Sprite_7SegmentF;
+extern const Sprite Sprite_7SegmentG;

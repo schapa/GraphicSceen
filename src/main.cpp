@@ -46,9 +46,10 @@ int main(int argc, char* argv[]) {
 //	TextWidget testWdt(FONT_CENTURY_SCOOLBOOK, 12, "H Hello [xxxx]");
 
 	SegmentDisplayWidget test7(SegmentDisplayWidget::Full);
-	test7.setSurface(new GfxSurface(PixelFormat_GrayScale, 100, 20));
+	test7.setSurface(new GfxSurface(PixelFormat_GrayScale, 100, 64));
 	test7.setVisible(true);
-	test7.getShape()->setY(40);
+	test7.getShape()->setX(3);
+	test7.getShape()->setY(3);
 	baseLayer.addWidget(&test7);
 
 
@@ -67,11 +68,14 @@ int main(int argc, char* argv[]) {
 //	testWdt.getShape()->setX(20);
 //	testWdt.getShape()->setY(20);
 
-	while(1) {
+	while(1) {		
+		baseLayer.render();
+		SSD1322_DrawSurface(baseLayer.getFrameBuffer(), baseLayer.getHeigth(), baseLayer.getBytesPerLine());
 		Event_t event;
 		EventQueue_Pend(&event);
 		switch (event.type) {
 			case EVENT_SYSTICK: {
+				test7.setValue(System_getUptime());
 //				char buffer[128];
 //				sprintf(buffer, "Uptime is %lu", System_getUptime());
 //				testWdt.setText(buffer);
@@ -101,9 +105,6 @@ int main(int argc, char* argv[]) {
 				break;
 		}
 		EventQueue_Dispose(&event);
-		baseLayer.render();
-
-		SSD1322_DrawSurface(baseLayer.getFrameBuffer(), baseLayer.getHeigth(), baseLayer.getBytesPerLine());
 	}
 
 	return 0;

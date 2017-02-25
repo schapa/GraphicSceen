@@ -16,7 +16,9 @@ public:
 	GfxSpriteShape();
 	virtual ~GfxSpriteShape();
 
+	std::vector<SpriteItem>& getSprites() { return sprites;};
+
 	virtual bool Draw();
-private:
+protected:
 	std::vector<SpriteItem> sprites;
 };
