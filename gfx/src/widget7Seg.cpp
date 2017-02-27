@@ -117,9 +117,8 @@ bool GfxMulti7SegShape::Draw() {
 	if (!surface || !visible || !dirty)
 		return false;
 	surface->fill(0);
-//	for (size_t i = 0; i < shapes.size(); i++)
-//		drawn |= shapes[i]->Draw();
-	drawn |= shapes[0]->Draw();
+	for (size_t i = 0; i < shapes.size(); i++)
+		drawn |= shapes[i]->Draw();
 	dirty = false;
 	return drawn;
 }

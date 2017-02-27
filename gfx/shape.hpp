@@ -25,7 +25,7 @@ public:
 	}
 
 	const bool &isVisible() const { return visible; }
-	void setVisible(const bool& val) { dirty = visible ^ val; visible = val; }
+	void setVisible(const bool& val) { dirty |= visible ^ val; visible = val; }
 	void setDirty() { dirty = true; }
 	void setSurface(GfxSurface *surface) { delete this->surface; this->surface = surface; }
 	GfxSurface *getSurface() { return this->surface; }
