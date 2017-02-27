@@ -10,16 +10,8 @@
 #include "shape.hpp"
 #include "surface.hpp"
 
-class Widget {
+class Widget : public GfxShape {
 public:
-	Widget() : shape(NULL) {};
-	virtual ~Widget() { delete shape; };
-
-	const bool &isVisible() { return shape->isVisible(); }
-	void setVisible(const bool& val) { shape->setVisible(val); }
-
-	virtual void setSurface(GfxSurface *surface) { getShape()->setSurface(surface); }
-	virtual GfxShape *getShape(void) { return shape; }
-protected:
-	GfxShape *shape;
+	Widget() {};
+	virtual ~Widget() {};
 };

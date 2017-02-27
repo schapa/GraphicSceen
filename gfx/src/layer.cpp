@@ -17,7 +17,7 @@ void GfxLayer::addShape(GfxShape *shape) {
 void GfxLayer::addWidget(Widget *widget) {
 	if (!widget)
 		return;
-	addShape(widget->getShape());
+	addShape(widget);
 }
 
 void GfxLayer::render() {

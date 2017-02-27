@@ -40,16 +40,10 @@ private:
 };
 
 
-class SegmentDisplayWidget : public Widget {
+class SegmentDisplayWidget : public GfxMulti7SegShape {
 public:
-	SegmentDisplayWidget();
-	virtual ~SegmentDisplayWidget();
-
-	virtual GfxMulti7SegShape *getShape(void) { return static_cast<GfxMulti7SegShape*>(shape); }
-	virtual void setSurface(GfxSurface *surface)  { static_cast<GfxMulti7SegShape*>(shape)->setSurface(surface); Widget::setSurface(surface);}
-
-	const int32_t &getValue() const { return static_cast<GfxMulti7SegShape*>(shape)->getValue(); }
-	void setValue(const int32_t &value) { static_cast<GfxMulti7SegShape*>(shape)->setValue(value); }
+	SegmentDisplayWidget() {};
+	virtual ~SegmentDisplayWidget() {};
 private:
 };
 

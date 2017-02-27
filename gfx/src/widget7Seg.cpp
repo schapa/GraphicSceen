@@ -9,7 +9,9 @@
 
 #include "sprites.hpp"
 
-Gfx7SegShape::Gfx7SegShape(): value(-3) {
+#include <assert.h>
+
+Gfx7SegShape::Gfx7SegShape(): GfxSpriteShape(false), value(-3) {
 	sprites.push_back(
 			SpriteItem(
 					1, 0, Sprite_7SegmentA));
@@ -78,56 +80,31 @@ GfxMulti7SegShape::~GfxMulti7SegShape() {
 
 void GfxMulti7SegShape::setValue(const int32_t &value) {
 	uint32_t absVal = value < 0 ? -value : value;
-	const size_t end = shapes.size() - (value < 0);
-	for (size_t i = 0 ; i < end; i++) {
-		shapes[i].setVisible(true);
-		shapes[i].setValue(absVal ?
-				absVal%10 : -3);
+	const size_t last = shapes.size() - 1;
+	for (size_t i = (value < 0); i < shapes.size(); i++) {
+		shapes[last - i].setVisible(!!absVal);
+		shapes[last - i].setValue(absVal%10);
 		absVal /= 10;
 	}
-	if (value < 0) {
-		shapes[end].setValue(-2);
-	}
+	if (value < 0)
+		shapes[0].setValue(-2);
 	this->dirty = true;
 }
 
 void GfxMulti7SegShape::setSurface(GfxSurface *surface) {
+	assert(surface);
+	GfxShape::setSurface(surface);
 	for (size_t i = 0; i < shapes.size(); i++)
 		shapes[i].setSurface(surface);
 }
 
 bool GfxMulti7SegShape::Draw() {
+	bool drawn = false;
 	if (!surface || !visible || !dirty)
 		return false;
 	surface->fill(0);
-	for (size_t i = 0; i < shapes.size(); i++) {
-//		const Gfx7SegShape& item = shapes[i];
-		shapes[i].Draw();
-//		DBGMSG_H("Draw %d. %d x %d. sz %d", i, item.sprite.getWidth(), item.sprite.getHeight(), item.sprite.getSize());
-//		if (item.isVisible) {
-//			const uint16_t& ix = item.getX();
-//			const uint16_t& iy = item.getY();
-//			const uint16_t& height = item.sprite.getHeight();
-//			const uint16_t& width = item.sprite.getWidth();
-//			for (size_t dy = 0; dy < height; dy++)
-//				for (size_t dx = 0; dx < width; dx++) {
-//					uint32_t pix =  item.sprite.getPixel(dx, dy);
-//					DBGMSG_L("Draw %p at %d %d", pix, ix + dx, iy + dy);
-//					if (!surface->getPixel(ix + dx, iy + dy))
-//						surface->drawPixel(ix + dx, iy + dy, pix);
-//				}
-//		}
-	}
+	for (size_t i = 0; i < shapes.size(); i++)
+		drawn |= shapes[i].Draw();
 	dirty = false;
-	return true;
+	return drawn;
 }
-
-
-SegmentDisplayWidget::SegmentDisplayWidget() {
-	shape = new GfxMulti7SegShape();
-}
-
-SegmentDisplayWidget::~SegmentDisplayWidget() {
-	delete shape;
-}
-

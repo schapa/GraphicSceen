@@ -9,12 +9,9 @@
 #include "sprite.hpp"
 
 #include "dbg_base.h"
-#if 0
+#if 01
 #include "dbg_trace.h"
 #endif
-
-GfxSpriteShape::GfxSpriteShape() {
-}
 
 GfxSpriteShape::~GfxSpriteShape() {
 	sprites.clear();
@@ -23,7 +20,8 @@ GfxSpriteShape::~GfxSpriteShape() {
 bool GfxSpriteShape::Draw() {
 	if (!surface || !visible || !dirty)
 		return false;
-	surface->fill(0);
+	if (isUniqueOnSurface)
+		surface->fill(0);
 	for (size_t i = 0; i < sprites.size(); i++) {
 		const SpriteItem& item = sprites[i];
 		DBGMSG_H("Draw %d. %d x %d. sz %d", i, item.sprite.getWidth(), item.sprite.getHeight(), item.sprite.getSize());

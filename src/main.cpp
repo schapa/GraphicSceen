@@ -16,7 +16,7 @@
 #include "layer.hpp"
 
 #include "shape.hpp"
-#include "textWidget.hpp"
+#include "widgetText.hpp"
 #include "memman.h"
 #include "widget7Seg.hpp"
 
@@ -48,9 +48,9 @@ int main(int argc, char* argv[]) {
 	SegmentDisplayWidget test7;
 	test7.setSurface(new GfxSurface(PixelFormat_GrayScale, 100, 64));
 	test7.setVisible(true);
-	test7.getShape()->setX(3);
-	test7.getShape()->setY(3);
-	baseLayer.addWidget(&test7);
+	test7.setX(3);
+	test7.setY(3);
+	baseLayer.addShape(&test7);
 
 
 //	infoWdt.setSurface(new GfxSurface(PixelFormat_GrayScale, 240, 20));
@@ -75,6 +75,7 @@ int main(int argc, char* argv[]) {
 		EventQueue_Pend(&event);
 		switch (event.type) {
 			case EVENT_SYSTICK: {
+				DBGMSG_INFO("tc");
 				test7.setValue(System_getUptime());
 //				char buffer[128];
 //				sprintf(buffer, "Uptime is %lu", System_getUptime());
