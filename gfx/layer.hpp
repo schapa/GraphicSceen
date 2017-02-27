@@ -21,10 +21,11 @@ public:
 	void addShape(GfxShape *shape);
 	void render();
 	void setTransparentBlendingMode(const bool &mode) { tranparentBlend = mode; }
+
+	virtual void drawPixel(const uint16_t &x, const uint16_t &y, const uint8_t &alpha);
+	virtual void drawPixel(const uint16_t &x, const uint16_t &y, const uint32_t &argb);
 private:
 	void blend();
-	void blendGrayScale_4();
-	void blendTransparent();
 private:
 	std::vector <GfxShape*>shapes;
 	bool tranparentBlend;

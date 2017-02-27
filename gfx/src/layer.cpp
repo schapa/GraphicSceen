@@ -8,6 +8,11 @@
 #include "layer.hpp"
 #include <string.h>
 
+#include "dbg_base.h"
+#if 0
+#include "dbg_trace.h"
+#endif
+
 void GfxLayer::addShape(GfxShape *shape) {
 	if (!shape)
 		return;
@@ -19,61 +24,34 @@ void GfxLayer::render() {
 	for (size_t i = 0; i < shapes.size(); i++)
 		isDrawn |= shapes[i]->Draw();
 	if (isDrawn)
-		tranparentBlend ? blendTransparent() : blend();
+		blend();
 }
 
 void GfxLayer::blend() {
-	switch (getPixelFormat()) {
-		case PixelFormat_GrayScale:
-			if (getBitsDepth() == ColorDepth_4)
-				blendGrayScale_4();
-			break;
-		default:
-			blendTransparent();
-	}
-}
-
-void GfxLayer::blendGrayScale_4() {
-//	uint8_t *fb = getFrameBuffer();
-//	uint16_t surfWidth = getWidth()/2;
-//	fill(0x00);
-//	for (size_t i = 0; i < shapes.size(); i++) {
-//		GfxSurface *surface = shapes[i]->getSurface();
-//		uint16_t xStart = shapes[i]->getX()/2;
-//		uint16_t yStart = shapes[i]->getY();
-//		uint16_t shpWidth = shapes[i]->getWidth()/2;
-//		uint16_t shpHeigth = shapes[i]->getHeigth();
-//		if (!surface || xStart >= surfWidth)
-//			continue;
-//		for (size_t y = 0; (y < shpHeigth) && (yStart + y < getHeigth()); y++) {
-//			uint8_t *start = &fb[yStart + y][xStart];
-//			uint16_t len = (xStart + shpWidth) <= surfWidth ? surface->getBytesPerLine() :
-//					(xStart < surfWidth) ? (surfWidth - xStart) : 0;
-//			memcpy(start, surface->getFrameBuffer()[y], len);
-//		}
-//	}
-}
-
-void GfxLayer::blendTransparent() {
 	fill(0x00);
-	for (size_t i = 0; i < shapes.size(); i++) {
+	for (size_t i = 0; i < shapes.size(); i++)
 		shapes[i]->Blend(this);
-//		GfxSurface *surface = shapes[i]->getSurface();
-//		uint16_t surfWidth = getWidth();
-//		uint16_t xStart = shapes[i]->getX();
-//		uint16_t yStart = shapes[i]->getY();
-//		uint16_t shpWidth = shapes[i]->getWidth();
-//		uint16_t shpHeigth = shapes[i]->getHeigth();
-//		if (!surface || xStart >= surfWidth)
-//			continue;
-//		for (size_t y = 0; (y < shpHeigth) && (yStart + y < getHeigth()); y++) {
-//			for (size_t x = 0; (x < shpWidth) && (xStart + x < getWidth()); x++) {
-//				uint32_t pixel = surface->getPixel(x, y);
-//				if (pixel) {
-//					drawPixel(xStart + x, yStart + y, pixel);
-//				}
-//			}
-//		}
+}
+
+
+void GfxLayer::drawPixel(const uint16_t &x, const uint16_t &y, const uint8_t &alpha) {
+	if (!tranparentBlend)
+		GfxSurface::drawPixel(x,y, alpha);
+	else {
+		const uint32_t val = getPixel(x, y);
+		if (val < alpha)
+			GfxSurface::drawPixel(x,y, (uint32_t)alpha);
 	}
 }
 
+void GfxLayer::drawPixel(const uint16_t &x, const uint16_t &y, const uint32_t &argb) {
+	if (!tranparentBlend)
+		GfxSurface::drawPixel(x,y, argb);
+	else if (argb < 255)
+		drawPixel(x,y, (uint8_t) argb);
+	else {
+		const uint32_t val = getPixel(x, y) & 0xFF000000;
+		if (val < (argb & 0xFF000000)) // compare only by alpha
+			GfxSurface::drawPixel(x,y, argb);
+	}
+}

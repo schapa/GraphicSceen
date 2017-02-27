@@ -7,6 +7,7 @@
 
 #include "surface.hpp"
 #include <string.h>
+#include <assert.h>
 
 
 GfxSurface::GfxSurface(void) {
@@ -78,7 +79,7 @@ void GfxSurface::fill(uint32_t val) {
 	}
 }
 
-void GfxSurface::drawPixel(uint16_t x, uint16_t y, uint8_t alpha) {
+void GfxSurface::drawPixel(const uint16_t &x, const uint16_t &y, const uint8_t &alpha) {
 	if (x >= width || y >= heigth)
 		return;
 
@@ -88,13 +89,13 @@ void GfxSurface::drawPixel(uint16_t x, uint16_t y, uint8_t alpha) {
 
 	switch (bitsDepth) {
 		case ColorDepth_4: {
-			alpha /= 16;
+			const uint8_t tmp = alpha/16;
 			if (x % 2) {
 				*ptrRaw &= 0xF0;
-				*ptrRaw |= alpha;
+				*ptrRaw |= tmp;
 			} else {
 				*ptrRaw &= 0x0F;
-				*ptrRaw |= alpha<<4;
+				*ptrRaw |= tmp<<4;
 			}
 			break;
 		}
@@ -135,7 +136,7 @@ void GfxSurface::drawPixel(uint16_t x, uint16_t y, uint8_t alpha) {
 	}
 }
 
-void GfxSurface::drawPixel(uint16_t x, uint16_t y, uint32_t argb) {
+void GfxSurface::drawPixel(const uint16_t &x, const uint16_t &y, const uint32_t &argb) {
 	if (x >= width || y >= heigth)
 		return;
 
@@ -145,13 +146,13 @@ void GfxSurface::drawPixel(uint16_t x, uint16_t y, uint32_t argb) {
 
 	switch (bitsDepth) {
 		case ColorDepth_4: {
-			argb &= 0x0F;
+			const uint32_t tmp = argb & 0x0F;
 			if (x % 2) {
 				*ptrRaw &= 0xF0;
-				*ptrRaw |= argb;
+				*ptrRaw |= tmp;
 			} else {
 				*ptrRaw &= 0x0F;
-				*ptrRaw |= argb<<4;
+				*ptrRaw |= tmp<<4;
 			}
 			break;
 		}
@@ -188,7 +189,7 @@ void GfxSurface::drawPixel(uint16_t x, uint16_t y, uint32_t argb) {
 	}
 }
 
-uint32_t GfxSurface::getPixel(uint16_t x, uint16_t y) {
+const uint32_t GfxSurface::getPixel(const uint16_t &x, const uint16_t &y) {
 	if (x >= width || y >= heigth)
 		return 0;
 
@@ -208,13 +209,11 @@ uint32_t GfxSurface::getPixel(uint16_t x, uint16_t y) {
 	default:
 		return 0;
 	}
+	return 0;
 }
 
 void GfxSurface::create(void) {
-	if (bitsDepth > 32) {
-//		assert() here
-		return;
-	}
+	assert (bitsDepth <= 32);
 	bytesPerPixel = ColorDepth_4/8;
 
 	bytesPerLine = (bitsDepth == ColorDepth_4) ?
