@@ -89,6 +89,8 @@ int main(int argc, char* argv[]) {
 		switch (event.type) {
 			case EVENT_SYSTICK: {
 				test7.setTemperature(-System_getUptime() - 97);
+				test7.setTemperatureType(System_getUptime() %2);
+				test7.setTripInd((System_getUptime() %2), !(System_getUptime() %2));
 //				char buffer[128];
 //				sprintf(buffer, "Uptime is %lu", System_getUptime());
 //				testWdt.setText(buffer);

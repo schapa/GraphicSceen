@@ -38,7 +38,7 @@ public:
 		setFahrenheitState(true);
 		setTripAState(true);
 		setTripBState(true);
-		setX(80);
+		setX(65);
 	};
 	virtual ~subiTempInfo() {};
 
