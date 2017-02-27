@@ -23,7 +23,7 @@ public:
 	void setFontSize(const uint8_t &size);
 	void setText(const char *text);
 
-	virtual bool Draw();
+	virtual bool draw();
 private:
 	void renderGrayScale(fontItem_p font, const char *text);
 private:

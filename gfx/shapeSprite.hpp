@@ -18,7 +18,7 @@ public:
 
 	std::vector<SpriteItem*>& getSprites() { return sprites; };
 
-	virtual bool Draw();
+	virtual bool draw();
 protected:
 	std::vector<SpriteItem*> sprites;
 	bool isSharingSurface;

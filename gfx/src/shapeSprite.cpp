@@ -19,9 +19,7 @@ GfxSpriteShape::~GfxSpriteShape() {
 	sprites.clear();
 }
 
-bool GfxSpriteShape::Draw() {
-	if (!surface || !visible || !dirty)
-		return false;
+bool GfxSpriteShape::draw() {
 	if (!isSharingSurface)
 		surface->fill(0);
 	const uint16_t sx = isSharingSurface ? getX() : 0;

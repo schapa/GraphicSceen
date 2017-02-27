@@ -36,7 +36,11 @@ public:
 	const uint16_t &getWidth(void) { return surface->getWidth(); }
 	const uint16_t &getHeigth(void) { return surface->getHeigth(); }
 
-	virtual bool Draw() = 0;
+	bool Draw() {
+		if (!surface || !visible || !dirty)
+			return false;
+		return draw();
+	}
 protected:
 	GfxSurface *surface;
 	uint8_t alpha;
@@ -44,6 +48,8 @@ protected:
 	bool dirty;
 	uint16_t x;
 	uint16_t y;
+private:
+	virtual bool draw() = 0;
 };
 
 #endif /* SHAPE_HPP_ */

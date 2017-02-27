@@ -15,7 +15,6 @@
 #endif
 
 
-
 GfxMultiShape::~GfxMultiShape() {
 	DBGMSG_H("Destroying");
 	for (size_t i = 0; i < shapes.size(); i++)
@@ -30,10 +29,8 @@ void GfxMultiShape::setSurface(GfxSurface *surface) {
 		shapes[i]->setSurface(surface);
 }
 
-bool GfxMultiShape::Draw() {
+bool GfxMultiShape::draw() {
 	bool drawn = false;
-	if (!surface || !visible || !dirty)
-		return false;
 	surface->fill(0);
 	for (size_t i = 0; i < shapes.size(); i++)
 		drawn |= shapes[i]->Draw();

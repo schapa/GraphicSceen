@@ -32,10 +32,9 @@ void GfxTextShape::setText(const char *text) {
 	this->text = text;
 }
 
-bool GfxTextShape::Draw(void) {
-	if (!dirty || !surface || !text) {
+bool GfxTextShape::draw(void) {
+	if (!text)
 		return false;
-	}
 
 	fontItem_p fontItem = FontPainter_SizeLookup(this->font, textSize);
 	if (!fontItem) {

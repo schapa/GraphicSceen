@@ -15,7 +15,7 @@ public:
 	GfxMultiShape() {};
 	virtual ~GfxMultiShape();
 	void setSurface(GfxSurface *surface);
-	virtual bool Draw();
+	virtual bool draw();
 protected:
 	std::vector<GfxShape*>shapes;
 };
