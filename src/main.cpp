@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
 		EventQueue_Pend(&event);
 		switch (event.type) {
 			case EVENT_SYSTICK: {
-				test7.setValue(-System_getUptime() - 198);
+				test7.setValue(-System_getUptime() - 97);
 //				char buffer[128];
 //				sprintf(buffer, "Uptime is %lu", System_getUptime());
 //				testWdt.setText(buffer);

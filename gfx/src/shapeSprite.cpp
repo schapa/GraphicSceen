@@ -9,7 +9,7 @@
 #include "sprite.hpp"
 
 #include "dbg_base.h"
-#if 01
+#if 0
 #include "dbg_trace.h"
 #endif
 
