@@ -19,6 +19,7 @@
 #include "widgetText.hpp"
 #include "memman.h"
 #include "widget7Seg.hpp"
+#include "widgetTemperature.hpp"
 
 #include "dbg_base.h"
 #if 0
@@ -44,7 +45,7 @@ int main(int argc, char* argv[]) {
 //	TextWidget timeWdt(FONT_DIGITAL_7SEGMENT, 18, "0123456789");
 //	TextWidget testWdt(FONT_CENTURY_SCOOLBOOK, 12, "H Hello [xxxx]");
 
-	GfxMulti7SegShape test7(3);
+	TemperatureWidget test7;
 	test7.setSurface(new GfxSurface(PixelFormat_GrayScale, 100, 64));
 	test7.setVisible(true);
 	test7.setX(3);
@@ -74,7 +75,7 @@ int main(int argc, char* argv[]) {
 		EventQueue_Pend(&event);
 		switch (event.type) {
 			case EVENT_SYSTICK: {
-				test7.setValue(-System_getUptime() - 97);
+				test7.setTemperature(-System_getUptime() - 97);
 //				char buffer[128];
 //				sprintf(buffer, "Uptime is %lu", System_getUptime());
 //				testWdt.setText(buffer);
