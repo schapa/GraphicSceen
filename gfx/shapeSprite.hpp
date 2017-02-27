@@ -13,14 +13,14 @@
 
 class GfxSpriteShape : public GfxShape {
 public:
-	GfxSpriteShape(bool isSharingSurface = false): isSharingSurface(isSharingSurface) {};
+	GfxSpriteShape() {};
 	virtual ~GfxSpriteShape();
 
 	std::vector<SpriteItem*>& getSprites() { return sprites; };
-
+	virtual void createSurface();
+	virtual bool Blend(GfxSurface *surface);
 protected:
 	std::vector<SpriteItem*> sprites;
-	bool isSharingSurface;
 private:
 	virtual bool draw();
 };

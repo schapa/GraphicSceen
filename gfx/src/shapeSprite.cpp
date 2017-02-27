@@ -8,6 +8,8 @@
 #include "shapeSprite.hpp"
 #include "sprite.hpp"
 
+#include <assert.h>
+
 #include "dbg_base.h"
 #if 0
 #include "dbg_trace.h"
@@ -19,11 +21,51 @@ GfxSpriteShape::~GfxSpriteShape() {
 	sprites.clear();
 }
 
+void GfxSpriteShape::createSurface() {
+	size_t maxX = 0;
+	size_t maxY = 0;
+	size_t minX = ~0;
+	size_t minY = ~0;
+	for (size_t i = 0; i < sprites.size(); i++) {
+		const uint16_t spX = sprites[i]->getX();
+		const uint16_t spY = sprites[i]->getY();
+		const size_t w = spX + sprites[i]->sprite.getWidth();
+		const size_t h = spY + sprites[i]->sprite.getHeight();
+		maxX = (maxX < w) ? w : maxX;
+		maxY = (maxY < h) ? h : maxY;
+		minX = (minX > spX) ? spX : minX;
+		minY = (minY > spY) ? spY : minY;
+	}
+	assert(maxX - minX > 0);
+	assert(maxY - minY > 0);
+	setSurface(new GfxSurface(sprites[0]->sprite.getDepth(), maxX - minX, maxY - minY));
+}
+
+bool GfxSpriteShape::Blend(GfxSurface *surface) {
+
+	if (!isVisible())
+		return false;
+	for (size_t i = 0; i < sprites.size(); i++) {
+		SpriteItem* item = sprites[i];
+		if (!item->isVisible)
+			continue;
+		DBGMSG_H("Draw %d. %d x %d. sz %d", i, item->sprite.getWidth(), item->sprite.getHeight(), item->sprite.getSize());
+		const uint16_t sx = getX() + item->getX();
+		const uint16_t sy = getY() + item->getY();
+		const uint16_t w = item->sprite.getWidth();
+		const uint16_t h = item->sprite.getHeight();
+		for (size_t y = 0; y < h; y++)
+			for (size_t x = 0; x < w; x++)
+				surface->drawPixel(sx + x, sy + y, item->sprite.getPixel(x, y));
+
+	}
+	return true;
+}
+
 bool GfxSpriteShape::draw() {
-	if (!isSharingSurface)
-		surface->fill(0);
-	const uint16_t sx = isSharingSurface ? getX() : 0;
-	const uint16_t sy = isSharingSurface ? getY() : 0;
+	surface->fill(0);
+	const uint16_t sx = 0;
+	const uint16_t sy = 0;
 	for (size_t i = 0; i < sprites.size(); i++) {
 		SpriteItem* item = sprites[i];
 		DBGMSG_H("Draw %d. %d x %d. sz %d", i, item->sprite.getWidth(), item->sprite.getHeight(), item->sprite.getSize());

@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
 //	TextWidget testWdt(FONT_CENTURY_SCOOLBOOK, 12, "H Hello [xxxx]");
 
 	TemperatureWidget test7;
-	test7.setSurface(new GfxSurface(PixelFormat_GrayScale, 100, 64));
+	test7.createSurface();
 	test7.setVisible(true);
 	test7.setX(3);
 	test7.setY(5);

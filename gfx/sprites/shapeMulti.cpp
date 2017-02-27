@@ -35,9 +35,22 @@ void GfxMultiShape::setSurface(GfxSurface *surface) {
 		shapes[i]->setSurface(surface);
 }
 
+void GfxMultiShape::createSurface() {
+	for (size_t i = 0; i < shapes.size(); i++)
+		shapes[i]->createSurface();
+}
+
+bool GfxMultiShape::Blend(GfxSurface *surface) {
+	if (!isVisible())
+		return false;
+	for (size_t i = 0; i < shapes.size(); i++)
+		shapes[i]->Blend(surface);
+	return true;
+}
+
 bool GfxMultiShape::draw() {
 	bool drawn = false;
-	surface->fill(0);
+//	surface->fill(0);
 	for (size_t i = 0; i < shapes.size(); i++)
 		drawn |= shapes[i]->Draw();
 	dirty = false;

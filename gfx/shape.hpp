@@ -12,13 +12,13 @@
 
 class GfxShape {
 public:
-	GfxShape() {
-		surface = NULL;
-		alpha = 255;
-		visible = false;
-		dirty = true;
-		x = 0;
-		y = 0;
+	GfxShape():
+		surface(NULL),
+		alpha(255),
+		visible(false),
+		dirty(true),
+		x(0),
+		y(0) {
 	}
 	virtual ~GfxShape() {
 		delete surface;
@@ -27,19 +27,25 @@ public:
 	const bool &isVisible() const { return visible; }
 	virtual void setVisible(const bool& val) { dirty |= visible ^ val; visible = val; }
 	virtual void setSurface(GfxSurface *surface) { delete this->surface; this->surface = surface; }
+	virtual void createSurface() = 0;
 	GfxSurface *getSurface() { return this->surface; }
 
 	const uint16_t &getX(void) { return x; }
 	const uint16_t &getY(void) { return y; }
 	void setX(const uint16_t &x) {  this->x = x; }
 	void setY(const uint16_t &y) {  this->y = y; }
-	const uint16_t &getWidth(void) { return surface->getWidth(); }
-	const uint16_t &getHeigth(void) { return surface->getHeigth(); }
+	virtual const uint16_t getWidth(void) { return surface->getWidth(); }
+	virtual const uint16_t getHeigth(void) { return surface->getHeigth(); }
 
 	inline bool Draw() {
-		if (!surface || !visible || !dirty)
+		if (/*!surface ||*/ !visible || !dirty)
 			return false;
 		return draw();
+	}
+	virtual bool Blend(GfxSurface *surface) {
+		if (!surface || !visible)
+			return false;
+		return true;
 	}
 protected:
 	GfxSurface *surface;

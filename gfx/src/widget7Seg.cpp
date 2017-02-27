@@ -20,7 +20,7 @@ enum {
 	SPRITE_MINUS_ONE = -1,
 };
 
-Gfx7SegShape::Gfx7SegShape(): GfxSpriteShape(true), value(-3) {
+Gfx7SegShape::Gfx7SegShape(): value(-3) {
 	sprites.push_back(
 			new SpriteItem(
 					1, 0, Sprite_7SegmentA));

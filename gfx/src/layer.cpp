@@ -57,22 +57,23 @@ void GfxLayer::blendGrayScale_4() {
 void GfxLayer::blendTransparent() {
 	fill(0x00);
 	for (size_t i = 0; i < shapes.size(); i++) {
-		GfxSurface *surface = shapes[i]->getSurface();
-		uint16_t surfWidth = getWidth();
-		uint16_t xStart = shapes[i]->getX();
-		uint16_t yStart = shapes[i]->getY();
-		uint16_t shpWidth = shapes[i]->getWidth();
-		uint16_t shpHeigth = shapes[i]->getHeigth();
-		if (!surface || xStart >= surfWidth)
-			continue;
-		for (size_t y = 0; (y < shpHeigth) && (yStart + y < getHeigth()); y++) {
-			for (size_t x = 0; (x < shpWidth) && (xStart + x < getWidth()); x++) {
-				uint32_t pixel = surface->getPixel(x, y);
-				if (pixel) {
-					drawPixel(xStart + x, yStart + y, pixel);
-				}
-			}
-		}
+		shapes[i]->Blend(this);
+//		GfxSurface *surface = shapes[i]->getSurface();
+//		uint16_t surfWidth = getWidth();
+//		uint16_t xStart = shapes[i]->getX();
+//		uint16_t yStart = shapes[i]->getY();
+//		uint16_t shpWidth = shapes[i]->getWidth();
+//		uint16_t shpHeigth = shapes[i]->getHeigth();
+//		if (!surface || xStart >= surfWidth)
+//			continue;
+//		for (size_t y = 0; (y < shpHeigth) && (yStart + y < getHeigth()); y++) {
+//			for (size_t x = 0; (x < shpWidth) && (xStart + x < getWidth()); x++) {
+//				uint32_t pixel = surface->getPixel(x, y);
+//				if (pixel) {
+//					drawPixel(xStart + x, yStart + y, pixel);
+//				}
+//			}
+//		}
 	}
 }
 
