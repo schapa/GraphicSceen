@@ -40,11 +40,11 @@ void GfxMultiShape::createSurface() {
 		shapes[i]->createSurface();
 }
 
-bool GfxMultiShape::Blend(GfxSurface *surface) {
+bool GfxMultiShape::Blend(GfxSurface *surface, const uint16_t& offX, const uint16_t& offY) {
 	if (!isVisible())
 		return false;
 	for (size_t i = 0; i < shapes.size(); i++)
-		shapes[i]->Blend(surface);
+		shapes[i]->Blend(surface, offX + x, offY + y);
 	return true;
 }
 

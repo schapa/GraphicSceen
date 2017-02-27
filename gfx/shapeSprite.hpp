@@ -18,7 +18,7 @@ public:
 
 	std::vector<SpriteItem*>& getSprites() { return sprites; };
 	virtual void createSurface();
-	virtual bool Blend(GfxSurface *surface);
+	virtual bool Blend(GfxSurface *surface, const uint16_t& offX = 0, const uint16_t& offY = 0);
 protected:
 	std::vector<SpriteItem*> sprites;
 private:

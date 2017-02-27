@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
 	TemperatureWidget test7;
 	test7.createSurface();
 	test7.setVisible(true);
-	test7.setX(3);
+	test7.setX(0);
 	test7.setY(5);
 	baseLayer.addShape(&test7);
 	test7.setTemperature( - 97);

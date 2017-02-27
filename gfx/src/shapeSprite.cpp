@@ -11,7 +11,7 @@
 #include <assert.h>
 
 #include "dbg_base.h"
-#if 01
+#if 0
 #include "dbg_trace.h"
 #endif
 
@@ -41,7 +41,7 @@ void GfxSpriteShape::createSurface() {
 	setSurface(new GfxSurface(sprites[0]->sprite.getDepth(), maxX - minX, maxY - minY));
 }
 
-bool GfxSpriteShape::Blend(GfxSurface *surface) {
+bool GfxSpriteShape::Blend(GfxSurface *surface, const uint16_t& offX, const uint16_t& offY) {
 
 	if (!isVisible())
 		return false;
@@ -50,8 +50,8 @@ bool GfxSpriteShape::Blend(GfxSurface *surface) {
 		SpriteItem* item = sprites[i];
 		if (!item->isVisible)
 			continue;
-		const uint16_t sx = getX() + item->getX();
-		const uint16_t sy = getY() + item->getY();
+		const uint16_t sx = offX + getX() + item->getX();
+		const uint16_t sy = offY + getY() + item->getY();
 		const uint16_t w = item->sprite.getWidth();
 		const uint16_t h = item->sprite.getHeight();
 		DBGMSG_M("Blend %d. At %d:%d. Sz %dx%d", i, sx, sy, w, h);

@@ -38,15 +38,11 @@ public:
 	virtual const uint16_t getHeigth(void) { return surface->getHeigth(); }
 
 	inline bool Draw() {
-		if (/*!surface ||*/ !visible || !dirty)
+		if (!visible || !dirty)
 			return false;
 		return draw();
 	}
-	virtual bool Blend(GfxSurface *surface) {
-		if (!surface || !visible)
-			return false;
-		return true;
-	}
+	virtual bool Blend(GfxSurface *surface, const uint16_t& offX = 0, const uint16_t& offY = 0) = 0;
 protected:
 	GfxSurface *surface;
 	uint8_t alpha;
