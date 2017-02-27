@@ -13,13 +13,13 @@
 
 class GfxSpriteShape : public GfxShape {
 public:
-	GfxSpriteShape(bool isUniqueOnSurface = true): isUniqueOnSurface(isUniqueOnSurface) {};
+	GfxSpriteShape(bool isSharingSurface = false): isSharingSurface(isSharingSurface) {};
 	virtual ~GfxSpriteShape();
 
-	std::vector<SpriteItem>& getSprites() { return sprites; };
+	std::vector<SpriteItem*>& getSprites() { return sprites; };
 
 	virtual bool Draw();
 protected:
-	std::vector<SpriteItem> sprites;
-	bool isUniqueOnSurface;
+	std::vector<SpriteItem*> sprites;
+	bool isSharingSurface;
 };

@@ -31,6 +31,7 @@ LDLIBS += \
 	-lpthread \
 	-lrt \
 	-m32 \
+	-rdynamic \
 
 .PHONY: all clean info
 

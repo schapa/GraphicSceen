@@ -33,7 +33,7 @@ public:
 
 	virtual bool Draw();
 private:
-	std::vector<Gfx7SegShape>shapes;
+	std::vector<Gfx7SegShape*>shapes;
 	int32_t value;
 };
 
