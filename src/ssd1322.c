@@ -92,7 +92,7 @@ void SSD1322_DrawSurface(const uint8_t *line, const uint16_t heigth, const uint8
     uint32_t i = 0;
     uint32_t j = 0;
     const uint8_t offset = 27;
-    uint8_t buffer[128];
+    uint8_t buffer[bytesPerLine];
 	SSD1322_SetColumnRange(offset +1, offset + heigth);
 	SSD1322_SetRowRange(0, 70);
 

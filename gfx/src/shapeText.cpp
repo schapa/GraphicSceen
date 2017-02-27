@@ -63,7 +63,7 @@ void GfxTextShape::renderGrayScale(fontItem_p font, const char *text) {
 	    for (uint16_t y = 0; (y < character.heigth) && (y < surface->getHeigth()); ++y) {
 	    	const uint8_t *pixel = &font->pixelData[character.offset + y * character.width];
 		    for (uint16_t x = 0; (x < character.width) && (x < surface->getWidth()); ++x) {
-		    	surface->drawPixel(x + xPos, y + character.top, (uint8_t)pixel[x]);
+		    	surface->drawPixel(x + xPos, y + character.top, (uint8_t)pixel[x], PixelFormat_GrayScale);
 		    }
 	    }
 	    xPos += character.advance - character.left;

@@ -11,7 +11,7 @@
 #include <assert.h>
 
 #include "dbg_base.h"
-#if 0
+#if 01
 #include "dbg_trace.h"
 #endif
 
@@ -45,18 +45,20 @@ bool GfxSpriteShape::Blend(GfxSurface *surface) {
 
 	if (!isVisible())
 		return false;
+	DBGMSG_H("Blend %p", this);
 	for (size_t i = 0; i < sprites.size(); i++) {
 		SpriteItem* item = sprites[i];
 		if (!item->isVisible)
 			continue;
-		DBGMSG_H("Draw %d. %d x %d. sz %d", i, item->sprite.getWidth(), item->sprite.getHeight(), item->sprite.getSize());
 		const uint16_t sx = getX() + item->getX();
 		const uint16_t sy = getY() + item->getY();
 		const uint16_t w = item->sprite.getWidth();
 		const uint16_t h = item->sprite.getHeight();
+		DBGMSG_M("Blend %d. At %d:%d. Sz %dx%d", i, sx, sy, w, h);
+
 		for (size_t y = 0; y < h; y++)
 			for (size_t x = 0; x < w; x++)
-				surface->drawPixel(sx + x, sy + y, item->sprite.getPixel(x, y));
+				surface->drawPixel(sx + x, sy + y, item->sprite.getPixel(x, y), PixelFormat_GrayScale);
 
 	}
 	return true;
@@ -68,8 +70,8 @@ bool GfxSpriteShape::draw() {
 	const uint16_t sy = 0;
 	for (size_t i = 0; i < sprites.size(); i++) {
 		SpriteItem* item = sprites[i];
-		DBGMSG_H("Draw %d. %d x %d. sz %d", i, item->sprite.getWidth(), item->sprite.getHeight(), item->sprite.getSize());
 		if (item->isVisible) {
+			DBGMSG_H("Item %d", i);
 			const uint16_t& ix = sx + item->getX();
 			const uint16_t& iy = sy + item->getY();
 			const uint16_t& height = item->sprite.getHeight();
@@ -79,7 +81,7 @@ bool GfxSpriteShape::draw() {
 					uint32_t pix =  item->sprite.getPixel(dx, dy);
 					DBGMSG_L("Draw %p at %d %d", pix, ix + dx, iy + dy);
 					if (!surface->getPixel(ix + dx, iy + dy))
-						surface->drawPixel(ix + dx, iy + dy, pix);
+						surface->drawPixel(ix + dx, iy + dy, pix, PixelFormat_GrayScale);
 				}
 		}
 	}

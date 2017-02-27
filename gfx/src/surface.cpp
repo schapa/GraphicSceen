@@ -67,10 +67,11 @@ void GfxSurface::fill(uint32_t val) {
 			break;
 		}
 		case ColorDepth_32: {
-			uint32_t **ptr = reinterpret_cast<uint32_t **>(line);
 			for (size_t i = 0; i < heigth; i++) {
-				for (size_t j = 0; j < width; j++)
-					ptr[i][j] = val;
+				for (size_t j = 0; j < width; j++) {
+					uint32_t *ptr = reinterpret_cast<uint32_t *>(&line[i*bytesPerLine + j*bytesPerPixel]);
+					*ptr = val;
+				}
 			}
 			break;
 		}
@@ -79,67 +80,67 @@ void GfxSurface::fill(uint32_t val) {
 	}
 }
 
-void GfxSurface::drawPixel(const uint16_t &x, const uint16_t &y, const uint8_t &alpha) {
+//void GfxSurface::drawPixel(const uint16_t &x, const uint16_t &y, const uint8_t &alpha) {
+//	if (x >= width || y >= heigth)
+//		return;
+//
+//	const size_t offset = (bitsDepth == ColorDepth_4) ?
+//			(y*bytesPerLine + x/2) : (y*bytesPerLine + x*bytesPerPixel);
+//	uint8_t *ptrRaw = &line[offset];
+//
+//	switch (bitsDepth) {
+//		case ColorDepth_4: {
+//			const uint8_t tmp = alpha/16;
+//			if (x % 2) {
+//				*ptrRaw &= 0xF0;
+//				*ptrRaw |= tmp;
+//			} else {
+//				*ptrRaw &= 0x0F;
+//				*ptrRaw |= tmp<<4;
+//			}
+//			break;
+//		}
+//		default:
+//			switch (pixelFormat) {
+//			case PixelFormat_GrayScale:
+//				// should newer get here
+//				break;
+//			case PixelFormat_ARGB8888: {
+//				uint32_t pix = alpha<<24 | 0xFFFFFF;
+//				uint32_t *ptr = reinterpret_cast<uint32_t *>(ptrRaw);
+//				*ptr = pix;
+//				break;
+//			}
+//			case PixelFormat_RGB888: {
+//				uint8_t *ptr = &line[offset];
+//				ptr[0] = alpha;
+//				ptr[1] = alpha;
+//				ptr[2] = alpha;
+//				break;
+//			}
+//			case PixelFormat_RGB565: {
+//				uint16_t pix = alpha>>3;
+//				pix |= pix<<11;
+//				pix |= (alpha>>2)<<5;
+//				uint16_t *ptr = reinterpret_cast<uint16_t *>(ptrRaw);
+//				*ptr = pix;
+//				break;
+//			}
+//			case PixelFormat_ARGB1555:
+//			case PixelFormat_ARGB4444:
+//			case PixelFormat_AL88:
+//				break;
+//			case PixelFormat_L8:
+//			case PixelFormat_AL44:
+//				break;
+//			}
+//	}
+//}
+
+void GfxSurface::drawPixel(const uint16_t &x, const uint16_t &y, const uint32_t &argbInp, const PixelFormat &src) {
 	if (x >= width || y >= heigth)
 		return;
-
-	const size_t offset = (bitsDepth == ColorDepth_4) ?
-			(y*bytesPerLine + x/2) : (y*bytesPerLine + x*bytesPerPixel);
-	uint8_t *ptrRaw = &line[offset];
-
-	switch (bitsDepth) {
-		case ColorDepth_4: {
-			const uint8_t tmp = alpha/16;
-			if (x % 2) {
-				*ptrRaw &= 0xF0;
-				*ptrRaw |= tmp;
-			} else {
-				*ptrRaw &= 0x0F;
-				*ptrRaw |= tmp<<4;
-			}
-			break;
-		}
-		default:
-			switch (pixelFormat) {
-			case PixelFormat_GrayScale:
-				// should newer get here
-				break;
-			case PixelFormat_ARGB8888: {
-				uint32_t pix = alpha<<24 | 0xFFFFFF;
-				uint32_t *ptr = reinterpret_cast<uint32_t *>(ptrRaw);
-				*ptr = pix;
-				break;
-			}
-			case PixelFormat_RGB888: {
-				uint8_t *ptr = &line[offset];
-				ptr[0] = alpha;
-				ptr[1] = alpha;
-				ptr[2] = alpha;
-				break;
-			}
-			case PixelFormat_RGB565: {
-				uint16_t pix = alpha>>3;
-				pix |= pix<<11;
-				pix |= (alpha>>2)<<5;
-				uint16_t *ptr = reinterpret_cast<uint16_t *>(ptrRaw);
-				*ptr = pix;
-				break;
-			}
-			case PixelFormat_ARGB1555:
-			case PixelFormat_ARGB4444:
-			case PixelFormat_AL88:
-				break;
-			case PixelFormat_L8:
-			case PixelFormat_AL44:
-				break;
-			}
-	}
-}
-
-void GfxSurface::drawPixel(const uint16_t &x, const uint16_t &y, const uint32_t &argb) {
-	if (x >= width || y >= heigth)
-		return;
-
+	const uint32_t &argb = convertPixel(src, argbInp);
 	const size_t offset = (bitsDepth == ColorDepth_4) ?
 			(y*bytesPerLine + x/2) : (y*bytesPerLine + x*bytesPerPixel);
 	uint8_t *ptrRaw = &line[offset];
@@ -214,7 +215,7 @@ const uint32_t GfxSurface::getPixel(const uint16_t &x, const uint16_t &y) {
 
 void GfxSurface::create(void) {
 	assert (bitsDepth <= 32);
-	bytesPerPixel = ColorDepth_4/8;
+	bytesPerPixel = bitsDepth/8;
 
 	bytesPerLine = (bitsDepth == ColorDepth_4) ?
 			width/2 + width%2 : width*bytesPerPixel /*+ width%(bitsDepth/8)*/;
@@ -224,7 +225,7 @@ void GfxSurface::create(void) {
 	}
 }
 
-ColorDepth GfxSurface::format2depth(const PixelFormat &fmt) {
+const ColorDepth GfxSurface::format2depth(const PixelFormat &fmt) const {
 	ColorDepth depth = ColorDepth_32;
 	switch (fmt) {
 		case PixelFormat_GrayScale:
@@ -248,4 +249,31 @@ ColorDepth GfxSurface::format2depth(const PixelFormat &fmt) {
 			break;
 	}
 	return depth;
+}
+
+const uint32_t GfxSurface::convertPixel(const PixelFormat &src, const uint32_t &pix) const {
+	if (pixelFormat == src)
+		return pix;
+	uint32_t newVal = 0;
+	switch (pixelFormat) {
+		case PixelFormat_GrayScale:
+			if (src == PixelFormat_RGB565) {
+				const uint8_t b = pix & 0x1F;
+				const uint8_t g = (pix>>6) & 0x3F;
+				const uint8_t r = (pix>>11) & 0x1F;
+				newVal = (b + g + r)/192;
+			}
+			break;
+		case PixelFormat_RGB565:
+			if (src == PixelFormat_GrayScale) {
+				newVal = pix<<1;
+				newVal |= pix<<7;
+				newVal |= pix<<12;
+			}
+			break;
+		default:
+			newVal = pix;
+			break;
+	}
+	return newVal;
 }

@@ -29,13 +29,13 @@ public:
 	const ColorDepth &getBitsDepth(void) { return bitsDepth; }
 	const PixelFormat &getPixelFormat(void) { return pixelFormat; }
 public:
-	virtual void drawPixel(const uint16_t &x, const uint16_t &y, const uint8_t &alpha);
-	virtual void drawPixel(const uint16_t &x, const uint16_t &y, const uint32_t &argb);
+	virtual void drawPixel(const uint16_t &x, const uint16_t &y, const uint32_t &argb, const PixelFormat &src);
 
 	const uint32_t getPixel(const uint16_t &x, const uint16_t &y);
 private:
 	void create(void);
-	ColorDepth format2depth(const PixelFormat &fmt);
+	const ColorDepth format2depth(const PixelFormat &fmt) const;
+	const inline uint32_t convertPixel(const PixelFormat &src, const uint32_t &pix) const;
 private:
 	uint8_t *line;
 	uint16_t bytesPerLine;

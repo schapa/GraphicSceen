@@ -33,25 +33,12 @@ void GfxLayer::blend() {
 		shapes[i]->Blend(this);
 }
 
-
-void GfxLayer::drawPixel(const uint16_t &x, const uint16_t &y, const uint8_t &alpha) {
+void GfxLayer::drawPixel(const uint16_t &x, const uint16_t &y, const uint32_t &argb, const PixelFormat &src) {
 	if (!tranparentBlend)
-		GfxSurface::drawPixel(x,y, alpha);
+		GfxSurface::drawPixel(x,y, argb, src);
 	else {
-		const uint32_t val = getPixel(x, y);
-		if (val < alpha)
-			GfxSurface::drawPixel(x,y, (uint32_t)alpha);
-	}
-}
-
-void GfxLayer::drawPixel(const uint16_t &x, const uint16_t &y, const uint32_t &argb) {
-	if (!tranparentBlend)
-		GfxSurface::drawPixel(x,y, argb);
-	else if (argb < 255)
-		drawPixel(x,y, (uint8_t) argb);
-	else {
-		const uint32_t val = getPixel(x, y) & 0xFF000000;
-		if (val < (argb & 0xFF000000)) // compare only by alpha
-			GfxSurface::drawPixel(x,y, argb);
+		const uint32_t old = getPixel(x, y);
+		if (old < argb)
+			GfxSurface::drawPixel(x,y, argb, src);
 	}
 }

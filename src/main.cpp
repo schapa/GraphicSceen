@@ -37,7 +37,17 @@ int main(int argc, char* argv[]) {
 	SSD1322_ClearDisplay();
 	DBGMSG_INFO("\nStart. Init %d", status);
 
-	GfxLayer baseLayer(PixelFormat_GrayScale, 256, 64);
+#ifdef EMULATOR
+	const uint16_t width = 256;
+	const PixelFormat pf = PixelFormat_GrayScale;
+#else
+	const uint16_t width = 240;
+	const PixelFormat pf = PixelFormat_RGB565;
+#endif
+	const uint16_t heigth = 64;
+
+//	GfxLayer baseLayer(PixelFormat_GrayScale, 256, 64);
+	GfxLayer baseLayer(pf, width, heigth);
 
 	DiscoLCDInit(baseLayer.getFrameBuffer());
 
@@ -51,6 +61,7 @@ int main(int argc, char* argv[]) {
 	test7.setX(3);
 	test7.setY(5);
 	baseLayer.addShape(&test7);
+	test7.setTemperature( - 97);
 
 
 //	infoWdt.setSurface(new GfxSurface(PixelFormat_GrayScale, 240, 20));
@@ -69,7 +80,9 @@ int main(int argc, char* argv[]) {
 //	testWdt.getShape()->setY(20);
 
 	while(1) {
+		size_t start = System_getUptimeMs();
 		baseLayer.render();
+		DBGMSG_INFO("rend %d", System_getUptimeMs() - start);
 		SSD1322_DrawSurface(baseLayer.getFrameBuffer(), baseLayer.getHeigth(), baseLayer.getBytesPerLine());
 		Event_t event;
 		EventQueue_Pend(&event);
