@@ -25,7 +25,6 @@
 #include "dbg_trace.h"
 #endif
 
-
 extern "C" void DiscoLCDInit(uint8_t *);
 extern "C" void DiscoLCD_setState(_Bool state);
 
@@ -49,7 +48,7 @@ int main(int argc, char* argv[]) {
 	test7.setSurface(new GfxSurface(PixelFormat_GrayScale, 100, 64));
 	test7.setVisible(true);
 	test7.setX(3);
-	test7.setY(3);
+	test7.setY(5);
 	baseLayer.addShape(&test7);
 
 
@@ -75,8 +74,7 @@ int main(int argc, char* argv[]) {
 		EventQueue_Pend(&event);
 		switch (event.type) {
 			case EVENT_SYSTICK: {
-				DBGMSG_INFO("tc");
-				test7.setValue(System_getUptime());
+				test7.setValue(-System_getUptime() - 95);
 //				char buffer[128];
 //				sprintf(buffer, "Uptime is %lu", System_getUptime());
 //				testWdt.setText(buffer);

@@ -10,7 +10,6 @@
 
 #include "surface.hpp"
 #include "shape.hpp"
-#include "widget.hpp"
 #include <vector>
 
 class GfxLayer : public GfxSurface {
@@ -20,7 +19,6 @@ public:
 	virtual ~GfxLayer() { };
 public:
 	void addShape(GfxShape *shape);
-	void addWidget(Widget *widget);
 	void render();
 	void setTransparentBlendingMode(const bool &mode) { tranparentBlend = mode; }
 private:

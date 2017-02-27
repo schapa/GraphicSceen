@@ -8,7 +8,6 @@
 #ifndef TEXTWIDGET_HPP_
 #define TEXTWIDGET_HPP_
 
-#include "widget.hpp"
 #include "shapeText.hpp"
 
 class TextWidget : public GfxTextShape {

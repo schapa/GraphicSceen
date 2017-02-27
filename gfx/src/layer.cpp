@@ -14,12 +14,6 @@ void GfxLayer::addShape(GfxShape *shape) {
 	shapes.push_back(shape);
 }
 
-void GfxLayer::addWidget(Widget *widget) {
-	if (!widget)
-		return;
-	addShape(widget);
-}
-
 void GfxLayer::render() {
 	bool isDrawn = false;
 	for (size_t i = 0; i < shapes.size(); i++)

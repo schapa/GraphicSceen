@@ -7,8 +7,6 @@
 
 #pragma once
 
-
-#include "widget.hpp"
 #include "shapeSprite.hpp"
 #include <vector>
 
