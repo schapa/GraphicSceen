@@ -36,7 +36,7 @@ class SpriteItem {
 public:
 	bool isVisible;
 	const Sprite& sprite;
-	SpriteItem(const uint16_t& x, const uint16_t& y, const Sprite& sprite): isVisible(true), sprite(sprite), x(x), y(y) {};
+	SpriteItem(const uint16_t& x, const uint16_t& y, const Sprite& sprite): isVisible(false), sprite(sprite), x(x), y(y) {};
 
 public:
 	const uint16_t& getX() const { return x; }

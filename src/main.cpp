@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
 //	testWdt.getShape()->setX(20);
 //	testWdt.getShape()->setY(20);
 
-	while(1) {		
+	while(1) {
 		baseLayer.render();
 		SSD1322_DrawSurface(baseLayer.getFrameBuffer(), baseLayer.getHeigth(), baseLayer.getBytesPerLine());
 		Event_t event;

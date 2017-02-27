@@ -25,8 +25,8 @@ public:
 	}
 
 	const bool &isVisible() const { return visible; }
-	void setVisible(const bool& val) { dirty |= visible ^ val; visible = val; }
-	void setSurface(GfxSurface *surface) { delete this->surface; this->surface = surface; }
+	virtual void setVisible(const bool& val) { dirty |= visible ^ val; visible = val; }
+	virtual void setSurface(GfxSurface *surface) { delete this->surface; this->surface = surface; }
 	GfxSurface *getSurface() { return this->surface; }
 
 	const uint16_t &getX(void) { return x; }
@@ -36,7 +36,7 @@ public:
 	const uint16_t &getWidth(void) { return surface->getWidth(); }
 	const uint16_t &getHeigth(void) { return surface->getHeigth(); }
 
-	bool Draw() {
+	inline bool Draw() {
 		if (!surface || !visible || !dirty)
 			return false;
 		return draw();
