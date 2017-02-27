@@ -8,6 +8,7 @@
 #pragma once
 
 #include "shapeSprite.hpp"
+#include "shapeMulti.hpp"
 #include <vector>
 
 
@@ -22,26 +23,16 @@ private:
 	int8_t value;
 };
 
-class GfxMulti7SegShape : public GfxShape {
+class GfxMulti7SegShape : public GfxMultiShape {
 public:
-	GfxMulti7SegShape();
-	virtual ~GfxMulti7SegShape();
+	GfxMulti7SegShape(const size_t size);
+	virtual ~GfxMulti7SegShape() {};
 
 	const int32_t &getValue() const { return value; }
 	void setValue(const int32_t &value);
-	void setSurface(GfxSurface *surface);
 
-	virtual bool Draw();
 private:
-	std::vector<Gfx7SegShape*>shapes;
 	int32_t value;
 };
 
-
-class SegmentDisplayWidget : public GfxMulti7SegShape {
-public:
-	SegmentDisplayWidget() {};
-	virtual ~SegmentDisplayWidget() {};
-private:
-};
 

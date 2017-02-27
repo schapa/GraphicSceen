@@ -6,7 +6,6 @@
  */
 
 #include "widget7Seg.hpp"
-
 #include "sprites.hpp"
 
 #include <assert.h>
@@ -14,6 +13,12 @@
 #if 0
 #include "dbg_trace.h"
 #endif
+
+enum {
+	SPRITE_EMPTY = -3,
+	SPRITE_MINUS = -2,
+	SPRITE_MINUS_ONE = -1,
+};
 
 Gfx7SegShape::Gfx7SegShape(): GfxSpriteShape(true), value(-3) {
 	sprites.push_back(
@@ -54,11 +59,11 @@ void Gfx7SegShape::setValue(const int8_t &value) {
 	};
 	uint8_t mask = 0;
 	this->value = value;
-	if (value < -2)
+	if (value < SPRITE_MINUS)
 		mask = 0x00;
-	else if (value == -2)
+	else if (value == SPRITE_MINUS)
 		mask = 0x01;
-	else if (value == -1)
+	else if (value == SPRITE_MINUS_ONE)
 		mask = 0x31;
 	else
 		mask = segmap[value%10];
@@ -68,21 +73,12 @@ void Gfx7SegShape::setValue(const int8_t &value) {
 	dirty = true;
 }
 
-GfxMulti7SegShape::GfxMulti7SegShape(): value(0) {
-	const size_t size = 3;
+GfxMulti7SegShape::GfxMulti7SegShape(const size_t size): value(0) {
 	DBGMSG_H("Creating of %d size", size);
 	for (size_t i = 0; i < size; i++) {
 		shapes.push_back(new Gfx7SegShape());
 		shapes[i]->setX(20 * i);
 	}
-}
-
-GfxMulti7SegShape::~GfxMulti7SegShape() {
-	DBGMSG_H("Destroying");
-
-	for (size_t i = 0; i < shapes.size(); i++)
-		delete shapes[i];
-	shapes.clear();
 }
 
 void GfxMulti7SegShape::setValue(const int32_t &value) {
@@ -91,34 +87,17 @@ void GfxMulti7SegShape::setValue(const int32_t &value) {
 	DBGMSG_M("Seting value %d", value);
 	for (size_t i = 0; i < shapes.size(); i++) {
 		const size_t pos = last - i;
-		shapes[pos]->setVisible(!!absVal);
-		shapes[pos]->setValue(absVal%10);
+		Gfx7SegShape *shape = static_cast<Gfx7SegShape*>(shapes[pos]);
+		shape->setVisible(!!absVal);
+		shape->setValue(absVal%10);
 		DBGMSG_L("pos %d val %d", pos, absVal%10);
 		absVal /= 10;
 	}
 	if (value < 0) {
-		int8_t sig = ((value > -200) && (value < -99)) ? -1 : -2;
+		int8_t sig = ((value > -200) && (value < -99)) ? SPRITE_MINUS_ONE : SPRITE_MINUS;
 		DBGMSG_L("Negative. pos %d val %d", 0, sig);
-		shapes[0]->setValue(sig);
-		shapes[0]->setVisible(true);
+		static_cast<Gfx7SegShape*>(shapes[0])->setValue(sig);
+		static_cast<Gfx7SegShape*>(shapes[0])->setVisible(true);
 	}
 	this->dirty = true;
-}
-
-void GfxMulti7SegShape::setSurface(GfxSurface *surface) {
-	assert(surface);
-	GfxShape::setSurface(surface);
-	for (size_t i = 0; i < shapes.size(); i++)
-		shapes[i]->setSurface(surface);
-}
-
-bool GfxMulti7SegShape::Draw() {
-	bool drawn = false;
-	if (!surface || !visible || !dirty)
-		return false;
-	surface->fill(0);
-	for (size_t i = 0; i < shapes.size(); i++)
-		drawn |= shapes[i]->Draw();
-	dirty = false;
-	return drawn;
 }

@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 //	TextWidget timeWdt(FONT_DIGITAL_7SEGMENT, 18, "0123456789");
 //	TextWidget testWdt(FONT_CENTURY_SCOOLBOOK, 12, "H Hello [xxxx]");
 
-	SegmentDisplayWidget test7;
+	GfxMulti7SegShape test7(3);
 	test7.setSurface(new GfxSurface(PixelFormat_GrayScale, 100, 64));
 	test7.setVisible(true);
 	test7.setX(3);
