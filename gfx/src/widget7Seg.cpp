@@ -26,22 +26,22 @@ Gfx7SegShape::Gfx7SegShape(): value(-3) {
 					2, 0, Sprite_7SegmentA));
 	sprites.push_back(
 			new SpriteItem(
-					12, 2, Sprite_7SegmentB));
+					12, 1, Sprite_7SegmentB));
 	sprites.push_back(
 			new SpriteItem(
-					12, 17, Sprite_7SegmentC));
+					12, 16, Sprite_7SegmentC));
 	sprites.push_back(
 			new SpriteItem(
-					2, 29, Sprite_7SegmentD));
+					2, 28, Sprite_7SegmentD));
 	sprites.push_back(
 			new SpriteItem(
-					0, 17, Sprite_7SegmentE));
+					0, 16, Sprite_7SegmentE));
 	sprites.push_back(
 			new SpriteItem(
-					0, 2, Sprite_7SegmentF));
+					0, 1, Sprite_7SegmentF));
 	sprites.push_back(
 			new SpriteItem(
-					3, 15, Sprite_7SegmentG));
+					3, 14, Sprite_7SegmentG));
 }
 
 void Gfx7SegShape::setValue(const int8_t &value) {

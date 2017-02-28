@@ -23,14 +23,14 @@ public:
 	subiTempInfo() {
 		sprites.push_back(
 				new SpriteItem(
-						0, 3, Sprite_Celsius));
+						0, 2, Sprite_Celsius));
 		sprites.push_back(
 				new SpriteItem(
-						0, 22, Sprite_Fahrenheit));
+						0, 17, Sprite_Fahrenheit));
 
 		setCelsiusState(true);
 		setFahrenheitState(true);
-		setX(52);
+		setX(53);
 	};
 	virtual ~subiTempInfo() {};
 
