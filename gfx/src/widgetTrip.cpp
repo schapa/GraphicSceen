@@ -55,9 +55,7 @@ void TripWidget::update() {
 	dirty = true;
 	subiTripInfo *indication = static_cast<subiTripInfo*>(shapes[0]);
 	GfxMulti7SegShape *digits = static_cast<GfxMulti7SegShape*>(shapes[1]);
-//	indication->setTripAState(isOnA);
-//	indication->setTripBState(isOnB);
-	indication->setTripAState(true);
-	indication->setTripBState(true);
+	indication->setTripAState(isOnA);
+	indication->setTripBState(isOnB);
 	digits->setValue(value);
 }

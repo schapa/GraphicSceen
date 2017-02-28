@@ -38,19 +38,12 @@ int main(int argc, char* argv[]) {
 	SSD1322_ClearDisplay();
 	DBGMSG_INFO("\nStart. Init %d", status);
 
-#ifdef EMULATOR
-	const uint16_t width = 256;
-	const PixelFormat pf = PixelFormat_GrayScale;
-#else
-	const uint16_t width = 240;
-	const PixelFormat pf = PixelFormat_RGB565;
-#endif
-	const uint16_t heigth = 64;
-
-//	GfxLayer baseLayer(PixelFormat_GrayScale, 256, 64);
-	GfxLayer baseLayer(pf, width, heigth);
-
+#if !defined(EMULATOR) && 0
+	GfxLayer baseLayer(PixelFormat_RGB565, 240, 64);
 	DiscoLCDInit(baseLayer.getFrameBuffer());
+#else
+	GfxLayer baseLayer(PixelFormat_GrayScale, 256, 64);
+#endif
 
 //	TextWidget infoWdt(FONT_CENTURY_SCOOLBOOK, 12, "The quick brown fox jumps over the lazy dog");
 
@@ -83,10 +76,10 @@ int main(int argc, char* argv[]) {
 		EventQueue_Pend(&event);
 		switch (event.type) {
 			case EVENT_SYSTICK: {
-//				temperature.setTemperature(System_getUptime());
+				temperature.setTemperature(System_getUptime());
 				temperature.setTemperatureType(System_getUptime() %2);
 				trip.setTripInd(!(System_getUptime() %2), (System_getUptime() %2));
-//				trip.setValue(999-System_getUptime());
+				trip.setValue(999-System_getUptime());
 //				char buffer[128];
 //				sprintf(buffer, "Uptime is %lu", System_getUptime());
 //				testWdt.setText(buffer);
