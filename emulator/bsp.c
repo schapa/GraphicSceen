@@ -38,6 +38,7 @@ static struct {
 	size_t offset;
 	_Bool selected;
 	_Bool ram;
+	_Bool mmaped;
 } s_lcd;
 
 void BSP_LcdReset(const _Bool state) {
@@ -49,7 +50,7 @@ void BSP_LcdCs(const _Bool state) {
 void BSP_LcdWrite(const uint8_t *buff, uint16_t size) {
 	if (size < 4)
 		return;
-	if (s_lcd.selected && s_lcd.ram) {
+	if (s_lcd.mmaped && s_lcd.selected && s_lcd.ram) {
 		memcpy((void*)&s_lcd.fb[s_lcd.offset], (void*)buff, size);
 		s_lcd.offset += size;
 	}
@@ -152,6 +153,7 @@ static void* uiThread (void *arg) {
 	snprintf(path, sizeof(path), "./build/gui %s", (char*)arg);
 
 	DBGMSG_H("Call [%s]", path);
+	s_lcd.mmaped = true;
 	system(path);
 	free(arg);
 	munmap((void*)s_lcd.fb, SCREEN_SIZE);
