@@ -21,3 +21,5 @@ extern const Sprite Sprite_Celsius;
 extern const Sprite Sprite_Fahrenheit;
 extern const Sprite Sprite_TripA;
 extern const Sprite Sprite_TripB;
+
+extern const Sprite Sprite_Dot;

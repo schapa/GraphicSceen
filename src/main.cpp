@@ -20,6 +20,7 @@
 #include "memman.h"
 #include "widget7Seg.hpp"
 #include "widgetTemperature.hpp"
+#include "widgetTrip.hpp"
 
 #include "dbg_base.h"
 #if 0
@@ -53,13 +54,23 @@ int main(int argc, char* argv[]) {
 
 //	TextWidget infoWdt(FONT_CENTURY_SCOOLBOOK, 12, "The quick brown fox jumps over the lazy dog");
 
-	TemperatureWidget test7;
-	test7.createSurface();
-	test7.setVisible(true);
-	test7.setX(0);
-	test7.setY(3);
-	baseLayer.addShape(&test7);
-	test7.setTemperature( 888);
+	TemperatureWidget temperature;
+	TripWidget trip;
+
+	temperature.createSurface();
+	temperature.setVisible(true);
+	temperature.setX(0);
+	temperature.setY(3);
+
+	trip.createSurface();
+	trip.setVisible(true);
+	trip.setX(70);
+	trip.setY(3);
+
+	baseLayer.addShape(&temperature);
+	baseLayer.addShape(&trip);
+
+	temperature.setTemperature( 888);
 
 
 	while(1) {
@@ -71,9 +82,10 @@ int main(int argc, char* argv[]) {
 		EventQueue_Pend(&event);
 		switch (event.type) {
 			case EVENT_SYSTICK: {
-				test7.setTemperature(System_getUptime());
-				test7.setTemperatureType(System_getUptime() %2);
-				test7.setTripInd((System_getUptime() %2), (System_getUptime() %2));
+				temperature.setTemperature(100+System_getUptime());
+				temperature.setTemperatureType(System_getUptime() %2);
+				trip.setTripInd(!(System_getUptime() %2), (System_getUptime() %2));
+				trip.setValue(999-System_getUptime());
 //				char buffer[128];
 //				sprintf(buffer, "Uptime is %lu", System_getUptime());
 //				testWdt.setText(buffer);

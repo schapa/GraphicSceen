@@ -27,29 +27,19 @@ public:
 		sprites.push_back(
 				new SpriteItem(
 						0, 33, Sprite_Fahrenheit));
-		sprites.push_back(
-				new SpriteItem(
-						30, 0, Sprite_TripA));
-		sprites.push_back(
-				new SpriteItem(
-						30, 25, Sprite_TripB));
 
 		setCelsiusState(true);
 		setFahrenheitState(true);
-		setTripAState(true);
-		setTripBState(true);
 		setX(73);
 	};
 	virtual ~subiTempInfo() {};
 
 	void setCelsiusState(const bool& state) { sprites[0]->isVisible = state; }
 	void setFahrenheitState(const bool& state) { sprites[1]->isVisible = state; }
-	void setTripAState(const bool& state) { sprites[2]->isVisible = state; }
-	void setTripBState(const bool& state) { sprites[3]->isVisible = state; }
 };
 
 TemperatureWidget::TemperatureWidget():
-		isCelsius(true), isOnA(false), isOnB(false), temperature(0) {
+		isCelsius(true), temperature(0) {
 	shapes.push_back(new GfxMulti7SegShape(3));
 	shapes.push_back(new subiTempInfo());
 	for (size_t i = 0; i < shapes.size(); i++)
@@ -64,6 +54,4 @@ void TemperatureWidget::update() {
 	digits->setValue(temperature);
 	indication->setCelsiusState(isCelsius);
 	indication->setFahrenheitState(!isCelsius);
-	indication->setTripAState(isOnA);
-	indication->setTripBState(isOnB);
 }
