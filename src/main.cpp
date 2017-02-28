@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
 
 	trip.createSurface();
 	trip.setVisible(true);
-	trip.setX(46);
+	trip.setX(76);
 	trip.setY(14);
 
 	baseLayer.addShape(&temperature);

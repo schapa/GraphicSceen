@@ -23,13 +23,13 @@ public:
 	subiTripInfo() {
 		sprites.push_back(
 				new SpriteItem(
-						30, 0, Sprite_TripA));
+						0, 0, Sprite_TripA));
 		sprites.push_back(
 				new SpriteItem(
-						30, 25, Sprite_TripB));
+						0, 18, Sprite_TripB));
 		sprites.push_back(
 				new SpriteItem(
-						88, 45, Sprite_Dot));
+						52, 32, Sprite_Dot));
 
 		setTripAState(true);
 		setTripBState(true);
@@ -45,7 +45,7 @@ TripWidget::TripWidget():
 		isOnA(false), isOnB(false), value(0) {
 	shapes.push_back(new subiTripInfo());
 	shapes.push_back(new GfxMulti7SegShape(3));
-	shapes[1]->setX(50);
+	shapes[1]->setX(14);
 	for (size_t i = 0; i < shapes.size(); i++)
 		shapes[i]->setVisible(true);
 }
@@ -55,7 +55,9 @@ void TripWidget::update() {
 	dirty = true;
 	subiTripInfo *indication = static_cast<subiTripInfo*>(shapes[0]);
 	GfxMulti7SegShape *digits = static_cast<GfxMulti7SegShape*>(shapes[1]);
-	indication->setTripAState(isOnA);
-	indication->setTripBState(isOnB);
+//	indication->setTripAState(isOnA);
+//	indication->setTripBState(isOnB);
+	indication->setTripAState(true);
+	indication->setTripBState(true);
 	digits->setValue(value);
 }
