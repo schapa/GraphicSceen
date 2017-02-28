@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
 	test7.createSurface();
 	test7.setVisible(true);
 	test7.setX(0);
-	test7.setY(5);
+	test7.setY(3);
 	baseLayer.addShape(&test7);
 	test7.setTemperature( 888);
 
@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
 			case EVENT_SYSTICK: {
 				test7.setTemperature(System_getUptime());
 				test7.setTemperatureType(System_getUptime() %2);
-				test7.setTripInd((System_getUptime() %2), !(System_getUptime() %2));
+				test7.setTripInd((System_getUptime() %2), (System_getUptime() %2));
 //				char buffer[128];
 //				sprintf(buffer, "Uptime is %lu", System_getUptime());
 //				testWdt.setText(buffer);
