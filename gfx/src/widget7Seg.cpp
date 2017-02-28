@@ -23,25 +23,25 @@ enum {
 Gfx7SegShape::Gfx7SegShape(): value(-3) {
 	sprites.push_back(
 			new SpriteItem(
-					1, 0, Sprite_7SegmentA));
+					2, 0, Sprite_7SegmentA));
 	sprites.push_back(
 			new SpriteItem(
-					13, 1, Sprite_7SegmentB));
+					15, 2, Sprite_7SegmentB));
 	sprites.push_back(
 			new SpriteItem(
-					13, 28, Sprite_7SegmentC));
+					15, 30, Sprite_7SegmentC));
 	sprites.push_back(
 			new SpriteItem(
-					1, 50, Sprite_7SegmentD));
+					2, 53, Sprite_7SegmentD));
 	sprites.push_back(
 			new SpriteItem(
-					0, 28, Sprite_7SegmentE));
+					0, 30, Sprite_7SegmentE));
 	sprites.push_back(
 			new SpriteItem(
-					0, 1, Sprite_7SegmentF));
+					0, 2, Sprite_7SegmentF));
 	sprites.push_back(
 			new SpriteItem(
-					2, 24, Sprite_7SegmentG));
+					3, 26, Sprite_7SegmentG));
 }
 
 void Gfx7SegShape::setValue(const int8_t &value) {
@@ -77,7 +77,7 @@ GfxMulti7SegShape::GfxMulti7SegShape(const size_t size): value(0) {
 	DBGMSG_H("Creating of %d size", size);
 	for (size_t i = 0; i < size; i++) {
 		shapes.push_back(new Gfx7SegShape());
-		shapes[i]->setX(20 * i);
+		shapes[i]->setX(25 * i);
 	}
 }
 

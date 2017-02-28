@@ -23,10 +23,10 @@ public:
 	subiTempInfo() {
 		sprites.push_back(
 				new SpriteItem(
-						0, 0, Sprite_Celsius));
+						0, 5, Sprite_Celsius));
 		sprites.push_back(
 				new SpriteItem(
-						0, 15, Sprite_Fahrenheit));
+						0, 33, Sprite_Fahrenheit));
 		sprites.push_back(
 				new SpriteItem(
 						0, 30, Sprite_TripA));
@@ -36,9 +36,9 @@ public:
 
 		setCelsiusState(true);
 		setFahrenheitState(true);
-		setTripAState(true);
-		setTripBState(true);
-		setX(65);
+//		setTripAState(true);
+//		setTripBState(true);
+		setX(73);
 	};
 	virtual ~subiTempInfo() {};
 
@@ -60,10 +60,10 @@ TemperatureWidget::TemperatureWidget():
 void TemperatureWidget::update() {
 	dirty = true;
 	GfxMulti7SegShape *digits = static_cast<GfxMulti7SegShape*>(shapes[0]);
-	subiTempInfo *indication = static_cast<subiTempInfo*>(shapes[1]);
+//	subiTempInfo *indication = static_cast<subiTempInfo*>(shapes[1]);
 	digits->setValue(temperature);
-	indication->setCelsiusState(isCelsius);
-	indication->setFahrenheitState(!isCelsius);
-	indication->setTripAState(isOnA);
-	indication->setTripBState(isOnB);
+//	indication->setCelsiusState(isCelsius);
+//	indication->setFahrenheitState(!isCelsius);
+//	indication->setTripAState(isOnA);
+//	indication->setTripBState(isOnB);
 }

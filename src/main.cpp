@@ -52,8 +52,6 @@ int main(int argc, char* argv[]) {
 	DiscoLCDInit(baseLayer.getFrameBuffer());
 
 //	TextWidget infoWdt(FONT_CENTURY_SCOOLBOOK, 12, "The quick brown fox jumps over the lazy dog");
-//	TextWidget timeWdt(FONT_DIGITAL_7SEGMENT, 18, "0123456789");
-//	TextWidget testWdt(FONT_CENTURY_SCOOLBOOK, 12, "H Hello [xxxx]");
 
 	TemperatureWidget test7;
 	test7.createSurface();
@@ -61,23 +59,8 @@ int main(int argc, char* argv[]) {
 	test7.setX(0);
 	test7.setY(5);
 	baseLayer.addShape(&test7);
-	test7.setTemperature( - 97);
+	test7.setTemperature( 888);
 
-
-//	infoWdt.setSurface(new GfxSurface(PixelFormat_GrayScale, 240, 20));
-//	timeWdt.setSurface(new GfxSurface(PixelFormat_GrayScale, 240, 20));
-//	testWdt.setSurface(new GfxSurface(PixelFormat_GrayScale, 128, 20));
-//	infoWdt.setVisible(true);
-//	timeWdt.setVisible(true);
-//	testWdt.setVisible(true);
-
-//	baseLayer.addWidget(&infoWdt);
-//	baseLayer.addWidget(&timeWdt);
-//	baseLayer.addWidget(&testWdt);
-
-//	infoWdt.getShape()->setY(40);
-//	testWdt.getShape()->setX(20);
-//	testWdt.getShape()->setY(20);
 
 	while(1) {
 		size_t start = System_getUptimeMs();
@@ -88,7 +71,7 @@ int main(int argc, char* argv[]) {
 		EventQueue_Pend(&event);
 		switch (event.type) {
 			case EVENT_SYSTICK: {
-				test7.setTemperature(-System_getUptime() - 97);
+				test7.setTemperature(System_getUptime());
 				test7.setTemperatureType(System_getUptime() %2);
 				test7.setTripInd((System_getUptime() %2), !(System_getUptime() %2));
 //				char buffer[128];
