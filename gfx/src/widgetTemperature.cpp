@@ -30,7 +30,7 @@ public:
 
 		setCelsiusState(true);
 		setFahrenheitState(true);
-		setX(60);
+		setX(52);
 	};
 	virtual ~subiTempInfo() {};
 

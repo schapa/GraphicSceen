@@ -29,7 +29,7 @@ public:
 						0, 18, Sprite_TripB));
 		sprites.push_back(
 				new SpriteItem(
-						52, 32, Sprite_Dot));
+						46, 29, Sprite_Dot));
 
 		setTripAState(true);
 		setTripBState(true);
@@ -45,7 +45,7 @@ TripWidget::TripWidget():
 		isOnA(false), isOnB(false), value(0) {
 	shapes.push_back(new subiTripInfo());
 	shapes.push_back(new GfxMulti7SegShape(3));
-	shapes[1]->setX(14);
+	shapes[1]->setX(12);
 	for (size_t i = 0; i < shapes.size(); i++)
 		shapes[i]->setVisible(true);
 }

@@ -29,19 +29,19 @@ Gfx7SegShape::Gfx7SegShape(): value(-3) {
 					12, 2, Sprite_7SegmentB));
 	sprites.push_back(
 			new SpriteItem(
-					12, 20, Sprite_7SegmentC));
+					12, 17, Sprite_7SegmentC));
 	sprites.push_back(
 			new SpriteItem(
-					2, 33, Sprite_7SegmentD));
+					2, 29, Sprite_7SegmentD));
 	sprites.push_back(
 			new SpriteItem(
-					0, 20, Sprite_7SegmentE));
+					0, 17, Sprite_7SegmentE));
 	sprites.push_back(
 			new SpriteItem(
 					0, 2, Sprite_7SegmentF));
 	sprites.push_back(
 			new SpriteItem(
-					3, 16, Sprite_7SegmentG));
+					3, 15, Sprite_7SegmentG));
 }
 
 void Gfx7SegShape::setValue(const int8_t &value) {
@@ -77,7 +77,7 @@ GfxMulti7SegShape::GfxMulti7SegShape(const size_t size): value(0) {
 	DBGMSG_H("Creating of %d size", size);
 	for (size_t i = 0; i < size; i++) {
 		shapes.push_back(new Gfx7SegShape());
-		shapes[i]->setX(21 * i);
+		shapes[i]->setX(18 * i);
 	}
 }
 

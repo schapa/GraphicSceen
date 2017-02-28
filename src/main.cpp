@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
 
 	trip.createSurface();
 	trip.setVisible(true);
-	trip.setX(76);
+	trip.setX(70);
 	trip.setY(14);
 
 	baseLayer.addShape(&temperature);
@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
 			case EVENT_SYSTICK: {
 				temperature.setTemperature(System_getUptime());
 				temperature.setTemperatureType(System_getUptime() %2);
-				trip.setTripInd(!(System_getUptime() %2), (System_getUptime() %2));
+				trip.setTripInd((System_getUptime() %2), (System_getUptime() %2));
 				trip.setValue(999-System_getUptime());
 //				char buffer[128];
 //				sprintf(buffer, "Uptime is %lu", System_getUptime());
