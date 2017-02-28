@@ -60,17 +60,18 @@ int main(int argc, char* argv[]) {
 	temperature.createSurface();
 	temperature.setVisible(true);
 	temperature.setX(0);
-	temperature.setY(3);
+	temperature.setY(14);
 
 	trip.createSurface();
 	trip.setVisible(true);
-	trip.setX(70);
-	trip.setY(3);
+	trip.setX(46);
+	trip.setY(14);
 
 	baseLayer.addShape(&temperature);
 	baseLayer.addShape(&trip);
 
 	temperature.setTemperature( 888);
+	trip.setValue( 888);
 
 
 	while(1) {
@@ -82,10 +83,10 @@ int main(int argc, char* argv[]) {
 		EventQueue_Pend(&event);
 		switch (event.type) {
 			case EVENT_SYSTICK: {
-				temperature.setTemperature(100+System_getUptime());
+//				temperature.setTemperature(System_getUptime());
 				temperature.setTemperatureType(System_getUptime() %2);
 				trip.setTripInd(!(System_getUptime() %2), (System_getUptime() %2));
-				trip.setValue(999-System_getUptime());
+//				trip.setValue(999-System_getUptime());
 //				char buffer[128];
 //				sprintf(buffer, "Uptime is %lu", System_getUptime());
 //				testWdt.setText(buffer);

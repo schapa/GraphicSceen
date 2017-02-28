@@ -27,9 +27,13 @@ public:
 		sprites.push_back(
 				new SpriteItem(
 						30, 25, Sprite_TripB));
+		sprites.push_back(
+				new SpriteItem(
+						88, 45, Sprite_Dot));
 
 		setTripAState(true);
 		setTripBState(true);
+		sprites[2]->isVisible = true;
 	};
 	virtual ~subiTripInfo() {};
 
