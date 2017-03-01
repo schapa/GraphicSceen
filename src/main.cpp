@@ -45,14 +45,20 @@ int main(int argc, char* argv[]) {
 	GfxLayer baseLayer(PixelFormat_GrayScale, 256, 64);
 #endif
 
-	TextWidget avgMpg(FONT_COOLVETICA, 12, "AVG.  MPG");
-	TextWidget perType(FONT_COOLVETICA, 12, "100 k mi/l");
+	TextWidget avgMpg(FONT_LIBEL_SUIT, 16, "AVG.  MPG");
+	TextWidget perType(FONT_LIBEL_SUIT, 16, "100kmi/l");
+//	TextWidget avgMpg(FONT_LIBEL_SUIT, 16, "A");
+//	TextWidget perType(FONT_LIBEL_SUIT, 16, "B");
+//	avgMpg.setNegative(true);
+//	perType.setNegative(true);
 
+	avgMpg.setSpacing(0);
 	avgMpg.createSurface();
-	avgMpg.setX(128);
-	avgMpg.setY(14);
+	avgMpg.setX(132);
+	avgMpg.setY(10);
 	avgMpg.setVisible(true);
 
+	perType.setSpacing(0);
 	perType.createSurface();
 	perType.setX(132);
 	perType.setY(28);

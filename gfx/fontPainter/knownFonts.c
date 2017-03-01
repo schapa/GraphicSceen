@@ -13,6 +13,7 @@
 #include "digital_7_regular_12_font.h"
 #include "digital_7_regular_18_font.h"
 #include "coolvetica_regular_12_font.h"
+#include "libel_suit_regular_16_font.h"
 
 
 typedef struct {
@@ -34,6 +35,9 @@ static const fontItem_p s_creampuff_regular_font[] = {
 static const fontItem_p s_coolvetica_regular_font[] = {
 		(const fontItem_p)&coolvetica_regular_12_font,
 };
+static const fontItem_p libel_suit_regular_font[] = {
+		(const fontItem_p)&libel_suit_regular_16_font,
+};
 
 
 static const fontSizeMap_t s_knownFonts[] = {
@@ -41,6 +45,7 @@ static const fontSizeMap_t s_knownFonts[] = {
 	[FONT_CENTURY_SCOOLBOOK] = { s_century_schoolbook_bold_font, sizeof(s_century_schoolbook_bold_font)/sizeof(fontItem_p) },
 	[FONT_CREAMPUFF] = { s_creampuff_regular_font, sizeof(s_creampuff_regular_font)/sizeof(fontItem_p) },
 	[FONT_COOLVETICA] = { s_coolvetica_regular_font, sizeof(s_coolvetica_regular_font)/sizeof(fontItem_p) },
+	[FONT_LIBEL_SUIT] = { libel_suit_regular_font, sizeof(libel_suit_regular_font)/sizeof(fontItem_p) },
 };
 
 

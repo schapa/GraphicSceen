@@ -24,6 +24,8 @@ public:
 	void setFont(const FontType &font);
 	void setFontSize(const uint8_t &size);
 	void setText(const char *text);
+	void setSpacing(const uint8_t &spacing);
+	void setNegative(const bool &negative);
 
 	virtual void createSurface();
 	virtual bool Blend(GfxSurface *surface, const uint16_t& offX = 0, const uint16_t& offY = 0);
@@ -33,7 +35,9 @@ private:
 private:
 	FontType font;
 	uint8_t textSize;
+	uint8_t spacing;
 	const char *text;
+	bool negative;
 
 	virtual bool draw();
 };

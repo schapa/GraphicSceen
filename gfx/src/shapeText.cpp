@@ -13,10 +13,7 @@
 #include "dbg_trace.h"
 #endif
 
-GfxTextShape::GfxTextShape(void) {
-	font = FONT_DIGITAL_7SEGMENT;
-	textSize = 12;
-	text = NULL;
+GfxTextShape::GfxTextShape(void) : font(FONT_LAST), textSize(0), spacing(0), text(NULL), negative(false) {
 }
 
 GfxTextShape::~GfxTextShape(void) {
@@ -35,7 +32,7 @@ const size_t GfxTextShape::getTextWidth() const {
 	DBGMSG_L("[%s]", text);
 	while (*text) {
 		fontLookupItem_t character = lookup[(size_t)*text];
-		width += character.advance - character.left;
+		width += character.advance - character.left + spacing;
 		DBGMSG_L("[%c] a:l:w %d %d %d", *text, character.advance, character.left, character.width);
 		text++;
 	}
@@ -79,6 +76,16 @@ void GfxTextShape::setText(const char *text) {
 	this->text = text;
 }
 
+void GfxTextShape::setSpacing(const uint8_t &spacing) {
+	dirty |= this->spacing ^ spacing;
+	this->spacing = spacing;
+};
+
+void GfxTextShape::setNegative(const bool &negative) {
+	dirty |= this->negative ^ negative;
+	this->negative = negative;
+}
+
 void GfxTextShape::createSurface() {
 	if (!this->text)
 		return;
@@ -113,7 +120,7 @@ bool GfxTextShape::draw(void) {
 	if (!fontItem) {
 		return false;
 	}
-	surface->fill(0);
+	surface->fill(this->negative ? 0xFF : 0);
 	switch (surface->getPixelFormat()) {
 		case PixelFormat_GrayScale:
 			renderGrayScale(fontItem, text);
@@ -137,10 +144,11 @@ void GfxTextShape::renderGrayScale(fontItem_p font, const char *text) {
 	    for (uint16_t y = 0; (y < character.heigth) && (y < surface->getHeight()); ++y) {
 	    	const uint8_t *pixel = &font->pixelData[character.offset + y * character.width];
 		    for (uint16_t x = 0; (x < character.width) && (x < surface->getWidth()); ++x) {
-		    	surface->drawPixel(x + xPos, y + character.top, (uint8_t)pixel[x], PixelFormat_L8);
+		    	const uint32_t pix = this->negative ? 0xFF - pixel[x] : pixel[x];
+		    	surface->drawPixel(x + xPos, y + character.top, pix, PixelFormat_L8);
 		    }
 	    }
-	    xPos += character.advance - character.left;
+	    xPos += character.advance - character.left + spacing;
 	    if (xPos > w)
 	    	break;
 	    text++;
