@@ -26,11 +26,11 @@ public:
 						0, 2, Sprite_Celsius));
 		sprites.push_back(
 				new SpriteItem(
-						0, 17, Sprite_Fahrenheit));
+						0, 15, Sprite_Fahrenheit));
 
 		setCelsiusState(true);
 		setFahrenheitState(true);
-		setX(53);
+		setX(48);
 	};
 	virtual ~subiTempInfo() {};
 

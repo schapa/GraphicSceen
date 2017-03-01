@@ -29,7 +29,7 @@ public:
 						0, 18, Sprite_TripB));
 		sprites.push_back(
 				new SpriteItem(
-						46, 29, Sprite_Dot));
+						43, 26, Sprite_Dot));
 
 		setTripAState(true);
 		setTripBState(true);
