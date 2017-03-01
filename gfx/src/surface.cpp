@@ -38,6 +38,7 @@ GfxSurface::GfxSurface(PixelFormat pixFormat, uint16_t width, uint16_t height) {
 
 GfxSurface::~GfxSurface(void) {
 	if (line) {
+		free(line);
 		line = NULL;
 	}
 }
