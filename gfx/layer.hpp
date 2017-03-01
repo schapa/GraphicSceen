@@ -16,7 +16,7 @@ class GfxLayer : public GfxSurface {
 public:
 	GfxLayer(ColorDepth bitsDepth, uint16_t width, uint16_t height) : GfxSurface(bitsDepth, width, height), tranparentBlend(true) {};
 	GfxLayer(PixelFormat pixFormat, uint16_t width, uint16_t height) : GfxSurface(pixFormat, width, height), tranparentBlend(true) {};
-	virtual ~GfxLayer() { };
+	virtual ~GfxLayer();
 public:
 	void addShape(GfxShape *shape);
 	void deleteShape(GfxShape *shape);

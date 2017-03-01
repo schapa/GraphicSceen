@@ -14,6 +14,12 @@
 #include "dbg_trace.h"
 #endif
 
+GfxLayer::~GfxLayer() {
+	for (size_t i = 0; i < shapes.size(); i++)
+		delete shapes[i];
+	shapes.clear();
+}
+
 void GfxLayer::addShape(GfxShape *shape) {
 	if (!shape)
 		return;
