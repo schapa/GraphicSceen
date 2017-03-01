@@ -31,7 +31,10 @@ public:
 	const int32_t &getValue() const { return value; }
 	void setValue(const int32_t &value);
 
+	void setZeroTrailing(const bool &isOn) { zeroTrailing = isOn; setValue(value); };
+
 private:
+	bool zeroTrailing;
 	const size_t size;
 	const size_t dotPos;
 	int32_t value;

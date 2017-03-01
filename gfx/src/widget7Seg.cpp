@@ -74,7 +74,7 @@ void Gfx7SegShape::setValue(const int8_t &value) {
 }
 
 GfxMulti7SegShape::GfxMulti7SegShape(const size_t& size, const size_t& dotPos):
-		size(size), dotPos(dotPos), value(0) {
+		zeroTrailing(false), size(size), dotPos(dotPos), value(0) {
 	DBGMSG_H("Creating of %d size", size);
 	for (size_t i = 0; i < size; i++) {
 		shapes.push_back(new Gfx7SegShape());
@@ -97,7 +97,9 @@ void GfxMulti7SegShape::setValue(const int32_t &value) {
 		const size_t pos = last - i;
 		Gfx7SegShape *shape = static_cast<Gfx7SegShape*>(shapes[pos]);
 
-		if (dot && (i <= dotPos))
+		if (zeroTrailing)
+			shape->setVisible(true);
+		else if (dot && (i <= dotPos))
 			shapes[i]->setVisible(true);
 		else
 			shape->setVisible(!!absVal);

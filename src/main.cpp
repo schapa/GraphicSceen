@@ -21,6 +21,7 @@
 #include "widget7Seg.hpp"
 #include "widgetTemperature.hpp"
 #include "widgetTrip.hpp"
+#include "widgetTime.hpp"
 
 #include "dbg_base.h"
 #if 0
@@ -66,32 +67,29 @@ int main(int argc, char* argv[]) {
 
 	TemperatureWidget temperature;
 	TripWidget trip;
-	GfxMulti7SegShape clock(4);
+	TimeWidget clock;
 
-	temperature.createSurface();
 	temperature.setVisible(true);
 	temperature.setX(0);
 	temperature.setY(14);
 	temperature.setTemperature(888);
 
-	trip.createSurface();
 	trip.setVisible(true);
 	trip.setX(62);
 	trip.setY(14);
 	trip.setValue(888);
 
-	clock.createSurface();
-	clock.setValue(1888);
 	clock.setVisible(true);
 	clock.setX(194);
 	clock.setY(14);
+	clock.setTime(8,50);
 
-//	baseLayer.addShape(&temperature);
+	baseLayer.addShape(&temperature);
 	baseLayer.addShape(&trip);
-//	baseLayer.addShape(&clock);
-//
-//	baseLayer.addShape(&avgMpg);
-//	baseLayer.addShape(&perType);
+	baseLayer.addShape(&clock);
+
+	baseLayer.addShape(&avgMpg);
+	baseLayer.addShape(&perType);
 
 
 	while(1) {
@@ -107,8 +105,8 @@ int main(int argc, char* argv[]) {
 				temperature.setTemperature(end);
 				temperature.setTemperatureType(System_getUptime() %2);
 				trip.setTripInd((System_getUptime() %2), (System_getUptime() %2));
-//				trip.setValue(999-System_getUptime());
-				trip.setValue(0);
+				trip.setValue(999-System_getUptime());
+				clock.setTime(System_getUptime()/2,System_getUptime()*2);
 //				char buffer[128];
 //				sprintf(buffer, "Uptime is %lu", System_getUptime());
 //				testWdt.setText(buffer);
