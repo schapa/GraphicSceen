@@ -23,6 +23,47 @@ GfxTextShape::~GfxTextShape(void) {
 
 }
 
+const size_t GfxTextShape::getTextWidth() const {
+	if (!text || !*text)
+		return 0;
+	const fontItem_p fontItem = FontPainter_SizeLookup(this->font, textSize);
+	if (!fontItem)
+		return 0;
+	const fontLookupItem_p& lookup = fontItem->lookup;
+	const char *text = this->text;
+	size_t width = 0;
+	DBGMSG_L("[%s]", text);
+	while (*text) {
+		fontLookupItem_t character = lookup[(size_t)*text];
+		width += character.advance - character.left;
+		DBGMSG_L("[%c] a:l:w %d %d %d", *text, character.advance, character.left, character.width);
+		text++;
+	}
+	DBGMSG_L("width %d", width);
+	return width;
+}
+
+const size_t GfxTextShape::getTextHeight() const {
+	if (!text || !*text)
+		return 0;
+	const fontItem_p fontItem = FontPainter_SizeLookup(this->font, textSize);
+	if (!fontItem)
+		return 0;
+	const fontLookupItem_p& lookup = fontItem->lookup;
+	const char *text = this->text;
+	size_t height = 0;
+	DBGMSG_L("[%s]", text);
+	while (*text) {
+		fontLookupItem_t character = lookup[(size_t)*text];
+		const size_t charHeight = character.heigth + character.top;
+		height = charHeight > height ? charHeight : height;
+		DBGMSG_L("[%c] t:h %d %d", *text, character.top, character.heigth);
+		text++;
+	}
+	DBGMSG_L("height %d", height);
+	return height;
+}
+
 void GfxTextShape::setFont(const FontType &font) {
 	dirty = this->font != font;
 	this->font = font;
@@ -39,8 +80,13 @@ void GfxTextShape::setText(const char *text) {
 }
 
 void GfxTextShape::createSurface() {
+	if (!this->text)
+		return;
+	const size_t w = getTextWidth();
+	const size_t h = getTextHeight();
 
-	assert(!"Not Implemented");
+	DBGMSG_L("Creating WxH %dx%d", w, h);
+	setSurface(new GfxSurface(PixelFormat_GrayScale, w, h));
 }
 
 bool GfxTextShape::Blend(GfxSurface *surface, const uint16_t& offX, const uint16_t& offY) {
@@ -50,8 +96,8 @@ bool GfxTextShape::Blend(GfxSurface *surface, const uint16_t& offX, const uint16
 	const uint16_t sx = offX + getX();
 	const uint16_t sy = offY + getY();
 	const uint16_t w = this->surface->getWidth();
-	const uint16_t h = this->surface->getHeigth();
-	DBGMSG_M("Blend %d. At %d:%d. Sz %dx%d", i, sx, sy, w, h);
+	const uint16_t h = this->surface->getHeight();
+	DBGMSG_M("At %d:%d. Sz %dx%d", sx, sy, w, h);
 
 	for (size_t y = 0; y < h; y++)
 		for (size_t x = 0; x < w; x++)
@@ -60,7 +106,7 @@ bool GfxTextShape::Blend(GfxSurface *surface, const uint16_t& offX, const uint16
 }
 
 bool GfxTextShape::draw(void) {
-	if (!text)
+	if (!text || !surface)
 		return false;
 
 	fontItem_p fontItem = FontPainter_SizeLookup(this->font, textSize);
@@ -88,7 +134,7 @@ void GfxTextShape::renderGrayScale(fontItem_p font, const char *text) {
 	const uint16_t &w = surface->getWidth();
 	while (*text) {
 		fontLookupItem_t character = lookup[(size_t)*text];
-	    for (uint16_t y = 0; (y < character.heigth) && (y < surface->getHeigth()); ++y) {
+	    for (uint16_t y = 0; (y < character.heigth) && (y < surface->getHeight()); ++y) {
 	    	const uint8_t *pixel = &font->pixelData[character.offset + y * character.width];
 		    for (uint16_t x = 0; (x < character.width) && (x < surface->getWidth()); ++x) {
 		    	surface->drawPixel(x + xPos, y + character.top, (uint8_t)pixel[x], PixelFormat_L8);

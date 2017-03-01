@@ -17,15 +17,15 @@ class GfxSurface {
 private:
 	GfxSurface(void);
 public:
-	GfxSurface(ColorDepth bitsDepth, uint16_t width, uint16_t heigth);
-	GfxSurface(PixelFormat pixFormat, uint16_t width, uint16_t heigth);
+	GfxSurface(ColorDepth bitsDepth, uint16_t width, uint16_t height);
+	GfxSurface(PixelFormat pixFormat, uint16_t width, uint16_t height);
 	virtual ~GfxSurface(void);
 	void fill(uint32_t value);
 public:
 	uint8_t *getFrameBuffer(void) { return line; }
 	const uint16_t &getBytesPerLine(void) { return bytesPerLine; }
 	const uint16_t &getWidth(void) { return width; }
-	const uint16_t &getHeigth(void) { return heigth; }
+	const uint16_t &getHeight(void) { return height; }
 	const ColorDepth &getBitsDepth(void) { return bitsDepth; }
 	const PixelFormat &getPixelFormat(void) { return pixelFormat; }
 public:
@@ -41,7 +41,7 @@ private:
 	uint16_t bytesPerLine;
 	uint16_t bytesPerPixel;
 	uint16_t width;
-	uint16_t heigth;
+	uint16_t height;
 	ColorDepth bitsDepth;
 	PixelFormat pixelFormat;
 };

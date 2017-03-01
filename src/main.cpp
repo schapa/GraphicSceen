@@ -45,31 +45,47 @@ int main(int argc, char* argv[]) {
 	GfxLayer baseLayer(PixelFormat_GrayScale, 256, 64);
 #endif
 
-	TextWidget infoWdt(FONT_CENTURY_SCOOLBOOK, 12, "The quick brown fox jumps over the lazy dog");
+	TextWidget avgMpg(FONT_COOLVETICA, 12, "AVG.  MPG");
+	TextWidget perType(FONT_COOLVETICA, 12, "100 k mi/l");
 
-	infoWdt.setSurface(new GfxSurface(PixelFormat_GrayScale, 110, 64));
-	infoWdt.setX(128);
-	infoWdt.setVisible(true);
+	avgMpg.createSurface();
+	avgMpg.setX(128);
+	avgMpg.setY(14);
+	avgMpg.setVisible(true);
+
+	perType.createSurface();
+	perType.setX(132);
+	perType.setY(28);
+	perType.setVisible(true);
 
 	TemperatureWidget temperature;
 	TripWidget trip;
+	GfxMulti7SegShape clock(4);
 
 	temperature.createSurface();
 	temperature.setVisible(true);
 	temperature.setX(0);
 	temperature.setY(14);
+	temperature.setTemperature(888);
 
 	trip.createSurface();
 	trip.setVisible(true);
 	trip.setX(62);
 	trip.setY(14);
+	trip.setValue(888);
+
+	clock.createSurface();
+	clock.setValue(1888);
+	clock.setVisible(true);
+	clock.setX(194);
+	clock.setY(14);
 
 	baseLayer.addShape(&temperature);
 	baseLayer.addShape(&trip);
-	baseLayer.addShape(&infoWdt);
+	baseLayer.addShape(&clock);
 
-	temperature.setTemperature( 888);
-	trip.setValue( 888);
+	baseLayer.addShape(&avgMpg);
+	baseLayer.addShape(&perType);
 
 
 	while(1) {
@@ -77,7 +93,7 @@ int main(int argc, char* argv[]) {
 		baseLayer.render();
 		size_t end = System_getUptimeMs() - start;
 		DBGMSG_INFO("rend %d", end);
-		SSD1322_DrawSurface(baseLayer.getFrameBuffer(), baseLayer.getHeigth(), baseLayer.getBytesPerLine());
+		SSD1322_DrawSurface(baseLayer.getFrameBuffer(), baseLayer.getHeight(), baseLayer.getBytesPerLine());
 		Event_t event;
 		EventQueue_Pend(&event);
 		switch (event.type) {

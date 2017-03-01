@@ -34,8 +34,8 @@ public:
 	const uint16_t &getY(void) { return y; }
 	void setX(const uint16_t &x) {  this->x = x; }
 	void setY(const uint16_t &y) {  this->y = y; }
-	virtual const uint16_t getWidth(void) { return surface->getWidth(); }
-	virtual const uint16_t getHeigth(void) { return surface->getHeigth(); }
+	virtual const uint16_t getWidth(void) const { return surface->getWidth(); }
+	virtual const uint16_t getHeight(void) const { return surface->getHeight(); }
 
 	inline bool Draw() {
 		if (!visible || !dirty)

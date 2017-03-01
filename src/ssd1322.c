@@ -88,17 +88,17 @@ void SSD1322_ClearDisplay(void) {
 	CS(false);
 }
 
-void SSD1322_DrawSurface(const uint8_t *line, const uint16_t heigth, const uint8_t bytesPerLine) {
+void SSD1322_DrawSurface(const uint8_t *line, const uint16_t height, const uint8_t bytesPerLine) {
     uint32_t i = 0;
     uint32_t j = 0;
     const uint8_t offset = 27;
     uint8_t buffer[bytesPerLine];
-	SSD1322_SetColumnRange(offset +1, offset + heigth);
+	SSD1322_SetColumnRange(offset +1, offset + height);
 	SSD1322_SetRowRange(0, 70);
 
 	SendCmd_Simple(SSD1322_WRITE_RAM);
 	CS(true);
-	for (i = 0; i < heigth; i++) {
+	for (i = 0; i < height; i++) {
 		for (j = 0; j < bytesPerLine; j++) {
 			buffer[j] = line[i*bytesPerLine + j];
 		}

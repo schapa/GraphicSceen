@@ -94,7 +94,7 @@ void GfxMulti7SegShape::setValue(const int32_t &value) {
 		absVal /= 10;
 	}
 	if (!value) {
-		static_cast<Gfx7SegShape*>(shapes[0])->setVisible(true);
+		static_cast<Gfx7SegShape*>(shapes[last])->setVisible(true);
 	} else if (value < 0) {
 		int8_t sig = ((value > -200) && (value < -99)) ? SPRITE_MINUS_ONE : SPRITE_MINUS;
 		DBGMSG_L("Negative. pos %d val %d", 0, sig);

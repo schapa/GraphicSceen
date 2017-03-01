@@ -15,9 +15,11 @@ public:
 	GfxTextShape();
 	virtual ~GfxTextShape();
 
-	const FontType &getFont() { return font; }
-	const uint8_t &getFontSize() { return textSize; }
-	const char *getText() { return text; }
+	const FontType &getFont() const { return font; }
+	const uint8_t &getFontSize() const { return textSize; }
+	const char *getText() const { return text; }
+	const size_t getTextWidth() const;
+	const size_t getTextHeight() const;
 
 	void setFont(const FontType &font);
 	void setFontSize(const uint8_t &size);

@@ -14,25 +14,25 @@ GfxSurface::GfxSurface(void) {
 	line = NULL;
 	bytesPerLine = 0;
 	width = 0;
-	heigth = 0;
+	height = 0;
 	bitsDepth = ColorDepth_4;
 	pixelFormat = PixelFormat_GrayScale;
 	bytesPerPixel = 0;
 }
 
-GfxSurface::GfxSurface(ColorDepth bitsDepth, uint16_t width, uint16_t heigth) : GfxSurface() {
+GfxSurface::GfxSurface(ColorDepth bitsDepth, uint16_t width, uint16_t height) : GfxSurface() {
 	this->bitsDepth = bitsDepth;
 	this->pixelFormat = PixelFormat_GrayScale;
 	this->width = width;
-	this->heigth = heigth;
+	this->height = height;
 	create();
 }
 
-GfxSurface::GfxSurface(PixelFormat pixFormat, uint16_t width, uint16_t heigth) {
+GfxSurface::GfxSurface(PixelFormat pixFormat, uint16_t width, uint16_t height) {
 	this->pixelFormat = pixFormat;
 	this->bitsDepth = format2depth(pixFormat);
 	this->width = width;
-	this->heigth = heigth;
+	this->height = height;
 	create();
 }
 
@@ -47,13 +47,13 @@ void GfxSurface::fill(uint32_t val) {
 		case ColorDepth_4:
 			val &= 0x0F;
 			val |= val<<4;
-			memset(line, val, heigth*bytesPerLine);
+			memset(line, val, height*bytesPerLine);
 			break;
 		case ColorDepth_8:
-			memset(line, val, heigth*bytesPerLine);
+			memset(line, val, height*bytesPerLine);
 			break;
 		case ColorDepth_16: {
-			for (size_t i = 0; i < heigth; i++) {
+			for (size_t i = 0; i < height; i++) {
 				for (size_t j = 0; j < width; j++) {
 					uint16_t *ptr = reinterpret_cast<uint16_t *>(&line[i*bytesPerLine + j*bytesPerPixel]);
 					*ptr = val;
@@ -67,7 +67,7 @@ void GfxSurface::fill(uint32_t val) {
 			break;
 		}
 		case ColorDepth_32: {
-			for (size_t i = 0; i < heigth; i++) {
+			for (size_t i = 0; i < height; i++) {
 				for (size_t j = 0; j < width; j++) {
 					uint32_t *ptr = reinterpret_cast<uint32_t *>(&line[i*bytesPerLine + j*bytesPerPixel]);
 					*ptr = val;
@@ -81,7 +81,7 @@ void GfxSurface::fill(uint32_t val) {
 }
 
 //void GfxSurface::drawPixel(const uint16_t &x, const uint16_t &y, const uint8_t &alpha) {
-//	if (x >= width || y >= heigth)
+//	if (x >= width || y >= height)
 //		return;
 //
 //	const size_t offset = (bitsDepth == ColorDepth_4) ?
@@ -138,7 +138,7 @@ void GfxSurface::fill(uint32_t val) {
 //}
 
 void GfxSurface::drawPixel(const uint16_t &x, const uint16_t &y, const uint32_t &argbInp, const PixelFormat &src) {
-	if (x >= width || y >= heigth)
+	if (x >= width || y >= height)
 		return;
 	const uint32_t &argb = convertPixel(src, argbInp);
 	const size_t offset = (bitsDepth == ColorDepth_4) ?
@@ -191,7 +191,7 @@ void GfxSurface::drawPixel(const uint16_t &x, const uint16_t &y, const uint32_t 
 }
 
 const uint32_t GfxSurface::getPixel(const uint16_t &x, const uint16_t &y) {
-	if (x >= width || y >= heigth)
+	if (x >= width || y >= height)
 		return 0;
 
 	const size_t offset = (bitsDepth == ColorDepth_4) ?
@@ -219,7 +219,7 @@ void GfxSurface::create(void) {
 
 	bytesPerLine = (bitsDepth == ColorDepth_4) ?
 			width/2 + width%2 : width*bytesPerPixel /*+ width%(bitsDepth/8)*/;
-	line = (uint8_t*)malloc(heigth * bytesPerLine);
+	line = (uint8_t*)malloc(height * bytesPerLine);
 	if (line) {
 		fill(0);
 	}

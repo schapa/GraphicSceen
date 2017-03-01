@@ -65,7 +65,7 @@ static LTDC_HandleTypeDef s_ltdc;
 
 
 static const uint16_t s_lcdWidth = 240;
-static const uint16_t s_lcdHeigth = 320;
+static const uint16_t s_lcdHeight = 320;
 
 void DiscoLCDInit(uint8_t *buff) {
 
@@ -79,18 +79,18 @@ void DiscoLCDInit(uint8_t *buff) {
 			.AccumulatedHBP = 29,
 			.AccumulatedVBP = 3,
 //			.AccumulatedActiveW = s_lcdWidth + 29,
-//			.AccumulatedActiveH = s_lcdHeigth + 3,
+//			.AccumulatedActiveH = s_lcdHeight + 3,
 //			.TotalWidth = s_lcdWidth + 39,
-//			.TotalHeigh = s_lcdHeigth + 7,
+//			.TotalHeigh = s_lcdHeight + 7,
 			.Backcolor.Red = 0,
 			.Backcolor.Green = 0,
 			.Backcolor.Blue = 0,
 	};
 
 	iface.AccumulatedActiveW = s_lcdWidth + iface.AccumulatedHBP;
-	iface.AccumulatedActiveH = s_lcdHeigth + iface.AccumulatedVBP;
+	iface.AccumulatedActiveH = s_lcdHeight + iface.AccumulatedVBP;
 	iface.TotalWidth = s_lcdWidth + iface.HorizontalSync + iface.VerticalSync + iface.AccumulatedHBP;
-	iface.TotalHeigh = s_lcdHeigth + 7;
+	iface.TotalHeigh = s_lcdHeight + 7;
 
 	s_ltdc.Init = iface;
 	s_ltdc.Instance = LTDC;
@@ -183,7 +183,7 @@ static void sendLcd(uint8_t val)  {
 
 static void initLayer(uint8_t *buff) {
 	const uint16_t width = s_lcdWidth;
-	const uint16_t heigth = 64;
+	const uint16_t height = 64;
 
 	uintptr_t fb = (uintptr_t)buff;
 
@@ -191,7 +191,7 @@ static void initLayer(uint8_t *buff) {
 			.WindowX0 = 0,
 			.WindowX1 = width - 1,
 			.WindowY0 = 0,
-			.WindowY1 = heigth - 1,
+			.WindowY1 = height - 1,
 			.PixelFormat = LTDC_PIXEL_FORMAT_RGB565,
 			.Alpha = 255,
 			.Alpha0 = 255,
@@ -199,7 +199,7 @@ static void initLayer(uint8_t *buff) {
 			.BlendingFactor2 = LTDC_BLENDING_FACTOR2_CA,
 			.FBStartAdress = fb,
 			.ImageWidth = width,
-			.ImageHeight = heigth,
+			.ImageHeight = height,
 			.Backcolor = s_ltdc.Init.Backcolor
 	};
 
