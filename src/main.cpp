@@ -47,37 +47,34 @@ int main(int argc, char* argv[]) {
 	GfxLayer baseLayer(PixelFormat_GrayScale, 256, 64);
 #endif
 
-	TemperatureWidget temperature;
-	TripWidget trip;
-	MPGWidget mpg;
-	TimeWidget clock;
+	TemperatureWidget *temperature = new TemperatureWidget();
+	TripWidget *trip = new TripWidget();
+	MPGWidget *mpg = new MPGWidget();
+	TimeWidget *clock = new TimeWidget();
 
-	temperature.setVisible(true);
-	temperature.setX(0);
-	temperature.setY(14);
-	temperature.setTemperature(888);
+	temperature->setVisible(true);
+	temperature->setX(0);
+	temperature->setY(14);
+	temperature->setTemperature(888);
 
-	trip.setVisible(true);
-	trip.setX(62);
-	trip.setY(14);
-	trip.setValue(888);
+	trip->setVisible(true);
+	trip->setX(62);
+	trip->setY(14);
+	trip->setValue(888);
 
-	mpg.setVisible(true);
-	mpg.setX(132);
-	mpg.setY(10);
+	mpg->setVisible(true);
+	mpg->setX(132);
+	mpg->setY(10);
 
-	clock.setVisible(true);
-	clock.setX(194);
-	clock.setY(14);
-	clock.setTime(8,50);
+	clock->setVisible(true);
+	clock->setX(194);
+	clock->setY(14);
+	clock->setTime(8,50);
 
-	baseLayer.addShape(&temperature);
-	baseLayer.addShape(&trip);
-	baseLayer.addShape(&mpg);
-	baseLayer.addShape(&clock);
-
-//	baseLayer.addShape(&avgMpg);
-//	baseLayer.addShape(&perType);
+	baseLayer.addShape(temperature);
+	baseLayer.addShape(trip);
+	baseLayer.addShape(mpg);
+	baseLayer.addShape(clock);
 
 
 	while(1) {
@@ -90,12 +87,13 @@ int main(int argc, char* argv[]) {
 		EventQueue_Pend(&event);
 		switch (event.type) {
 			case EVENT_SYSTICK: {
-				temperature.setTemperature(end);
-				temperature.setTemperatureType(System_getUptime() %2);
-				trip.setTripInd((System_getUptime() %2), (System_getUptime() %2));
-				trip.setValue(999-System_getUptime());
-				mpg.setType((MPGWidget::Type)(System_getUptime()%3));
-				clock.setTime(System_getUptime()/2,System_getUptime()*2);
+				temperature->setTemperature(end);
+				temperature->setTemperatureType(System_getUptime() %2);
+				trip->setTripInd((System_getUptime() %2), (System_getUptime() %2));
+				trip->setValue(999-System_getUptime());
+				mpg->setType((MPGWidget::Type)(System_getUptime()%3));
+				clock->setTime(System_getUptime()/2,System_getUptime()*2);
+
 //				char buffer[128];
 //				sprintf(buffer, "Uptime is %lu", System_getUptime());
 //				testWdt.setText(buffer);

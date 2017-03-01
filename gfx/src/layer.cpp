@@ -7,6 +7,7 @@
 
 #include "layer.hpp"
 #include <string.h>
+#include <algorithm>
 
 #include "dbg_base.h"
 #if 0
@@ -17,6 +18,15 @@ void GfxLayer::addShape(GfxShape *shape) {
 	if (!shape)
 		return;
 	shapes.push_back(shape);
+}
+
+void GfxLayer::deleteShape(GfxShape *shape) {
+
+	if (!shape)
+		return;
+	std::vector <GfxShape*>::iterator position = std::find(shapes.begin(), shapes.end(), shape);
+	if (position != shapes.end())
+		shapes.erase(position);
 }
 
 void GfxLayer::render() {

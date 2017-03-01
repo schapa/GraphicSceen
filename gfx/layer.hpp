@@ -19,6 +19,7 @@ public:
 	virtual ~GfxLayer() { };
 public:
 	void addShape(GfxShape *shape);
+	void deleteShape(GfxShape *shape);
 	void render();
 	void setTransparentBlendingMode(const bool &mode) { tranparentBlend = mode; }
 	virtual void drawPixel(const uint16_t &x, const uint16_t &y, const uint32_t &argb, const PixelFormat &src);
