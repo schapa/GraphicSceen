@@ -16,12 +16,13 @@
 #include "layer.hpp"
 
 #include "shape.hpp"
-#include "widgetText.hpp"
 #include "memman.h"
+#include "widgetText.hpp"
 #include "widget7Seg.hpp"
 #include "widgetTemperature.hpp"
 #include "widgetTrip.hpp"
 #include "widgetTime.hpp"
+#include "widgetMpg.hpp"
 
 #include "dbg_base.h"
 #if 0
@@ -46,27 +47,24 @@ int main(int argc, char* argv[]) {
 	GfxLayer baseLayer(PixelFormat_GrayScale, 256, 64);
 #endif
 
-	TextWidget avgMpg(FONT_LIBEL_SUIT, 16, "AVG.  MPG");
-	TextWidget perType(FONT_LIBEL_SUIT, 16, "100kmi/l");
-//	TextWidget avgMpg(FONT_LIBEL_SUIT, 16, "A");
-//	TextWidget perType(FONT_LIBEL_SUIT, 16, "B");
-//	avgMpg.setNegative(true);
-//	perType.setNegative(true);
-
-	avgMpg.setSpacing(0);
-	avgMpg.createSurface();
-	avgMpg.setX(132);
-	avgMpg.setY(10);
-	avgMpg.setVisible(true);
-
-	perType.setSpacing(0);
-	perType.createSurface();
-	perType.setX(132);
-	perType.setY(28);
-	perType.setVisible(true);
+//	TextWidget avgMpg(FONT_LIBEL_SUIT, 16, "AVG.  MPG");
+//	TextWidget perType(FONT_LIBEL_SUIT, 16, "100kmi/l");
+//
+//	avgMpg.setSpacing(0);
+//	avgMpg.createSurface();
+//	avgMpg.setX(132);
+//	avgMpg.setY(10);
+//	avgMpg.setVisible(true);
+//
+//	perType.setSpacing(0);
+//	perType.createSurface();
+//	perType.setX(132);
+//	perType.setY(28);
+//	perType.setVisible(true);
 
 	TemperatureWidget temperature;
 	TripWidget trip;
+	MPGWidget mpg;
 	TimeWidget clock;
 
 	temperature.setVisible(true);
@@ -79,6 +77,10 @@ int main(int argc, char* argv[]) {
 	trip.setY(14);
 	trip.setValue(888);
 
+	mpg.setVisible(true);
+	mpg.setX(132);
+	mpg.setY(10);
+
 	clock.setVisible(true);
 	clock.setX(194);
 	clock.setY(14);
@@ -86,10 +88,11 @@ int main(int argc, char* argv[]) {
 
 	baseLayer.addShape(&temperature);
 	baseLayer.addShape(&trip);
+	baseLayer.addShape(&mpg);
 	baseLayer.addShape(&clock);
 
-	baseLayer.addShape(&avgMpg);
-	baseLayer.addShape(&perType);
+//	baseLayer.addShape(&avgMpg);
+//	baseLayer.addShape(&perType);
 
 
 	while(1) {
@@ -106,6 +109,7 @@ int main(int argc, char* argv[]) {
 				temperature.setTemperatureType(System_getUptime() %2);
 				trip.setTripInd((System_getUptime() %2), (System_getUptime() %2));
 				trip.setValue(999-System_getUptime());
+				mpg.setType((MPGWidget::Type)(System_getUptime()%3));
 				clock.setTime(System_getUptime()/2,System_getUptime()*2);
 //				char buffer[128];
 //				sprintf(buffer, "Uptime is %lu", System_getUptime());
