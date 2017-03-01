@@ -45,7 +45,11 @@ int main(int argc, char* argv[]) {
 	GfxLayer baseLayer(PixelFormat_GrayScale, 256, 64);
 #endif
 
-//	TextWidget infoWdt(FONT_CENTURY_SCOOLBOOK, 12, "The quick brown fox jumps over the lazy dog");
+	TextWidget infoWdt(FONT_CENTURY_SCOOLBOOK, 12, "The quick brown fox jumps over the lazy dog");
+
+	infoWdt.setSurface(new GfxSurface(PixelFormat_GrayScale, 110, 64));
+	infoWdt.setX(128);
+	infoWdt.setVisible(true);
 
 	TemperatureWidget temperature;
 	TripWidget trip;
@@ -62,6 +66,7 @@ int main(int argc, char* argv[]) {
 
 	baseLayer.addShape(&temperature);
 	baseLayer.addShape(&trip);
+	baseLayer.addShape(&infoWdt);
 
 	temperature.setTemperature( 888);
 	trip.setValue( 888);
@@ -70,13 +75,14 @@ int main(int argc, char* argv[]) {
 	while(1) {
 		size_t start = System_getUptimeMs();
 		baseLayer.render();
-		DBGMSG_INFO("rend %d", System_getUptimeMs() - start);
+		size_t end = System_getUptimeMs() - start;
+		DBGMSG_INFO("rend %d", end);
 		SSD1322_DrawSurface(baseLayer.getFrameBuffer(), baseLayer.getHeigth(), baseLayer.getBytesPerLine());
 		Event_t event;
 		EventQueue_Pend(&event);
 		switch (event.type) {
 			case EVENT_SYSTICK: {
-				temperature.setTemperature(System_getUptime());
+				temperature.setTemperature(end);
 				temperature.setTemperatureType(System_getUptime() %2);
 				trip.setTripInd((System_getUptime() %2), (System_getUptime() %2));
 				trip.setValue(999-System_getUptime());

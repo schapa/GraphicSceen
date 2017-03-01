@@ -257,11 +257,20 @@ const uint32_t GfxSurface::convertPixel(const PixelFormat &src, const uint32_t &
 	uint32_t newVal = 0;
 	switch (pixelFormat) {
 		case PixelFormat_GrayScale:
-			if (src == PixelFormat_RGB565) {
-				const uint8_t b = pix & 0x1F;
-				const uint8_t g = (pix>>6) & 0x3F;
-				const uint8_t r = (pix>>11) & 0x1F;
-				newVal = (b + g + r)/192;
+			switch (src) {
+				case PixelFormat_RGB565: {
+					const uint8_t b = pix & 0x1F;
+					const uint8_t g = (pix>>6) & 0x3F;
+					const uint8_t r = (pix>>11) & 0x1F;
+					newVal = (b + g + r)/192;
+					break;
+				}
+				case PixelFormat_L8: {
+					newVal = pix/16;
+					break;
+				}
+				default:
+					break;
 			}
 			break;
 		case PixelFormat_RGB565:

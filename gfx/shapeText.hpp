@@ -23,6 +23,9 @@ public:
 	void setFontSize(const uint8_t &size);
 	void setText(const char *text);
 
+	virtual void createSurface();
+	virtual bool Blend(GfxSurface *surface, const uint16_t& offX = 0, const uint16_t& offY = 0);
+
 private:
 	void renderGrayScale(fontItem_p font, const char *text);
 private:
