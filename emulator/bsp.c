@@ -118,7 +118,7 @@ static void* sysTickThread (void *arg) {
 static int mmapPerform(char *path) {
 	int fd = -1;
 	do {
-		fd = open(path, O_RDWR | O_CREAT);
+		fd = open(path, O_RDWR | O_CREAT, S_IRWXG);
 		DBGMSG_M("Open [%s] fd %d", path, fd);
 		if (fd < 0) {
 			usleep((1000*1000));

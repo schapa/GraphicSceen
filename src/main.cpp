@@ -47,21 +47,6 @@ int main(int argc, char* argv[]) {
 	GfxLayer baseLayer(PixelFormat_GrayScale, 256, 64);
 #endif
 
-//	TextWidget avgMpg(FONT_LIBEL_SUIT, 16, "AVG.  MPG");
-//	TextWidget perType(FONT_LIBEL_SUIT, 16, "100kmi/l");
-//
-//	avgMpg.setSpacing(0);
-//	avgMpg.createSurface();
-//	avgMpg.setX(132);
-//	avgMpg.setY(10);
-//	avgMpg.setVisible(true);
-//
-//	perType.setSpacing(0);
-//	perType.createSurface();
-//	perType.setX(132);
-//	perType.setY(28);
-//	perType.setVisible(true);
-
 	TemperatureWidget temperature;
 	TripWidget trip;
 	MPGWidget mpg;

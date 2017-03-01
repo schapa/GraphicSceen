@@ -16,7 +16,7 @@
 
 MPGWidget::MPGWidget(const Type& type): type(type) {
 	const uint16_t line2 = 20;
-	avg = new TextWidget(FONT_LIBEL_SUIT, 16, "AVG");
+	avg = new TextWidget(FONT_LIBEL_SUIT, 16, "AVG.");
 	mpg = new TextWidget(FONT_LIBEL_SUIT, 16, "MPG");
 	liter = new TextWidget(FONT_LIBEL_SUIT, 16, "l");
 	hunred = new TextWidget(FONT_LIBEL_SUIT, 16, "100");
@@ -75,7 +75,6 @@ void MPGWidget::update() {
 			mpg->setVisible(true);
 			break;
 		case JDM:
-			hunred->setVisible(true);
 			k->setVisible(true);
 			m->setVisible(true);
 			perLiter->setVisible(true);
