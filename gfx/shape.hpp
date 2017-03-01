@@ -40,7 +40,9 @@ public:
 	inline bool Draw() {
 		if (!visible || !dirty)
 			return false;
-		return draw();
+		bool drawn = draw();
+		dirty = false;
+		return drawn;
 	}
 	virtual bool Blend(GfxSurface *surface, const uint16_t& offX = 0, const uint16_t& offY = 0) = 0;
 protected:

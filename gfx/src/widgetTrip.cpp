@@ -27,13 +27,9 @@ public:
 		sprites.push_back(
 				new SpriteItem(
 						0, 18, Sprite_TripB));
-		sprites.push_back(
-				new SpriteItem(
-						43, 26, Sprite_Dot));
 
 		setTripAState(true);
 		setTripBState(true);
-		sprites[2]->isVisible = true;
 	};
 	virtual ~subiTripInfo() {};
 
@@ -44,7 +40,7 @@ public:
 TripWidget::TripWidget():
 		isOnA(false), isOnB(false), value(0) {
 	shapes.push_back(new subiTripInfo());
-	shapes.push_back(new GfxMulti7SegShape(3));
+	shapes.push_back(new GfxMulti7SegShape(3, 1));
 	shapes[1]->setX(12);
 	for (size_t i = 0; i < shapes.size(); i++)
 		shapes[i]->setVisible(true);

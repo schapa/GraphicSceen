@@ -25,14 +25,17 @@ private:
 
 class GfxMulti7SegShape : public GfxMultiShape {
 public:
-	GfxMulti7SegShape(const size_t size);
+	GfxMulti7SegShape(const size_t& size, const size_t& dotPos = 0);
 	virtual ~GfxMulti7SegShape() {};
 
 	const int32_t &getValue() const { return value; }
 	void setValue(const int32_t &value);
 
 private:
+	const size_t size;
+	const size_t dotPos;
 	int32_t value;
+	SpriteItem *dot;
 };
 
 

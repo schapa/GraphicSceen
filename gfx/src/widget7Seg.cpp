@@ -73,22 +73,34 @@ void Gfx7SegShape::setValue(const int8_t &value) {
 	dirty = true;
 }
 
-GfxMulti7SegShape::GfxMulti7SegShape(const size_t size): value(0) {
+GfxMulti7SegShape::GfxMulti7SegShape(const size_t& size, const size_t& dotPos):
+		size(size), dotPos(dotPos), value(0) {
 	DBGMSG_H("Creating of %d size", size);
 	for (size_t i = 0; i < size; i++) {
 		shapes.push_back(new Gfx7SegShape());
 		shapes[i]->setX(16 * i);
 	}
+	if (dotPos && ((size - dotPos) > 0)) {
+		dot = new SpriteItem(16*(size - dotPos) - 1, 26, Sprite_Dot);
+		dot->isVisible = true;
+
+		shapes.push_back(new GfxSpriteShape(dot));
+		shapes[size]->setVisible(true);
+	}
 }
 
 void GfxMulti7SegShape::setValue(const int32_t &value) {
 	uint32_t absVal = value < 0 ? -value : value;
-	const size_t last = shapes.size() - 1;
+	const size_t last = size - 1;
 	DBGMSG_M("Seting value %d", value);
-	for (size_t i = 0; i < shapes.size(); i++) {
+	for (size_t i = 0; i < size; i++) {
 		const size_t pos = last - i;
 		Gfx7SegShape *shape = static_cast<Gfx7SegShape*>(shapes[pos]);
-		shape->setVisible(!!absVal);
+
+		if (dot && (i <= dotPos))
+			shapes[i]->setVisible(true);
+		else
+			shape->setVisible(!!absVal);
 		shape->setValue(absVal%10);
 		DBGMSG_L("pos %d val %d", pos, absVal%10);
 		absVal /= 10;
