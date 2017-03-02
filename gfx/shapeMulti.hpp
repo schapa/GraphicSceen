@@ -14,7 +14,6 @@ class GfxMultiShape : public GfxShape {
 public:
 	GfxMultiShape(){};
 	virtual ~GfxMultiShape();
-	virtual void setVisible(const bool& val);
 	virtual void setSurface(GfxSurface *surface);
 	virtual void createSurface();
 	virtual bool Blend(GfxSurface *surface, const uint16_t& offX = 0, const uint16_t& offY = 0);

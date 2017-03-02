@@ -31,7 +31,7 @@ public:
 	virtual bool Blend(GfxSurface *surface, const uint16_t& offX = 0, const uint16_t& offY = 0);
 
 private:
-	void renderGrayScale(fontItem_p font, const char *text);
+	void renderGrayScale(fontItem_p font);
 private:
 	FontType font;
 	uint8_t textSize;

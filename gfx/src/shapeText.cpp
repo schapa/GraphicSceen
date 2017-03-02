@@ -97,7 +97,7 @@ void GfxTextShape::createSurface() {
 }
 
 bool GfxTextShape::Blend(GfxSurface *surface, const uint16_t& offX, const uint16_t& offY) {
-	if (!isVisible())
+	if (!visible)
 		return false;
 	DBGMSG_H("Blend %p", this);
 	const uint16_t sx = offX + getX();
@@ -113,7 +113,7 @@ bool GfxTextShape::Blend(GfxSurface *surface, const uint16_t& offX, const uint16
 }
 
 bool GfxTextShape::draw(void) {
-	if (!text || !surface)
+	if (!text)
 		return false;
 
 	fontItem_p fontItem = FontPainter_SizeLookup(this->font, textSize);
@@ -123,20 +123,21 @@ bool GfxTextShape::draw(void) {
 	surface->fill(this->negative ? 0xFF : 0);
 	switch (surface->getPixelFormat()) {
 		case PixelFormat_GrayScale:
-			renderGrayScale(fontItem, text);
+			renderGrayScale(fontItem);
 			break;
 		default:
-			renderGrayScale(fontItem, text);
+			renderGrayScale(fontItem);
 			break;
 	}
 	dirty = false;
 	return true;
 }
 
-void GfxTextShape::renderGrayScale(fontItem_p font, const char *text) {
-	if (!font || !text || !surface || !visible)
+void GfxTextShape::renderGrayScale(fontItem_p font) {
+	if (!font)
 		return;
 	uint16_t xPos = 0;
+	const char *text = this->text;
 	const fontLookupItem_p& lookup = font->lookup;
 	const uint16_t &w = surface->getWidth();
 	while (*text) {

@@ -22,12 +22,6 @@ GfxMultiShape::~GfxMultiShape() {
 	shapes.clear();
 }
 
-void GfxMultiShape::setVisible(const bool& val) {
-	GfxShape::setVisible(val);
-	for (size_t i = 0; i < shapes.size(); i++)
-		shapes[i]->setVisible(val);
-}
-
 void GfxMultiShape::setSurface(GfxSurface *surface) {
 	assert(surface);
 	GfxShape::setSurface(surface);

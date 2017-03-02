@@ -55,12 +55,12 @@ int main(int argc, char* argv[]) {
 	temperature->setVisible(true);
 	temperature->setX(0);
 	temperature->setY(14);
-	temperature->setTemperature(888);
+	temperature->setTemperature(0);
 
 	trip->setVisible(true);
 	trip->setX(62);
 	trip->setY(14);
-	trip->setValue(888);
+	trip->setValue(0);
 
 	mpg->setVisible(true);
 	mpg->setX(132);
