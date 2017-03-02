@@ -42,9 +42,9 @@ int main(int argc, char* argv[]) {
 
 #if !defined(EMULATOR) && 0
 	GfxLayer baseLayer(PixelFormat_RGB565, 240, 64);
-	DiscoLCDInit(baseLayer.getFrameBuffer());
+	DiscoLCDInit(baseLayer->getFrameBuffer());
 #else
-	GfxLayer baseLayer(PixelFormat_GrayScale, 256, 64);
+	GfxLayer *baseLayer = new GfxLayer(PixelFormat_GrayScale, 256, 64);
 #endif
 
 	TemperatureWidget *temperature = new TemperatureWidget();
@@ -71,18 +71,17 @@ int main(int argc, char* argv[]) {
 	clock->setY(14);
 	clock->setTime(8,50);
 
-	baseLayer.addShape(temperature);
-	baseLayer.addShape(trip);
-	baseLayer.addShape(mpg);
-	baseLayer.addShape(clock);
-
+	baseLayer->addShape(temperature);
+	baseLayer->addShape(trip);
+	baseLayer->addShape(mpg);
+	baseLayer->addShape(clock);
 
 	while(1) {
 		size_t start = System_getUptimeMs();
-		baseLayer.render();
+		baseLayer->render();
 		size_t end = System_getUptimeMs() - start;
 		DBGMSG_INFO("rend %d", end);
-		SSD1322_DrawSurface(baseLayer.getFrameBuffer(), baseLayer.getHeight(), baseLayer.getBytesPerLine());
+		SSD1322_DrawSurface(baseLayer->getFrameBuffer(), baseLayer->getHeight(), baseLayer->getBytesPerLine());
 		Event_t event;
 		EventQueue_Pend(&event);
 		switch (event.type) {

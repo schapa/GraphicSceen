@@ -9,6 +9,7 @@
 
 #include "shapeMulti.hpp"
 #include "widgetText.hpp"
+#include "widgetMisc.hpp"
 
 class MPGWidget: public GfxMultiShape {
 public:
@@ -29,6 +30,7 @@ private:
 	TextWidget *avg;
 	TextWidget *mpg;
 	TextWidget *liter;
+	GfxLineShape *line;
 	TextWidget *hunred;
 	TextWidget *k;
 	TextWidget *m;

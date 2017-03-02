@@ -15,10 +15,12 @@
 #endif
 
 MPGWidget::MPGWidget(const Type& type): type(type) {
-	const uint16_t line2 = 20;
+	const uint16_t line2_x = 6;
+	const uint16_t line2_y = 20;
 	avg = new TextWidget(FONT_LIBEL_SUIT, 16, "AVG.");
 	mpg = new TextWidget(FONT_LIBEL_SUIT, 16, "MPG");
 	liter = new TextWidget(FONT_LIBEL_SUIT, 16, "l");
+	line = new GfxLineShape();
 	hunred = new TextWidget(FONT_LIBEL_SUIT, 16, "100");
 	k = new TextWidget(FONT_LIBEL_SUIT, 16, "k");
 	m = new TextWidget(FONT_LIBEL_SUIT, 16, "m");
@@ -31,24 +33,31 @@ MPGWidget::MPGWidget(const Type& type): type(type) {
 	liter->setX(19);
 	liter->setY(3);
 
-	hunred->setX(0);
-	hunred->setY(line2);
 
-	k->setX(16);
-	k->setY(line2);
+	line->setX(line2_x);
+	line->setY(20);
+	line->drawLine(0,0, 32,0);
+	line->setVisible(true);
 
-	m->setX(22);
-	m->setY(line2);
+	hunred->setX(line2_x);
+	hunred->setY(line2_y);
 
-	i->setX(32);
-	i->setY(line2);
+	k->setX(line2_x + 16);
+	k->setY(line2_y);
 
-	perLiter->setX(35);
-	perLiter->setY(line2);
+	m->setX(line2_x + 22);
+	m->setY(line2_y);
+
+	i->setX(line2_x + 32);
+	i->setY(line2_y);
+
+	perLiter->setX(line2_x + 35);
+	perLiter->setY(line2_y);
 
 	shapes.push_back(avg);
 	shapes.push_back(mpg);
 	shapes.push_back(liter);
+	shapes.push_back(line);
 	shapes.push_back(hunred);
 	shapes.push_back(k);
 	shapes.push_back(m);
