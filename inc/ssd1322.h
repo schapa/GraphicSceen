@@ -36,6 +36,7 @@ typedef enum {
 
 	SSD1322_SET_PHASE_LENGTH = 0xB1,  // Followed by A - pls, refer to .pdf
 	SSD1322_SET_CLOCK_DIVIDER = 0xB3,  // Followed by A. Div = 2^A. A <=10
+	SSD1322_SET_ENHANCEMENT_A = 0xB4,  // Followed by A, B
 	SSD1322_SET_GPIO = 0xB5,  // Followed by A - pls, refer to .pdf
 	SSD1322_SET_PRECHARGE_PERIOD_2 = 0xB6,  // Followed by A clkc. A e [0;15]
 	SSD1322_SET_GRAY_SCALE_TABLE = 0xB8,  // Followed by A[16]. Max 180.
