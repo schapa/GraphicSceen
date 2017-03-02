@@ -31,6 +31,7 @@ private:
 	TextWidget *mpg;
 	TextWidget *liter;
 	GfxLineShape *line;
+	GfxSpriteShape *icons;
 	TextWidget *hunred;
 	TextWidget *k;
 	TextWidget *m;

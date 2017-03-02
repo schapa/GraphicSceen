@@ -46,7 +46,8 @@ void GfxLayer::render() {
 void GfxLayer::blend() {
 	fill(0x00);
 	for (size_t i = 0; i < shapes.size(); i++)
-		shapes[i]->Blend(this);
+		if (shapes[i]->isVisible())
+			shapes[i]->Blend(this);
 }
 
 void GfxLayer::drawPixel(const uint16_t &x, const uint16_t &y, const uint32_t &argb, const PixelFormat &src) {

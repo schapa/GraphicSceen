@@ -23,3 +23,6 @@ extern const Sprite Sprite_TripA;
 extern const Sprite Sprite_TripB;
 
 extern const Sprite Sprite_Dot;
+extern const Sprite Sprite_HalfArrow;
+extern const Sprite Sprite_GasStation;
+

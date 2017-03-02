@@ -38,7 +38,8 @@ bool GfxMultiShape::Blend(GfxSurface *surface, const uint16_t& offX, const uint1
 	if (!isVisible())
 		return false;
 	for (size_t i = 0; i < shapes.size(); i++)
-		shapes[i]->Blend(surface, offX + x, offY + y);
+		if (shapes[i]->isVisible())
+			shapes[i]->Blend(surface, offX + x, offY + y);
 	return true;
 }
 
