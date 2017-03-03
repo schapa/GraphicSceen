@@ -20,4 +20,5 @@ void MEMMAN_free(void *ptr);
 #ifdef __cplusplus
 }
 #endif
+
 #endif /* MEMMAN_H_ */

@@ -10,6 +10,7 @@
 #include "bsp.h"
 #include "Queue.h"
 #include "system.h"
+#include "timers.h"
 #include "ssd1322.h"
 
 #include "surface.hpp"
@@ -32,10 +33,15 @@
 extern "C" void DiscoLCDInit(uint8_t *);
 extern "C" void DiscoLCD_setState(_Bool state);
 
+static void onTimerPush(uint32_t id) {
+	EventQueue_Push(EVENT_TIMCALL, (void*)id, NULL);
+}
+
 int main(int argc, char* argv[]) {
 	(void)argc;
 	(void)argv;
 
+	Timer_init(onTimerPush);
 	_Bool status = BSP_Init();
 	SSD1322_ClearDisplay();
 	DBGMSG_INFO("\nStart. Init %d", status);
@@ -106,6 +112,10 @@ int main(int argc, char* argv[]) {
 //				};
 //				_Bool stat = CAN_write(&msg);
 //				DBGMSG_INFO("Send Can %d. %d", StdId-1, stat);
+				break;
+			}
+			case EVENT_TIMCALL: {
+				Timer_onTimerCb((uint32_t)event.data);
 				break;
 			}
 			case EVENT_CAN:

@@ -5,8 +5,11 @@
  *      Author: shapa
  */
 
-#ifndef QUEUE_H_
-#define QUEUE_H_
+#pragma once
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -36,4 +39,6 @@ void EventQueue_Pend(Event_t *event);
  */
 void EventQueue_Dispose(Event_t *event);
 
-#endif /* QUEUE_H_ */
+#ifdef __cplusplus
+}
+#endif

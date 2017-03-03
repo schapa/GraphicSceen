@@ -6,6 +6,7 @@ CFLAGS += \
 	-I./gfx/fontPainter \
 	-I./gfx/fontPainter/fonts \
 	-I./inc \
+	-I./lib \
 	-I./Queue \
 	-I./menu \
 	
@@ -23,13 +24,12 @@ CFLAGS += \
 export SRC := \
 	./dbg/dbg_trace.c \
 	./src/main.cpp \
-	./src/memman.c \
-	./src/Queue.c \
 	./src/ssd1322.c \
 	./src/system.c \
 	./src/_initialize_hardware.c \
 	./src/_write.c \
 	./src/stm32f4xx_hal_msp.c \
+	$(wildcard ./lib/src/*.c) \
 	\
 	./sdk/src/cortexm/exception_handlers.c \
 	\

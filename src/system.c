@@ -7,7 +7,7 @@
 
 #include <stddef.h>
 #include "system.h"
-
+#include "timers.h"
 #include "bsp.h"
 
 static struct {
@@ -56,6 +56,7 @@ void SysTick_Handler(void) {
 #if defined(USE_HAL_DRIVER)
 	HAL_IncTick();
 #endif
+	Timer_makeTick();
 }
 
 void System_delayMsDummy(uint32_t delay) {
