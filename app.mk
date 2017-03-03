@@ -27,10 +27,9 @@ export SRC := \
 	./src/Queue.c \
 	./src/ssd1322.c \
 	./src/system.c \
-	\
-	./sys/_initialize_hardware.c \
-	./sys/_write.c \
-	./sys/stm32f4xx_hal_msp.c \
+	./src/_initialize_hardware.c \
+	./src/_write.c \
+	./src/stm32f4xx_hal_msp.c \
 	\
 	./sdk/src/cortexm/exception_handlers.c \
 	\

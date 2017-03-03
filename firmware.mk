@@ -21,9 +21,6 @@ SRC += \
 	./firmware/DiscoLcd_ili9341.c \
 	
 SRC += \
-	./sys/_initialize_hardware.c \
-	./sys/_write.c \
-	./sys/stm32f4xx_hal_msp.c \
 	./sdk/src/cmsis/system_stm32f4xx.c \
 	./sdk/src/cmsis/vectors_stm32f429xx.c \
 	./sdk/src/cortexm/_initialize_hardware.c \
