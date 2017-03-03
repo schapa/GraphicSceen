@@ -24,21 +24,21 @@ SRC += \
 	./sys/_initialize_hardware.c \
 	./sys/_write.c \
 	./sys/stm32f4xx_hal_msp.c \
-	./system/src/cmsis/system_stm32f4xx.c \
-	./system/src/cmsis/vectors_stm32f429xx.c \
-	./system/src/cortexm/_initialize_hardware.c \
-	./system/src/cortexm/_reset_hardware.c \
-	./system/src/cortexm/exception_handlers.c \
+	./sdk/src/cmsis/system_stm32f4xx.c \
+	./sdk/src/cmsis/vectors_stm32f429xx.c \
+	./sdk/src/cortexm/_initialize_hardware.c \
+	./sdk/src/cortexm/_reset_hardware.c \
+	./sdk/src/cortexm/exception_handlers.c \
 	\
-	./system/src/diag/Trace.c \
-	./system/src/diag/trace_impl.c \
+	./sdk/src/diag/Trace.c \
+	./sdk/src/diag/trace_impl.c \
 	\
-	./system/src/newlib/_cxx.cpp \
-	./system/src/newlib/_exit.c \
-	./system/src/newlib/_sbrk.c \
-	./system/src/newlib/_startup.c \
-	./system/src/newlib/_syscalls.c \
-	./system/src/newlib/assert.c \
+	./sdk/src/newlib/_cxx.cpp \
+	./sdk/src/newlib/_exit.c \
+	./sdk/src/newlib/_sbrk.c \
+	./sdk/src/newlib/_startup.c \
+	./sdk/src/newlib/_syscalls.c \
+	./sdk/src/newlib/assert.c \
 	\
 
 CFLAGS += \
