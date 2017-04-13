@@ -20,6 +20,8 @@ CFLAGS += \
 	-I./sdk/include/cortexm/ \
 	-I./sdk/include/diag \
 	-I./sdk/include/stm32f4-hal \
+	-ffunction-sections \
+	-fdata-sections \
 	
 export SRC := \
 	./dbg/dbg_trace.c \

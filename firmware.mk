@@ -41,11 +41,14 @@ SRC += \
 CFLAGS += \
 	-I./firmware/ \
 
-CFLAGS += -Og \
+CFLAGS += \
+	-Og \
 	-ggdb \
 	-mcpu=cortex-m4 \
 	-mthumb -mabi=aapcs \
 	-mfloat-abi=soft \
+	-ffunction-sections \
+	-fdata-sections \
 
 LDFLAGS += \
 	-mcpu=cortex-m4 \
