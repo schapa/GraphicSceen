@@ -15,6 +15,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 #include "Queue.h"
+#include "stm32f4xx_hal.h"
 
 #define BSP_TICKS_PER_SECOND 1000
 
@@ -25,6 +26,7 @@ extern "C" {
 #define SCREEN_SIZE (SCREEN_BYTES_PERLINE*SCREEN_HEIGHT)
 
 _Bool BSP_Init(void);
+SPI_HandleTypeDef *BSP_GetHandleSpi_5(void);
 
 void BSP_LedRedSet(const _Bool state);
 void BSP_LedGreenSet(const _Bool state);

@@ -24,7 +24,7 @@ void PWM_Init(void) {
 void PWM_Configure(uint32_t channel, uint8_t dutPercent) {
 
 	timerOscInit(&s_tim1Handle, channel, dutPercent);
-	HAL_TIM_PWM_Start(&s_tim1Handle, TIM_CHANNEL_1);
+	HAL_TIM_PWM_Start(&s_tim1Handle, channel);
 }
 
 static void timerBaseInit(TIM_HandleTypeDef *htim) {
@@ -41,7 +41,7 @@ static void timerBaseInit(TIM_HandleTypeDef *htim) {
 			0
 	};
 	htim->Init = iface;
-	htim->Instance = TIM1;
+	htim->Instance = TIM2;
 	HAL_TIM_PWM_Init(htim);
 }
 

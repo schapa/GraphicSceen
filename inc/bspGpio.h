@@ -22,9 +22,9 @@ typedef enum {
 	GPIO_MEMS_INT_1, // pa1
 	GPIO_MEMS_INT_2, // pa2
 	GPIO_MEMS_CS, // pc1
-	GPIO_SPI5_SCK, // pf7  - concurent with GPIO_LCD_SCL
+	GPIO_SPI5_SCK, // pf7
 	GPIO_SPI5_MISO, // pf8
-	GPIO_SPI5_MOSI, // pf9   GPIO_LCD_SDA
+	GPIO_SPI5_MOSI, // pf9
 
 	GPIO_LCD_R2, //pc10
 	GPIO_LCD_R3, //pb0
@@ -53,8 +53,6 @@ typedef enum {
 	GPIO_LCD_TE, //pd11
 	GPIO_LCD_RDX, //pd12
 	GPIO_LCD_WRX, //pd13
-//	GPIO_LCD_SCL, //pf7
-//	GPIO_LCD_SDA, //pf9
 	GPIO_LCD_ENABLE, //pf10
 	GPIO_LCD_DOTCLK, //pg7
 
@@ -120,27 +118,26 @@ typedef enum {
 } Gpio_e;
 
 enum {
-	GPIO_USER_0 = GPIO_LAST, //pa5
+	GPIO_USER_0 = GPIO_LAST, //pa5    pwm
 	GPIO_USER_1, //pa7
 	GPIO_USER_2, //pb2 boot 1
 	GPIO_USER_3, //pb3
 	GPIO_USER_4, //pb4
 	GPIO_USER_5, //pb7
 	GPIO_USER_6, //pc3
-	GPIO_USER_7, //pc4
-	GPIO_USER_8, //pc8
-	GPIO_USER_9, //pc11
-	GPIO_USER_10, //pc12
-	GPIO_USER_11, //pc13
-	GPIO_USER_12, //pe2
-	GPIO_USER_13, //pe3
-	GPIO_USER_14, //pe4
-	GPIO_USER_15, //pe5
-	GPIO_USER_16, //pe6
-	GPIO_USER_17, //pf6
-	GPIO_USER_18, //pg2
-	GPIO_USER_19, //pg3
-	GPIO_USER_20, //pg9
+	GPIO_USER_7, //pc8
+	GPIO_USER_8, //pc11
+	GPIO_USER_9, //pc12
+	GPIO_USER_10, //pc13
+	GPIO_USER_11, //pe2
+	GPIO_USER_12, //pe3
+	GPIO_USER_13, //pe4
+	GPIO_USER_14, //pe5
+	GPIO_USER_15, //pe6
+	GPIO_USER_16, //pf6
+	GPIO_USER_17, //pg2
+	GPIO_USER_18, //pg3
+	GPIO_USER_19, //pg9
 };
 
 

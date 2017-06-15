@@ -47,9 +47,6 @@
 #include "system.h"
 #include "ili9341.h"
 
-static void initGPIO_Ctrl(void);
-static void initSpi(void);
-
 static void chipSelect(_Bool mode);
 static void setDataMode(_Bool mode);
 
@@ -60,7 +57,6 @@ static void initILI9341(void);
 
 static void initLayer(uint8_t *buff);
 
-static SPI_HandleTypeDef s_spi;
 static LTDC_HandleTypeDef s_ltdc;
 
 
@@ -95,8 +91,9 @@ void DiscoLCDInit(uint8_t *buff) {
 	s_ltdc.Init = iface;
 	s_ltdc.Instance = LTDC;
 
-	initGPIO_Ctrl();
-	initSpi();
+	chipSelect(false);
+	setDataMode(true);
+
 	initILI9341();
 
 	HAL_LTDC_Init(&s_ltdc);
@@ -113,49 +110,6 @@ void DiscoLCD_setState(_Bool state) {
 	}
 }
 
-
-static void initGPIO_Ctrl(void) {
-
-	GPIO_InitTypeDef iface = {
-			GPIO_PIN_2,
-			GPIO_MODE_OUTPUT_PP,
-			GPIO_NOPULL,
-			GPIO_SPEED_FREQ_HIGH,
-			0
-	};
-
-	__HAL_RCC_GPIOC_CLK_ENABLE();
-	__HAL_RCC_GPIOD_CLK_ENABLE();
-
-	HAL_GPIO_Init(GPIOC, &iface);
-
-	iface.Pin = GPIO_PIN_13;
-	HAL_GPIO_Init(GPIOD, &iface);
-
-	chipSelect(false);
-	setDataMode(true);
-}
-
-static void initSpi(void) {
-
-	SPI_InitTypeDef iface = {
-		SPI_MODE_MASTER,
-		SPI_DIRECTION_2LINES,
-		SPI_DATASIZE_8BIT,
-		SPI_POLARITY_LOW,
-		SPI_PHASE_1EDGE,
-		SPI_NSS_SOFT,
-		SPI_BAUDRATEPRESCALER_16,//			SPI_BAUDRATEPRESCALER_256,
-		SPI_FIRSTBIT_MSB,
-		SPI_TIMODE_DISABLE,
-		SPI_CRCCALCULATION_DISABLE,
-		0xABCD
-	};
-	s_spi.Instance = SPI5;
-	s_spi.Init = iface;
-	HAL_SPI_Init(&s_spi);
-}
-
 static void chipSelect(_Bool mode) {
 	GPIO_PinState val = mode ? GPIO_PIN_RESET : GPIO_PIN_SET;
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, val);
@@ -169,7 +123,7 @@ static void setDataMode(_Bool mode) {
 static void sendLcdCmd(uint8_t val) {
 	setDataMode(false);
 	chipSelect(true);
-	HAL_SPI_Transmit(&s_spi, &val, 1, 0xFFFF);
+	HAL_SPI_Transmit(BSP_GetHandleSpi_5(), &val, 1, 0xFFFF);
 	chipSelect(false);
 }
 
@@ -177,7 +131,7 @@ static void sendLcdCmd(uint8_t val) {
 static void sendLcd(uint8_t val)  {
 	setDataMode(true);
 	chipSelect(true);
-	HAL_SPI_Transmit(&s_spi, &val, 1, 0xFFFF);
+	HAL_SPI_Transmit(BSP_GetHandleSpi_5(), &val, 1, 0xFFFF);
 	chipSelect(false);
 }
 

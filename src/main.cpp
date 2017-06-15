@@ -40,14 +40,13 @@ static void onTimerPush(uint32_t id) {
 int main(int argc, char* argv[]) {
 	(void)argc;
 	(void)argv;
-
 	Timer_init(onTimerPush);
 	_Bool status = BSP_Init();
 	SSD1322_ClearDisplay();
 	DBGMSG_INFO("\nStart. Init %d", status);
 
-#if !defined(EMULATOR) && 0
-	GfxLayer baseLayer(PixelFormat_RGB565, 240, 64);
+#if !defined(EMULATOR) && 01
+	GfxLayer *baseLayer = new GfxLayer(PixelFormat_RGB565, 240, 64);
 	DiscoLCDInit(baseLayer->getFrameBuffer());
 #else
 	GfxLayer *baseLayer = new GfxLayer(PixelFormat_GrayScale, 256, 64);
