@@ -81,6 +81,13 @@ _Bool BSP_Init(void) {
 
 	return true;
 }
+SPI_HandleTypeDef *BSP_GetHandleSpi_5(void) {
+	return NULL;
+}
+I2C_HandleTypeDef *BSP_GetHandleI2C_3(void) {
+	return NULL;
+}
+
 
 void BSP_Gpio_Init(void) {
 

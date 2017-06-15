@@ -75,6 +75,12 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi) {
 	}
 }
 
+void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c) {
+	if (hi2c->Instance == I2C3) {
+		__HAL_RCC_I2C3_CLK_ENABLE();
+	}
+}
+
 void HAL_LTDC_MspInit(LTDC_HandleTypeDef* hltdc) {
 	if (hltdc->Instance == LTDC) {
 		RCC_PeriphCLKInitTypeDef phClk;

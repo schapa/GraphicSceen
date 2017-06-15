@@ -13,6 +13,7 @@ CFLAGS += \
 CFLAGS += \
 	-DTRACE \
 	-DSTM32F429xx \
+	-DUSE_HAL_DRIVER \
 	-DHSE_VALUE=8000000 \
 	-I./sdk/include/ \
 	-I./sdk/include/arm \
@@ -25,12 +26,8 @@ CFLAGS += \
 	
 export SRC := \
 	./dbg/dbg_trace.c \
-	./src/main.cpp \
-	./src/ssd1322.c \
-	./src/system.c \
-	./src/_initialize_hardware.c \
-	./src/_write.c \
-	./src/stm32f4xx_hal_msp.c \
+	$(wildcard ./src/*.c) \
+	$(wildcard ./src/*.cpp) \
 	$(wildcard ./lib/src/*.c) \
 	\
 	./sdk/src/cortexm/exception_handlers.c \
@@ -44,6 +41,7 @@ export SRC := \
 	./sdk/src/stm32f4-hal/stm32f4xx_hal_usart.c \
 	./sdk/src/stm32f4-hal/stm32f4xx_hal_uart.c \
 	./sdk/src/stm32f4-hal/stm32f4xx_hal_spi.c \
+	./sdk/src/stm32f4-hal/stm32f4xx_hal_i2c.c \
 	./sdk/src/stm32f4-hal/stm32f4xx_hal_can.c \
 	./sdk/src/stm32f4-hal/stm32f4xx_hal_tim.c \
 	./sdk/src/stm32f4-hal/stm32f4xx_hal_tim_ex.c \

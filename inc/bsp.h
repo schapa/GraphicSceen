@@ -27,6 +27,7 @@ extern "C" {
 
 _Bool BSP_Init(void);
 SPI_HandleTypeDef *BSP_GetHandleSpi_5(void);
+I2C_HandleTypeDef *BSP_GetHandleI2C_3(void);
 
 void BSP_LedRedSet(const _Bool state);
 void BSP_LedGreenSet(const _Bool state);

@@ -24,9 +24,10 @@
 #include "widgetTrip.hpp"
 #include "widgetTime.hpp"
 #include "widgetMpg.hpp"
+#include "STMPE811.hpp"
 
 #include "dbg_base.h"
-#if 0
+#if 01
 #include "dbg_trace.h"
 #endif
 
@@ -37,6 +38,21 @@ static void onTimerPush(uint32_t id) {
 	EventQueue_Push(EVENT_TIMCALL, (void*)id, NULL);
 }
 
+static uint32_t s_accelTim = 0;
+static uint32_t s_senseTim = 0;
+
+
+static void onTimerFire(uint32_t id, void *data) {
+	if (id == s_accelTim) {
+
+	} else if (id == s_senseTim) {
+		STMPE811 *touch = reinterpret_cast<STMPE811*>(data);
+		uint16_t x, y, z;
+		if (touch->read(x, y, z))
+			DBGMSG_M("Touch: %d %d %d", x, y, z);
+	}
+}
+
 int main(int argc, char* argv[]) {
 	(void)argc;
 	(void)argv;
@@ -44,6 +60,12 @@ int main(int argc, char* argv[]) {
 	_Bool status = BSP_Init();
 	SSD1322_ClearDisplay();
 	DBGMSG_INFO("\nStart. Init %d", status);
+
+	STMPE811 touch(BSP_GetHandleI2C_3());
+	touch.init();
+
+	s_accelTim = Timer_newArmed(BSP_TICKS_PER_SECOND/10, true, onTimerFire, NULL);
+	s_senseTim = Timer_newArmed(BSP_TICKS_PER_SECOND/5, true, onTimerFire, &touch);
 
 #if !defined(EMULATOR) && 01
 	GfxLayer *baseLayer = new GfxLayer(PixelFormat_RGB565, 240, 64);
@@ -82,10 +104,10 @@ int main(int argc, char* argv[]) {
 	baseLayer->addShape(clock);
 
 	while(1) {
-		size_t start = System_getUptimeMs();
+		const size_t start = System_getUptimeMs();
 		baseLayer->render();
-		size_t end = System_getUptimeMs() - start;
-		DBGMSG_INFO("rend %d", end);
+		const size_t end = System_getUptimeMs() - start;
+//		DBGMSG_INFO("rend %d", end);
 		SSD1322_DrawSurface(baseLayer->getFrameBuffer(), baseLayer->getHeight(), baseLayer->getBytesPerLine());
 		Event_t event;
 		EventQueue_Pend(&event);
