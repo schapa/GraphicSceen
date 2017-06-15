@@ -12,13 +12,7 @@ MAP_FILE := $(BUILD_ROOT)/$(PROGNAME).map
 export ASM_SRC := 
 
 SRC += \
-	./firmware/bsp.c \
-	./firmware/bspLcd.c \
-	./firmware/canWrapper.c \
-	./firmware/pwmWrapper.c \
-	./firmware/system.c \
-	./firmware/tracer.c \
-	./firmware/DiscoLcd_ili9341.c \
+	$(wildcard ./firmware/*.c) \
 	
 SRC += \
 	./sdk/src/cmsis/system_stm32f4xx.c \

@@ -23,6 +23,7 @@
 #include "system.h"
 #include "ssd1322.h"
 #include "dbg_trace.h"
+#include "bspGpio.h"
 
 extern int pthread_setname_np (pthread_t __target_thread, const char *__name)
 	     __THROW __nonnull ((2));
@@ -79,6 +80,16 @@ _Bool BSP_Init(void) {
 	System_setStatus(INFORM_IDLE);
 
 	return true;
+}
+
+void BSP_Gpio_Init(void) {
+
+}
+void BSP_Gpio_Init_Pin(const Gpio_e pin) {
+
+}
+const GpioCfg_t *const BSP_Gpio_CfgGet(const Gpio_e pin) {
+	return NULL;
 }
 
 static void startSysTickThread (void) {
