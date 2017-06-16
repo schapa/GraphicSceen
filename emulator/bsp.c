@@ -82,10 +82,12 @@ _Bool BSP_Init(void) {
 	return true;
 }
 SPI_HandleTypeDef *BSP_GetHandleSpi_5(void) {
-	return NULL;
+	static SPI_HandleTypeDef handle;
+	return &handle;
 }
 I2C_HandleTypeDef *BSP_GetHandleI2C_3(void) {
-	return NULL;
+	static I2C_HandleTypeDef handle;
+	return &handle;
 }
 
 

@@ -14,8 +14,7 @@
 #include "memman.h"
 
 #include "STMPE811.hpp"
-
-#include "SubiClcokScreen.hpp"
+#include "ssd1322.h"
 
 #include "dbg_base.h"
 #if 01
@@ -42,6 +41,10 @@ static void onTimerFire(uint32_t id, void *data) {
 	}
 }
 
+#include "layer.hpp"
+#include "widgetText.hpp"
+extern "C" void DiscoLCDInit(uint8_t *);
+
 int main(int argc, char* argv[]) {
 	(void)argc;
 	(void)argv;
@@ -52,30 +55,39 @@ int main(int argc, char* argv[]) {
 	STMPE811 touch(BSP_GetHandleI2C_3());
 	touch.init();
 
+	GfxLayer *baseLayer = new GfxLayer(PixelFormat_RGB565, 240, 64);
+	DiscoLCDInit(baseLayer->getFrameBuffer());
+
+	TextWidget *text = new TextWidget(FONT_LIBEL_SUIT, 16);
+	text->setSurface(new GfxSurface(PixelFormat_GrayScale, 240, 30));
+	text->setX(10);
+	text->setY(10);
+	text->setVisible(true);
+	text->setText("Hello");
+
+	baseLayer->addShape(text);
+
 	s_accelTim = Timer_newArmed(BSP_TICKS_PER_SECOND/10, true, onTimerFire, NULL);
 	s_senseTim = Timer_newArmed(BSP_TICKS_PER_SECOND/5, true, onTimerFire, &touch);
 
-	SubiClcokScreen *subi = new SubiClcokScreen(false);
-
 	while(1) {
-		const size_t start = System_getUptimeMs();
-		subi->draw();
-		const size_t end = System_getUptimeMs() - start;
+#ifdef EMULATOR
+		SSD1322_DrawSurface(baseLayer->getFrameBuffer(), baseLayer->getHeight(), baseLayer->getBytesPerLine());
+#endif
+		baseLayer->render();
 		Event_t event;
 		EventQueue_Pend(&event);
 		switch (event.type) {
 			case EVENT_SYSTICK: {
-				subi->setTemperature(end);
-				subi->setTemperatureType(System_getUptime() %2);
-				subi->setTripInd((System_getUptime() %2), (System_getUptime() %2));
-				subi->setValue(999-System_getUptime());
-				subi->setType((MPGWidget::Type)(System_getUptime()%3));
-				subi->setTime(System_getUptime()/2,System_getUptime()*2);
 				break;
 			}
-			case EVENT_TIMCALL:
+			case EVENT_TIMCALL: {
 				Timer_onTimerCb((uint32_t)event.data);
+				char buff[256];
+				snprintf(buff, sizeof(buff), "X:Y  %d      %d", touch.getX(), touch.getY());
+				text->setText(buff);
 				break;
+			}
 			case EVENT_CAN:
 				CAN_handleEvent(&event);
 				break;

@@ -41,17 +41,27 @@ bool STMPE811::read(uint16_t &x, uint16_t &y, uint16_t &z) {
 	readReg(iface, 0x0B, interup);
 	if (!interup)
 		return false;
-	DBGMSG_L("isr %p", interup);
 
 	if (interup & 0x03) {
 		uint8_t fifo = 0;
 		readReg(iface, 0x4C, fifo);
-		DBGMSG_L("fifo %d", fifo);
 		const size_t size = fifo * 4;
 		uint8_t rawData[size];
+		uint32_t mid_x = 0;
+		uint32_t mid_y = 0;
+		uint32_t mid_z = 0;
 		HAL_I2C_Mem_Read(iface, 0x82, 0xD7, 1, rawData, size, 0x0F);
-		for (size_t i = 0; i < size; i++)
-			DBGMSG_L("%d %d", i, rawData[i]);
+		for (size_t i = 0; i < fifo; i++) {
+			uint8_t *ptr = &rawData[i*4];
+			const uint16_t coo_x = ptr[0] << 4 | (ptr[1] >> 4);
+			const uint16_t coo_y = (ptr[1] &0x0F) << 8 | (ptr[2]);
+			mid_x += coo_x;
+			mid_y += coo_y;
+			mid_z += ptr[3];
+		}
+		this->x = x = mid_x / fifo;
+		this->y = y = mid_y / fifo;
+		this->z = z = mid_z / fifo;
 		writeReg(iface, 0x0B, interup);
 		return true;
 	}

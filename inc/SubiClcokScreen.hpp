@@ -7,15 +7,25 @@
 
 #pragma once
 
-#include "surface.hpp"
 #include "layer.hpp"
-#include "shape.hpp"
 #include "widgetText.hpp"
 #include "widget7Seg.hpp"
 #include "widgetTemperature.hpp"
 #include "widgetTrip.hpp"
 #include "widgetTime.hpp"
 #include "widgetMpg.hpp"
+
+
+//example
+//#include "SubiClcokScreen.hpp"
+//SubiClcokScreen *subi = new SubiClcokScreen(false);
+//subi->setTemperature(System_getUptime());
+//subi->setTemperatureType(System_getUptime() %2);
+//subi->setTripInd((System_getUptime() %2), (System_getUptime() %2));
+//subi->setValue(999-System_getUptime());
+//subi->setType((MPGWidget::Type)(System_getUptime()%3));
+//subi->setTime(System_getUptime()/2,System_getUptime()*2);
+//subi->draw();
 
 class SubiClcokScreen {
 
