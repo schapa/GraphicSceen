@@ -14,6 +14,8 @@
 #include "tracer.h"
 #include "bspGpio.h"
 
+#include <assert.h>
+
 static USART_HandleTypeDef s_traceUsart;
 static DMA_HandleTypeDef s_traceTxDma;
 
@@ -29,6 +31,7 @@ _Bool BSP_Init(void) {
 	System_setStatus(INFORM_IDLE);
 	System_setLedControl(BSP_LedGreenSet);
 	BSP_Gpio_Init();
+	assert(BSP_SDRAM_Init());
 	initSpi(&s_spi5, SPI5);
 	initI2C(&s_i2c3, I2C3);
 

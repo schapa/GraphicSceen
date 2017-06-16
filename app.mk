@@ -46,6 +46,8 @@ export SRC := \
 	./sdk/src/stm32f4-hal/stm32f4xx_hal_tim.c \
 	./sdk/src/stm32f4-hal/stm32f4xx_hal_tim_ex.c \
 	./sdk/src/stm32f4-hal/stm32f4xx_hal_ltdc.c \
+	./sdk/src/stm32f4-hal/stm32f4xx_ll_fmc.c \
+	./sdk/src/stm32f4-hal/stm32f4xx_hal_sdram.c \
 	\
 	$(wildcard ./gfx/src/*.cpp) \
 	$(wildcard ./gfx/sprites/*.cpp) \
