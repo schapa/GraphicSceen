@@ -57,14 +57,8 @@ I2C_HandleTypeDef *BSP_GetHandleI2C_3(void) {
 	return &s_i2c3;
 }
 
-void BSP_LedRedSet(const _Bool state) {
-	GPIO_PinState val = state ? GPIO_PIN_SET : GPIO_PIN_RESET;
-	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_14, val);
-}
-
 void BSP_LedGreenSet(const _Bool state) {
-	GPIO_PinState val = state ? GPIO_PIN_SET : GPIO_PIN_RESET;
-	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, val);
+	BSP_Gpio_SetPin(GPIO_LED_GREEN, state);
 }
 
 static void initSpi(SPI_HandleTypeDef *const handle, SPI_TypeDef *const inst) {
@@ -107,3 +101,4 @@ static void initI2C(I2C_HandleTypeDef *const handle, I2C_TypeDef *const inst) {
 	handle->Init = iface;
 	HAL_I2C_Init(handle);
 }
+

@@ -5,15 +5,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include "diag/Trace.h"
 #include "canWrapper.h"
 
 #include "bsp.h"
+#include "bspGpio.h"
 #include "Queue.h"
 #include "system.h"
 #include "timers.h"
 #include "memman.h"
 
+#include "L3GD20.hpp"
 #include "STMPE811.hpp"
 #include "ssd1322.h"
 
@@ -28,17 +29,11 @@ static void onTimerPush(uint32_t id) {
 }
 
 static uint32_t s_accelTim = 0;
-static uint32_t s_senseTim = 0;
-
 
 static void onTimerFire(uint32_t id, void *data) {
 	if (id == s_accelTim) {
-
-	} else if (id == s_senseTim) {
-		STMPE811 *touch = reinterpret_cast<STMPE811*>(data);
-		uint16_t x, y, z;
-		if (touch->read(x, y, z))
-			DBGMSG_M("Touch: %d %d %d", x, y, z);
+//		L3GD20 *accel = (L3GD20*)data;
+//		accel->read();
 	}
 }
 
@@ -54,6 +49,7 @@ int main(int argc, char* argv[]) {
 	DBGMSG_INFO("\nStart. Init %d", status);
 
 	STMPE811 touch(BSP_GetHandleI2C_3());
+	L3GD20 accel(BSP_GetHandleSpi_5());
 	touch.init();
 
 	GfxLayer *baseLayer = new GfxLayer(PixelFormat_RGB565, 240, 64);
@@ -68,8 +64,7 @@ int main(int argc, char* argv[]) {
 
 	baseLayer->addShape(text);
 
-	s_accelTim = Timer_newArmed(BSP_TICKS_PER_SECOND/10, true, onTimerFire, NULL);
-	s_senseTim = Timer_newArmed(BSP_TICKS_PER_SECOND/5, true, onTimerFire, &touch);
+	s_accelTim = Timer_newArmed(BSP_TICKS_PER_SECOND/10, true, onTimerFire, &accel);
 
 	while(1) {
 #ifdef EMULATOR
@@ -82,13 +77,21 @@ int main(int argc, char* argv[]) {
 			case EVENT_SYSTICK: {
 				break;
 			}
-			case EVENT_TIMCALL: {
-				Timer_onTimerCb((uint32_t)event.data);
-				char buff[256];
-				snprintf(buff, sizeof(buff), "X:Y  %d      %d", touch.getX(), touch.getY());
-				text->setText(buff);
+			case EVENT_EXTI: {
+				const int pin = reinterpret_cast<int>(event.data) >> 1;
+				const bool state = reinterpret_cast<int>(event.data) & 1;
+				if (pin == GPIO_TOUCH_INT) {
+					touch.read();
+					char buff[256];
+					snprintf(buff, sizeof(buff), "X:Y  %d      %d", touch.getX(), touch.getY());
+					text->setText(buff);
+				} //else
+					DBGMSG_INFO("EXTI: %d %d", pin, state);
 				break;
 			}
+			case EVENT_TIMCALL:
+				Timer_onTimerCb((uint32_t)event.data);
+				break;
 			case EVENT_CAN:
 				CAN_handleEvent(&event);
 				break;

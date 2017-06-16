@@ -9,6 +9,8 @@
 #include "bspGpio.h"
 #include <assert.h>
 
+const IRQn_Type pin2Exti(const uint32_t pin);
+
 struct GpioCfg_t{
 	GPIO_TypeDef *const port;
 	const GPIO_InitTypeDef config;
@@ -101,7 +103,7 @@ static const GpioCfg_t s_defCon[] = {
 		{ GPIOA, { GPIO_PIN_10, GPIO_MODE_AF_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_VERY_HIGH, GPIO_AF7_USART1 } },
 
 	[GPIO_TOUCH_INT] =
-		{ GPIOA, { GPIO_PIN_15, GPIO_MODE_IT_RISING_FALLING, GPIO_PULLDOWN, GPIO_SPEED_FREQ_MEDIUM, 0 } },
+		{ GPIOA, { GPIO_PIN_15, GPIO_MODE_IT_FALLING, GPIO_PULLDOWN, GPIO_SPEED_FREQ_MEDIUM, 0 } },
 
 	[GPIO_SDRAM_DATA_0] =
 		{ GPIOD, { GPIO_PIN_14, GPIO_MODE_AF_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_VERY_HIGH, GPIO_AF12_FMC } },
@@ -237,7 +239,6 @@ static const GpioCfg_t s_defCon[] = {
 	[GPIO_USER_19] =
 		{ GPIOG, { GPIO_PIN_9, GPIO_MODE_INPUT, GPIO_NOPULL, GPIO_SPEED_FREQ_LOW, 0 } },
 };
-
 static const size_t s_size = sizeof(s_defCon)/sizeof(*s_defCon);
 
 void BSP_Gpio_Init(void) {
@@ -251,6 +252,8 @@ void BSP_Gpio_Init(void) {
 	for (size_t i = 0; i < s_size; i++) {
 		const GpioCfg_t* const itm = &s_defCon[i];
 		HAL_GPIO_Init(itm->port, (GPIO_InitTypeDef*)&itm->config);
+		if (itm->config.Mode & 0x10010000)
+			HAL_NVIC_EnableIRQ(pin2Exti(itm->config.Pin));
 	}
 }
 
@@ -259,7 +262,50 @@ void BSP_Gpio_Init_Pin(const Gpio_e pin) {
 	HAL_GPIO_Init(s_defCon[pin].port, (GPIO_InitTypeDef*)&s_defCon[pin].config);
 }
 
+const _Bool BSP_Gpio_ReadPin(const Gpio_e pin) {
+	assert(pin < s_size);
+	return !!(s_defCon[pin].port->IDR & s_defCon[pin].config.Pin);
+}
+
+void BSP_Gpio_SetPin(const Gpio_e pin, const _Bool val) {
+	assert(pin < s_size);
+	if (val)
+		s_defCon[pin].port->BSRR |= s_defCon[pin].config.Pin;
+	else
+		s_defCon[pin].port->BSRR |= s_defCon[pin].config.Pin << 16;
+}
+
 const GpioCfg_t *const BSP_Gpio_CfgGet(const Gpio_e pin) {
 	assert(pin < s_size);
 	return &s_defCon[pin];
 }
+
+const IRQn_Type pin2Exti(const uint32_t pin) {
+	IRQn_Type irq = -1;
+	switch (pin) {
+		case GPIO_PIN_0: irq = EXTI0_IRQn; break;
+		case GPIO_PIN_1: irq = EXTI1_IRQn; break;
+		case GPIO_PIN_2: irq = EXTI2_IRQn; break;
+		case GPIO_PIN_3: irq = EXTI3_IRQn; break;
+		case GPIO_PIN_4: irq = EXTI4_IRQn; break;
+		case GPIO_PIN_5:
+		case GPIO_PIN_6:
+		case GPIO_PIN_7:
+		case GPIO_PIN_8:
+		case GPIO_PIN_9:
+			irq = EXTI9_5_IRQn;
+			break;
+		case GPIO_PIN_10:
+		case GPIO_PIN_11:
+		case GPIO_PIN_12:
+		case GPIO_PIN_13:
+		case GPIO_PIN_14:
+		case GPIO_PIN_15:
+			irq = EXTI15_10_IRQn;
+			break;
+		default:
+			assert(!"Invalid pin");
+	}
+	return irq;
+}
+

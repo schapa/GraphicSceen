@@ -11,6 +11,8 @@
  extern "C" {
 #endif
 
+#include <stdbool.h>
+
 typedef struct GpioCfg_t GpioCfg_t;
 
 typedef enum {
@@ -143,7 +145,8 @@ enum {
 
 void BSP_Gpio_Init(void);
 void BSP_Gpio_Init_Pin(const Gpio_e pin);
-
+const _Bool BSP_Gpio_ReadPin(const Gpio_e pin);
+void BSP_Gpio_SetPin(const Gpio_e pin, const _Bool val);
 const GpioCfg_t *const BSP_Gpio_CfgGet(const Gpio_e pin);
 
 #ifdef __cplusplus

@@ -81,10 +81,12 @@ _Bool BSP_Init(void) {
 
 	return true;
 }
+
 SPI_HandleTypeDef *BSP_GetHandleSpi_5(void) {
 	static SPI_HandleTypeDef handle;
 	return &handle;
 }
+
 I2C_HandleTypeDef *BSP_GetHandleI2C_3(void) {
 	static I2C_HandleTypeDef handle;
 	return &handle;
@@ -95,6 +97,12 @@ void BSP_Gpio_Init(void) {
 
 }
 void BSP_Gpio_Init_Pin(const Gpio_e pin) {
+
+}
+const _Bool BSP_Gpio_ReadPin(const Gpio_e pin) {
+	return true;
+}
+void BSP_Gpio_SetPin(const Gpio_e pin, const _Bool val) {
 
 }
 const GpioCfg_t *const BSP_Gpio_CfgGet(const Gpio_e pin) {

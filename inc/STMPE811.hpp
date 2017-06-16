@@ -16,7 +16,7 @@ public:
 
 public:
 	void init();
-	bool read(uint16_t &x, uint16_t &y, uint16_t &z);
+	bool read();
 
 	const uint16_t &getX() const { return x; }
 	const uint16_t &getY() const { return y; }

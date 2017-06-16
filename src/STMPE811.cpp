@@ -36,7 +36,7 @@ void STMPE811::init(void) {
 	writeReg(iface, 0x09, 0x01);
 }
 
-bool STMPE811::read(uint16_t &x, uint16_t &y, uint16_t &z) {
+bool STMPE811::read() {
 	uint8_t interup = 0;
 	readReg(iface, 0x0B, interup);
 	if (!interup)
@@ -59,9 +59,9 @@ bool STMPE811::read(uint16_t &x, uint16_t &y, uint16_t &z) {
 			mid_y += coo_y;
 			mid_z += ptr[3];
 		}
-		this->x = x = mid_x / fifo;
-		this->y = y = mid_y / fifo;
-		this->z = z = mid_z / fifo;
+		x = mid_x / fifo;
+		y = mid_y / fifo;
+		z = mid_z / fifo;
 		writeReg(iface, 0x0B, interup);
 		return true;
 	}

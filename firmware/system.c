@@ -23,3 +23,12 @@ void System_Unlock(int primask) {
 void System_Poll(void) {
     __WFI();
 }
+
+#include "dbg_base.h"
+void Default_Handler_C(void) {
+	const int32_t irq = (__get_IPSR() & 0x0F) - 16;
+	if (irq < 0)
+		DBGMSG_ERR("System ISR %d", irq + 16);
+	else
+		DBGMSG_ERR("Unhandled user ISR %d", irq);
+}

@@ -347,16 +347,12 @@ pHandler __isr_vectors[] =
 // specific handler is not present in the application code.
 // When in DEBUG, trigger a debug exception to clearly notify
 // the user of the exception and help identify the cause.
-
+void Default_Handler_C(void);
 void __attribute__ ((section(".after_vectors")))
 Default_Handler(void)
 {
-#if defined(DEBUG)
-__DEBUG_BKPT();
-#endif
-while (1)
-  {
-  }
+	Default_Handler_C();
+	while (1);
 }
 
 // ----------------------------------------------------------------------------
