@@ -1,4 +1,5 @@
 
+export CC := gcc
 export CPP := g++
 export LD := g++
 
@@ -29,7 +30,6 @@ CFLAGS += \
 LDLIBS += \
 	-lc \
 	-lpthread \
-	-lrt \
 	-m32 \
 	-rdynamic \
 

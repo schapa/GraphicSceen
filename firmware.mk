@@ -15,6 +15,8 @@ SRC += \
 	$(wildcard ./firmware/*.c) \
 	
 SRC += \
+	./sdk/src/cortexm/exception_handlers.c \
+	\
 	./sdk/src/cmsis/system_stm32f4xx.c \
 	./sdk/src/cmsis/vectors_stm32f429xx.c \
 	./sdk/src/cortexm/_initialize_hardware.c \

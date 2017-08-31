@@ -24,9 +24,9 @@
 #include "ssd1322.h"
 #include "dbg_trace.h"
 #include "bspGpio.h"
-
-extern int pthread_setname_np (pthread_t __target_thread, const char *__name)
-	     __THROW __nonnull ((2));
+#ifdef LINUX
+#include <sys/prctl.h> // prctl
+#endif
 
 static void* sysTickThread (void *arg);
 static void* uiThread (void *arg);
@@ -114,9 +114,9 @@ static void startSysTickThread (void) {
 	pthread_t pid;
 	int result = pthread_create(&pid, NULL, sysTickThread, NULL);
     if (result) {
-    	DBGMSG_ERR("pthread_create()");
+    		DBGMSG_ERR("pthread_create()");
     }
-	pthread_setname_np(pid, "sysTick");
+
 }
 
 static void startUiThread(void) {
@@ -126,17 +126,21 @@ static void startUiThread(void) {
 	pthread_t pid;
 	int result = pthread_create(&pid, NULL, uiThread, (void*)strdup(path));
     if (result) {
-    	DBGMSG_ERR("pthread_create()");
+    		DBGMSG_ERR("pthread_create()");
     }
-	pthread_setname_np(pid, "uiThread");
 }
+#ifdef LINUX
+extern int usleep (long val);
+#endif
 
 static void* sysTickThread (void *arg) {
+#ifdef LINUX
+	prctl(PR_SET_NAME, "sysTick");
+#endif
 	(void)arg;
 
 	while (true) {
 		extern void SysTick_Handler(void);
-		extern int usleep (__useconds_t __useconds);
 		SysTick_Handler();
 		usleep((1000*1000) / BSP_TICKS_PER_SECOND);
 	}
@@ -175,7 +179,9 @@ static int mmapPerform(char *path) {
 }
 
 static void* uiThread (void *arg) {
-
+#ifdef LINUX
+	prctl(PR_SET_NAME, "uiThread");
+#endif
 	char path[256];
 	int fd = mmapPerform((char*)arg);
 	snprintf(path, sizeof(path), "./build/gui %s", (char*)arg);

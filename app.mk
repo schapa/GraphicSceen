@@ -30,7 +30,6 @@ export SRC := \
 	$(wildcard ./src/*.cpp) \
 	$(wildcard ./lib/src/*.c) \
 	\
-	./sdk/src/cortexm/exception_handlers.c \
 	\
 	./sdk/src/stm32f4-hal/stm32f4xx_hal.c \
 	./sdk/src/stm32f4-hal/stm32f4xx_hal_cortex.c \
