@@ -9,7 +9,6 @@
 
 #include "shapeSprite.hpp"
 #include "shapeMulti.hpp"
-#include <vector>
 
 
 class Gfx7SegShape : public GfxSpriteShape {

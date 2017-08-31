@@ -15,8 +15,8 @@
 #endif
 
 GfxLayer::~GfxLayer() {
-	for (size_t i = 0; i < shapes.size(); i++)
-		delete shapes[i];
+	for (auto it = shapes.begin(); it != shapes.end(); it++)
+		delete *it;
 	shapes.clear();
 }
 
@@ -30,24 +30,24 @@ void GfxLayer::deleteShape(GfxShape *shape) {
 
 	if (!shape)
 		return;
-	std::vector <GfxShape*>::iterator position = std::find(shapes.begin(), shapes.end(), shape);
+	auto position = std::find(shapes.begin(), shapes.end(), shape);
 	if (position != shapes.end())
 		shapes.erase(position);
 }
 
 void GfxLayer::render() {
 	bool isDrawn = false;
-	for (size_t i = 0; i < shapes.size(); i++)
-		isDrawn |= shapes[i]->Draw();
+	for (auto it = shapes.begin(); it != shapes.end(); it++)
+		isDrawn |= (*it)->Draw();
 	if (isDrawn)
 		blend();
 }
 
 void GfxLayer::blend() {
 	fill(0x00);
-	for (size_t i = 0; i < shapes.size(); i++)
-		if (shapes[i]->isVisible())
-			shapes[i]->Blend(this);
+	for (auto it = shapes.begin(); it != shapes.end(); it++)
+		if ((*it)->isVisible())
+			(*it)->Blend(this);
 }
 
 void GfxLayer::drawPixel(const uint16_t &x, const uint16_t &y, const uint32_t &argb, const PixelFormat &src) {

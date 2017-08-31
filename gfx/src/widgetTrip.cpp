@@ -33,24 +33,25 @@ public:
 	};
 	virtual ~subiTripInfo() {};
 
-	void setTripAState(const bool& state) { sprites[0]->isVisible = state; }
-	void setTripBState(const bool& state) { sprites[1]->isVisible = state; }
+	void setTripAState(const bool& state) { sprites.front()->isVisible = state; }
+	void setTripBState(const bool& state) { sprites.back()->isVisible = state; }
 };
 
 TripWidget::TripWidget():
 		isOnA(false), isOnB(false), value(0) {
+	GfxMulti7SegShape *tmp = new GfxMulti7SegShape(3, 1);
 	shapes.push_back(new subiTripInfo());
-	shapes.push_back(new GfxMulti7SegShape(3, 1));
-	shapes[1]->setX(12);
-	for (size_t i = 0; i < shapes.size(); i++)
-		shapes[i]->setVisible(true);
+	shapes.push_back(tmp);
+	tmp->setX(12);
+	for (auto it = shapes.begin(); it != shapes.end(); it++)
+		(*it)->setVisible(true);
 }
 
 
 void TripWidget::update() {
 	dirty = true;
-	subiTripInfo *indication = static_cast<subiTripInfo*>(shapes[0]);
-	GfxMulti7SegShape *digits = static_cast<GfxMulti7SegShape*>(shapes[1]);
+	subiTripInfo *indication = static_cast<subiTripInfo*>(shapes.front());
+	GfxMulti7SegShape *digits = static_cast<GfxMulti7SegShape*>(shapes.back());
 	indication->setTripAState(isOnA);
 	indication->setTripBState(isOnB);
 	digits->setValue(value);

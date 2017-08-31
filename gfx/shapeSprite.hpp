@@ -9,7 +9,7 @@
 
 #include "shape.hpp"
 #include "sprite.hpp"
-#include <vector>
+#include <list>
 
 class GfxSpriteShape : public GfxShape {
 public:
@@ -17,11 +17,11 @@ public:
 	GfxSpriteShape(SpriteItem *item) { sprites.push_back(item); };
 	virtual ~GfxSpriteShape();
 
-	std::vector<SpriteItem*>& getSprites() { return sprites; };
+	std::list<SpriteItem*>& getSprites() { return sprites; };
 	virtual void createSurface() {};
 	virtual bool Blend(GfxSurface *surface, const uint16_t& offX = 0, const uint16_t& offY = 0);
 protected:
-	std::vector<SpriteItem*> sprites;
+	std::list<SpriteItem*> sprites;
 private:
 	virtual bool draw() { return true; }
 };

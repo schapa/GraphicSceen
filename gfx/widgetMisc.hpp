@@ -11,7 +11,6 @@
 
 #include "shape.hpp"
 #include "sprite.hpp"
-#include <vector>
 
 class GfxLineShape : public GfxSpriteShape {
 public:

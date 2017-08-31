@@ -22,15 +22,13 @@
 class dots : public GfxSpriteShape {
 public:
 	dots() {
-		sprites.push_back(
-				new SpriteItem(
-						0, 0, Sprite_Dot));
-		sprites.push_back(
-				new SpriteItem(
-						0, 14, Sprite_Dot));
+		SpriteItem *dotU = new SpriteItem(0, 0, Sprite_Dot);
+		SpriteItem *dotD = new SpriteItem(0, 14, Sprite_Dot);
+		sprites.push_back(dotU);
+		sprites.push_back(dotD);
 
-		sprites[0]->isVisible = true;
-		sprites[1]->isVisible = true;
+		dotU->isVisible = true;
+		dotD->isVisible = true;
 		setX(31);
 		setY(6);
 	};
@@ -47,8 +45,8 @@ TimeWidget::TimeWidget():
 	shapes.push_back(h);
 	shapes.push_back(m);
 	shapes.push_back(new dots());
-	for (size_t i = 0; i < shapes.size(); i++)
-		shapes[i]->setVisible(true);
+	for (auto it = shapes.begin(); it != shapes.end(); it++)
+		(*it)->setVisible(true);
 }
 
 void TimeWidget::setTime(const uint8_t& hours, const uint8_t& minutes) {
@@ -60,8 +58,9 @@ void TimeWidget::setTime(const uint8_t& hours, const uint8_t& minutes) {
 
 void TimeWidget::update() {
 	dirty = true;
-	GfxMulti7SegShape *h = static_cast<GfxMulti7SegShape*>(shapes[0]);
-	GfxMulti7SegShape *m = static_cast<GfxMulti7SegShape*>(shapes[1]);
+	auto it = shapes.begin();
+	GfxMulti7SegShape *h = static_cast<GfxMulti7SegShape*>(*it++);
+	GfxMulti7SegShape *m = static_cast<GfxMulti7SegShape*>(*it);
 	h->setValue(hours);
 	m->setValue(minutes);
 }

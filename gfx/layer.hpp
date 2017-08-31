@@ -10,7 +10,7 @@
 
 #include "surface.hpp"
 #include "shape.hpp"
-#include <vector>
+#include <list>
 
 class GfxLayer : public GfxSurface {
 public:
@@ -26,7 +26,7 @@ public:
 private:
 	void blend();
 private:
-	std::vector <GfxShape*>shapes;
+	std::list <GfxShape*>shapes;
 	bool tranparentBlend;
 };
 

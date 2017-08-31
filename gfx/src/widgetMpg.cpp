@@ -18,15 +18,13 @@
 class Icons : public GfxSpriteShape {
 public:
 	Icons() {
-		sprites.push_back(
-				new SpriteItem(
-						0, 9, Sprite_HalfArrow));
-		sprites.push_back(
-				new SpriteItem(
-						10, 0, Sprite_GasStation));
+		SpriteItem *arrow = new SpriteItem(0, 9, Sprite_HalfArrow);
+		SpriteItem *gas = new SpriteItem(10, 0, Sprite_GasStation);
+		sprites.push_back(arrow);
+		sprites.push_back(gas);
 
-		sprites[0]->isVisible = true;
-		sprites[1]->isVisible = true;
+		arrow->isVisible = true;
+		gas->isVisible = true;
 	};
 	virtual ~Icons() {};
 };
@@ -86,17 +84,17 @@ MPGWidget::MPGWidget(const Type& type): type(type) {
 	perLiter->setY(line2_y);
 	shapes.push_back(perLiter);
 
-	for (size_t i = 0; i < shapes.size(); i++)
-		shapes[i]->createSurface();
+	for (auto it = shapes.begin(); it != shapes.end(); it++)
+		(*it)->createSurface();
 	update();
 }
 
 
 void MPGWidget::update() {
-	for (size_t i = 0; i < shapes.size(); i++)
-		shapes[i]->setVisible(false);
+	for (auto it = shapes.begin(); it != shapes.end(); it++)
+		(*it)->setVisible(false);
 	icons->setVisible(true);
-line->setVisible(true);
+	line->setVisible(true);
 	switch (type) {
 		case EDM:
 			liter->setVisible(true);

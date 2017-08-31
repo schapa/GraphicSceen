@@ -16,8 +16,8 @@
 #endif
 
 GfxSpriteShape::~GfxSpriteShape() {
-	for (size_t i = 0; i < sprites.size(); i++)
-		delete sprites[i];
+	for (auto it = sprites.begin(); it != sprites.end(); it++)
+		delete *it;
 	sprites.clear();
 }
 
@@ -26,14 +26,15 @@ bool GfxSpriteShape::Blend(GfxSurface *surface, const uint16_t& offX, const uint
 	if (!isVisible())
 		return false;
 	DBGMSG_H("Blend %p", this);
-	for (size_t i = 0; i < sprites.size(); i++) {
-		SpriteItem* item = sprites[i];
+	for (auto it = sprites.begin(); it != sprites.end(); it++) {
+		std::list<SpriteItem*>::const_iterator iii;
+		SpriteItem* item = *it;
 		if (!item->isVisible)
 			continue;
 		const uint16_t sx = offX + getX() + item->getX();
 		const uint16_t sy = offY + getY() + item->getY();
-		const uint16_t w = item->sprite.getWidth();
-		const uint16_t h = item->sprite.getHeight();
+		const uint16_t &w = item->sprite.getWidth();
+		const uint16_t &h = item->sprite.getHeight();
 		DBGMSG_M("Blend %d. At %d:%d. Sz %dx%d", i, sx, sy, w, h);
 
 		for (size_t y = 0; y < h; y++)

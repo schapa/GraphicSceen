@@ -34,23 +34,23 @@ public:
 	};
 	virtual ~subiTempInfo() {};
 
-	void setCelsiusState(const bool& state) { sprites[0]->isVisible = state; }
-	void setFahrenheitState(const bool& state) { sprites[1]->isVisible = state; }
+	void setCelsiusState(const bool& state) { sprites.front()->isVisible = state; }
+	void setFahrenheitState(const bool& state) { sprites.back()->isVisible = state; }
 };
 
 TemperatureWidget::TemperatureWidget():
 		isCelsius(true), temperature(0) {
 	shapes.push_back(new GfxMulti7SegShape(3));
 	shapes.push_back(new subiTempInfo());
-	for (size_t i = 0; i < shapes.size(); i++)
-		shapes[i]->setVisible(true);
+	for (auto it = shapes.begin(); it != shapes.end(); it++)
+		(*it)->setVisible(true);
 }
 
 
 void TemperatureWidget::update() {
 	dirty = true;
-	GfxMulti7SegShape *digits = static_cast<GfxMulti7SegShape*>(shapes[0]);
-	subiTempInfo *indication = static_cast<subiTempInfo*>(shapes[1]);
+	GfxMulti7SegShape *digits = static_cast<GfxMulti7SegShape*>(shapes.front());
+	subiTempInfo *indication = static_cast<subiTempInfo*>(shapes.back());
 	digits->setValue(temperature);
 	indication->setCelsiusState(isCelsius);
 	indication->setFahrenheitState(!isCelsius);

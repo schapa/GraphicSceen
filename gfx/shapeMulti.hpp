@@ -8,7 +8,7 @@
 #pragma once
 
 #include "shape.hpp"
-#include <vector>
+#include <list>
 
 class GfxMultiShape : public GfxShape {
 public:
@@ -18,7 +18,7 @@ public:
 	virtual void createSurface();
 	virtual bool Blend(GfxSurface *surface, const uint16_t& offX = 0, const uint16_t& offY = 0);
 protected:
-	std::vector<GfxShape*>shapes;
+	std::list<GfxShape*>shapes;
 private:
 	virtual bool draw();
 };
