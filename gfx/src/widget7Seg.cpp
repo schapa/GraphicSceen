@@ -93,30 +93,32 @@ GfxMulti7SegShape::GfxMulti7SegShape(const size_t& size, const size_t& dotPos):
 }
 
 void GfxMulti7SegShape::setValue(const int32_t &value) {
-//	uint32_t absVal = value < 0 ? -value : value;
-//	const size_t last = size - 1;
-//	DBGMSG_M("Seting value %d", value);
-//	for (size_t i = 0; i < size; i++) {
-//		const size_t pos = last - i;
-//		Gfx7SegShape *shape = static_cast<Gfx7SegShape*>(shapes[pos]);
-//
-//		if (zeroTrailing)
-//			shape->setVisible(true);
-//		else if (dot && (i <= dotPos))
-//			shapes[i]->setVisible(true);
-//		else
-//			shape->setVisible(!!absVal);
-//		shape->setValue(absVal%10);
-//		DBGMSG_L("pos %d val %d", pos, absVal%10);
-//		absVal /= 10;
-//	}
-//	if (!value) {
-//		static_cast<Gfx7SegShape*>(shapes[last])->setVisible(true);
-//	} else if (value < 0) {
-//		int8_t sig = ((value > -200) && (value < -99)) ? SPRITE_MINUS_ONE : SPRITE_MINUS;
-//		DBGMSG_L("Negative. pos %d val %d", 0, sig);
-//		static_cast<Gfx7SegShape*>(shapes[0])->setValue(sig);
-//		static_cast<Gfx7SegShape*>(shapes[0])->setVisible(true);
-//	}
+	uint32_t absVal = value < 0 ? -value : value;
+	const size_t last = size - 1;
+	DBGMSG_M("Seting value %d %d", value, size);
+	size_t i = 0;
+if (last == 0)
+return;
+	for (auto it = shapes.begin(); it != shapes.end(); it++, i++) {
+		Gfx7SegShape *shape = static_cast<Gfx7SegShape*>(*it);
+
+		if (zeroTrailing)
+			shape->setVisible(true);
+		else if (dot && (i <= dotPos))
+			shape->setVisible(true);
+		else
+			shape->setVisible(!!absVal);
+		shape->setValue(absVal%10);
+		DBGMSG_L("pos %d val %d", last - i, absVal%10);
+		absVal /= 10;
+	}
+	if (!value) {
+		static_cast<Gfx7SegShape*>(shapes.back())->setVisible(true);
+	} else if (value < 0) {
+		const int8_t sig = ((value > -200) && (value < -99)) ? SPRITE_MINUS_ONE : SPRITE_MINUS;
+		DBGMSG_L("Negative. pos %d val %d", 0, sig);
+		static_cast<Gfx7SegShape*>(shapes.front())->setValue(sig);
+		static_cast<Gfx7SegShape*>(shapes.front())->setVisible(true);
+	}
 	this->dirty = true;
 }

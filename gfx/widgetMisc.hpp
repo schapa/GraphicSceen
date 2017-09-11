@@ -14,7 +14,7 @@
 
 class GfxLineShape : public GfxSpriteShape {
 public:
-	GfxLineShape() : sx(0), sy(0), ex(0), ey(0), width(1) {};
+	GfxLineShape() : sx(0), sy(0), ex(0), ey(0) {};
 	virtual ~GfxLineShape() {};
 
 	void drawLine(const uint16_t &sx, const uint16_t &sy, const uint16_t &ex, const uint16_t &ey);
@@ -24,5 +24,4 @@ private:
 	uint16_t sy;
 	uint16_t ex;
 	uint16_t ey;
-	uint16_t width;
 };

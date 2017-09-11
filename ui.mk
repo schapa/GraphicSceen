@@ -26,7 +26,6 @@ CFLAGS += \
 LDLIBS += \
 	-lc \
 	-lpthread \
-	-lrt \
 	$(shell pkg-config --libs gtk+-3.0) \
 
 .PHONY: all clean info

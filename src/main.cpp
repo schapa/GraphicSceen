@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include "canWrapper.h"
 
+#include "canWrapper.h"
 #include "bsp.h"
 #include "bspGpio.h"
 #include "Queue.h"
@@ -52,11 +52,16 @@ int main(int argc, char* argv[]) {
 	L3GD20 accel(BSP_GetHandleSpi_5());
 	touch.init();
 
-	GfxLayer *baseLayer = new GfxLayer(PixelFormat_RGB565, 240, 64);
+#ifdef EMULATOR
+	const PixelFormat pixfmt = PixelFormat_GrayScale;
+#else
+	const PixelFormat pixfmt = PixelFormat_RGB565;
+#endif
+	GfxLayer *baseLayer = new GfxLayer(pixfmt, SCREEN_WIDTH, SCREEN_HEIGHT);
 	DiscoLCDInit(baseLayer->getFrameBuffer());
 
 	TextWidget *text = new TextWidget(FONT_LIBEL_SUIT, 16);
-	text->setSurface(new GfxSurface(PixelFormat_GrayScale, 240, 30));
+	text->setSurface(new GfxSurface(PixelFormat_GrayScale, SCREEN_WIDTH, 30));
 	text->setX(10);
 	text->setY(10);
 	text->setVisible(true);

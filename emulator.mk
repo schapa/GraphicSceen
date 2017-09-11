@@ -23,6 +23,8 @@ CFLAGS += \
 	-O0 \
 	-m32 \
 	-DEMULATOR \
+	-U__STRICT_ANSI__ \
+	-U__weak \
 	-Wno-deprecated-declarations \
 	-Wall -Wformat=0 \
 
