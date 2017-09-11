@@ -6,6 +6,7 @@
  */
 
 #include "surface.hpp"
+#include "memman.h"
 #include <string.h>
 #include <assert.h>
 
@@ -220,7 +221,7 @@ void GfxSurface::create(void) {
 
 	bytesPerLine = (bitsDepth == ColorDepth_4) ?
 			width/2 + width%2 : width*bytesPerPixel /*+ width%(bitsDepth/8)*/;
-	line = (uint8_t*)malloc(height * bytesPerLine);
+	line = (uint8_t*)MEMMAN_malloc(height * bytesPerLine);
 	if (line) {
 		fill(0);
 	}
