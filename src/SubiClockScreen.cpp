@@ -5,7 +5,7 @@
  *      Author: shapa
  */
 
-#include "SubiClcokScreen.hpp"
+#include "SubiClockScreen.hpp"
 
 #include "ssd1322.h"
 

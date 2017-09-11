@@ -1,5 +1,5 @@
 /*
- * SubiClcokScreen.hpp
+ * SubiClockScreen.hpp
  *
  *  Created on: Jun 16, 2017
  *      Author: shapa
