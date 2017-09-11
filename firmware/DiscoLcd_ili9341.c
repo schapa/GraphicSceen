@@ -137,7 +137,7 @@ static void sendLcd(uint8_t val)  {
 
 static void initLayer(uint8_t *buff) {
 	const uint16_t width = s_lcdWidth;
-	const uint16_t height = 64;
+	const uint16_t height = s_lcdHeight;
 
 	uintptr_t fb = (uintptr_t)buff;
 

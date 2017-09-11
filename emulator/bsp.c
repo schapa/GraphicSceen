@@ -42,6 +42,8 @@ static struct {
 	_Bool mmaped;
 } s_lcd;
 
+static uint8_t s_sdramBuff[8*0x400*0x400];
+
 void BSP_LcdReset(const _Bool state) {
 
 }
@@ -92,6 +94,13 @@ I2C_HandleTypeDef *BSP_GetHandleI2C_3(void) {
 	return &handle;
 }
 
+uint8_t *BSP_SDRAM_GetBase(void) {
+	return s_sdramBuff;
+}
+
+size_t BSP_SDRAM_GetSize(void) {
+	return sizeof(s_sdramBuff);
+}
 
 void BSP_Gpio_Init(void) {
 

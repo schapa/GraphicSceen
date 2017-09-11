@@ -31,6 +31,8 @@ I2C_HandleTypeDef *BSP_GetHandleI2C_3(void);
 void BSP_LedGreenSet(const _Bool state);
 
 _Bool BSP_SDRAM_Init(void);
+uint8_t *BSP_SDRAM_GetBase(void);
+size_t BSP_SDRAM_GetSize(void);
 
 void BSP_LcdInit(void);
 void BSP_LcdReset(const _Bool state);

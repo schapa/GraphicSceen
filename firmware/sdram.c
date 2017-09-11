@@ -8,7 +8,14 @@
 #include "stm32f4xx_hal.h"
 #include <stdbool.h>
 
-static SDRAM_HandleTypeDef s_sdram;
+static struct {
+	 SDRAM_HandleTypeDef dev;
+	 uint8_t *base;
+	 size_t size;
+} s_sdram = {
+		.base = (uint8_t*)0xD0000000,
+		.size = (8*1024*1024),
+};
 
 #define SDRAM_TIMEOUT ((uint32_t)0xFFFF)
 #define REFRESH_COUNT ((uint32_t)0x0569) /* SDRAM refresh counter (90Mhz SD clock) */
@@ -52,15 +59,23 @@ _Bool BSP_SDRAM_Init(void) {
 			2,
 			2
 	};
-	s_sdram.Init = iface;
-	s_sdram.Instance = FMC_SDRAM_DEVICE;
+	s_sdram.dev.Init = iface;
+	s_sdram.dev.Instance = FMC_SDRAM_DEVICE;
 
-	HAL_StatusTypeDef stat = HAL_SDRAM_Init(&s_sdram, (FMC_SDRAM_TimingTypeDef*)&timing);
+	HAL_StatusTypeDef stat = HAL_SDRAM_Init(&s_sdram.dev, (FMC_SDRAM_TimingTypeDef*)&timing);
 	if (stat != HAL_OK)
 		return false;
 	if (!init())
 		return false;
 	return sdram_test();
+}
+
+uint8_t *BSP_SDRAM_GetBase(void) {
+	return s_sdram.base;
+}
+
+size_t BSP_SDRAM_GetSize(void) {
+	return s_sdram.size;
 }
 
 static _Bool init(void) {
@@ -76,26 +91,26 @@ static _Bool init(void) {
 			{ FMC_SDRAM_CMD_AUTOREFRESH_MODE, FMC_SDRAM_CMD_TARGET_BANK2, 4, 0 },
 			{ FMC_SDRAM_CMD_LOAD_MODE, FMC_SDRAM_CMD_TARGET_BANK2, 1, tmpmrd },
 	};
-	HAL_StatusTypeDef stat = HAL_SDRAM_SendCommand(&s_sdram, (FMC_SDRAM_CommandTypeDef*)&cmd[0], SDRAM_TIMEOUT);
+	HAL_StatusTypeDef stat = HAL_SDRAM_SendCommand(&s_sdram.dev, (FMC_SDRAM_CommandTypeDef*)&cmd[0], SDRAM_TIMEOUT);
 	if (stat != HAL_OK)
 		return false;
 	HAL_Delay(1);
 	for (size_t i = 1; i < sizeof(cmd)/sizeof(*cmd); i++) {
-		HAL_SDRAM_SendCommand(&s_sdram, (FMC_SDRAM_CommandTypeDef*)&cmd[i], SDRAM_TIMEOUT);
+		HAL_SDRAM_SendCommand(&s_sdram.dev, (FMC_SDRAM_CommandTypeDef*)&cmd[i], SDRAM_TIMEOUT);
 		if (stat != HAL_OK)
 			return false;
 	}
-	return HAL_SDRAM_ProgramRefreshRate(&s_sdram, REFRESH_COUNT) == HAL_OK;
+	return HAL_SDRAM_ProgramRefreshRate(&s_sdram.dev, REFRESH_COUNT) == HAL_OK;
 }
 
 static _Bool sdram_test(void) {
     uint8_t pattern = 0xAA;
     uint8_t antipattern = 0x55;
-    uint32_t mem_size = (8*1024*1024);
-    uint8_t * const mem_base = (uint8_t*)0xD0000000;
+    uint32_t mem_size = s_sdram.size;
+    uint8_t * const mem_base = (uint8_t*)s_sdram.base;
 
     /* test data bus */
-    for (uint8_t i=1; i; i<<=1) {
+    for (uint8_t i = 1; i; i <<= 1) {
         *mem_base = i;
         if (*mem_base != i)
             return false;
@@ -103,7 +118,7 @@ static _Bool sdram_test(void) {
 
     /* test address bus */
     /* Check individual address lines */
-    for (uint32_t i=1; i<mem_size; i<<=1) {
+    for (uint32_t i = 1; i < mem_size; i <<= 1) {
         mem_base[i] = pattern;
         if (mem_base[i] != pattern)
             return false;
@@ -111,13 +126,13 @@ static _Bool sdram_test(void) {
 
     /* Check for aliasing (overlapping addresses) */
     mem_base[0] = antipattern;
-    for (uint32_t i=1; i<mem_size; i<<=1) {
+    for (uint32_t i = 1; i < mem_size; i <<=1 ) {
         if (mem_base[i] != pattern)
             return false;
     }
 
     /* test all ram cells */
-    for (uint32_t i=0; i<mem_size; i++) {
+    for (uint32_t i = 0; i < mem_size; i++) {
         mem_base[i] = pattern;
         if (mem_base[i] != pattern)
             return false;

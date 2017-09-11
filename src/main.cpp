@@ -32,8 +32,8 @@ static uint32_t s_accelTim = 0;
 
 static void onTimerFire(uint32_t id, void *data) {
 	if (id == s_accelTim) {
-//		L3GD20 *accel = (L3GD20*)data;
-//		accel->read();
+		L3GD20 *accel = (L3GD20*)data;
+		accel->read();
 	}
 }
 
@@ -53,12 +53,14 @@ int main(int argc, char* argv[]) {
 	touch.init();
 
 #ifdef EMULATOR
+
 	const PixelFormat pixfmt = PixelFormat_GrayScale;
 #else
 	const PixelFormat pixfmt = PixelFormat_RGB565;
 #endif
 	GfxLayer *baseLayer = new GfxLayer(pixfmt, SCREEN_WIDTH, SCREEN_HEIGHT);
-	GfxLayer *discoScreenLayer = new GfxLayer(pixfmt, 240, SCREEN_HEIGHT);
+	GfxLayer *discoScreenLayer = new GfxLayer(pixfmt, 240, 320, false);
+	discoScreenLayer->setFrameBuffer(BSP_SDRAM_GetBase());
 	GfxSurface *textSurface = new GfxSurface(PixelFormat_GrayScale, SCREEN_WIDTH, 30);
 
 	DiscoLCDInit(discoScreenLayer->getFrameBuffer());
@@ -73,7 +75,7 @@ int main(int argc, char* argv[]) {
 	baseLayer->addShape(text);
 	discoScreenLayer->addShape(text);
 
-	s_accelTim = Timer_newArmed(BSP_TICKS_PER_SECOND/10, true, onTimerFire, &accel);
+	s_accelTim = Timer_newArmed(BSP_TICKS_PER_SECOND/3, true, onTimerFire, &accel);
 
 	while(1) {
 #ifdef EMULATOR

@@ -11,67 +11,64 @@
 #include <assert.h>
 
 
-GfxSurface::GfxSurface(void) {
-	line = NULL;
-	bytesPerLine = 0;
-	width = 0;
-	height = 0;
-	bitsDepth = ColorDepth_4;
-	pixelFormat = PixelFormat_GrayScale;
-	bytesPerPixel = 0;
-}
+GfxSurface::GfxSurface(void) :
+	fb(NULL),
+	bytesPerLine(0),
+	bytesPerPixel(0),
+	width(0),
+	height(0),
+	bitsDepth(ColorDepth_4),
+	pixelFormat(PixelFormat_GrayScale) {}
 
-GfxSurface::GfxSurface(ColorDepth bitsDepth, uint16_t width, uint16_t height) : GfxSurface() {
-	this->bitsDepth = bitsDepth;
-	this->pixelFormat = PixelFormat_GrayScale;
+GfxSurface::GfxSurface(ColorDepth bitsDepth, uint16_t width, uint16_t height, const bool& creat) : GfxSurface() {
 	this->width = width;
 	this->height = height;
-	create();
+	this->pixelFormat = PixelFormat_GrayScale;
+	this->bitsDepth = bitsDepth;
+	create(creat);
 }
 
-GfxSurface::GfxSurface(PixelFormat pixFormat, uint16_t width, uint16_t height) {
+GfxSurface::GfxSurface(PixelFormat pixFormat, uint16_t width, uint16_t height, const bool& creat) : GfxSurface() {
+	this->width = width;
+	this->height = height;
 	this->pixelFormat = pixFormat;
 	this->bitsDepth = format2depth(pixFormat);
-	this->width = width;
-	this->height = height;
-	create();
+	create(creat);
 }
 
 GfxSurface::~GfxSurface(void) {
-	if (line) {
-		free(line);
-		line = NULL;
-	}
+	MEMMAN_free(fb);
+	fb = NULL;
 }
 
 void GfxSurface::fill(uint32_t val) {
+	assert(fb);
 	switch (bitsDepth) {
 		case ColorDepth_4:
 			val &= 0x0F;
 			val |= val<<4;
-			memset(line, val, height*bytesPerLine);
+			memset(fb, val, height*bytesPerLine);
 			break;
 		case ColorDepth_8:
-			memset(line, val, height*bytesPerLine);
+			memset(fb, val, height*bytesPerLine);
 			break;
 		case ColorDepth_16: {
 			for (size_t i = 0; i < height; i++) {
 				for (size_t j = 0; j < width; j++) {
-					uint16_t *ptr = reinterpret_cast<uint16_t *>(&line[i*bytesPerLine + j*bytesPerPixel]);
+					uint16_t *ptr = reinterpret_cast<uint16_t *>(&fb[i*bytesPerLine + j*bytesPerPixel]);
 					*ptr = val;
 				}
 			}
 			break;
 		}
 		case ColorDepth_24: {
-			int *ptr = NULL;
-			*ptr = 1; // stop here;
+			assert(!"couldnt handle");
 			break;
 		}
 		case ColorDepth_32: {
 			for (size_t i = 0; i < height; i++) {
 				for (size_t j = 0; j < width; j++) {
-					uint32_t *ptr = reinterpret_cast<uint32_t *>(&line[i*bytesPerLine + j*bytesPerPixel]);
+					uint32_t *ptr = reinterpret_cast<uint32_t *>(&fb[i*bytesPerLine + j*bytesPerPixel]);
 					*ptr = val;
 				}
 			}
@@ -140,12 +137,13 @@ void GfxSurface::fill(uint32_t val) {
 //}
 
 void GfxSurface::drawPixel(const uint16_t &x, const uint16_t &y, const uint32_t &argbInp, const PixelFormat &src) {
+	assert(fb);
 	if (x >= width || y >= height)
 		return;
 	const uint32_t &argb = convertPixel(src, argbInp);
 	const size_t offset = (bitsDepth == ColorDepth_4) ?
 			(y*bytesPerLine + x/2) : (y*bytesPerLine + x*bytesPerPixel);
-	uint8_t *ptrRaw = &line[offset];
+	uint8_t *ptrRaw = &fb[offset];
 
 	switch (bitsDepth) {
 		case ColorDepth_4: {
@@ -170,7 +168,7 @@ void GfxSurface::drawPixel(const uint16_t &x, const uint16_t &y, const uint32_t 
 				break;
 			}
 			case PixelFormat_RGB888: {
-				uint8_t *ptr = &line[offset];
+				uint8_t *ptr = &fb[offset];
 				ptr[0] = argb & 0xFF;
 				ptr[1] = argb>>8 & 0xFF;;
 				ptr[2] = argb>>16 & 0xFF;;
@@ -192,13 +190,14 @@ void GfxSurface::drawPixel(const uint16_t &x, const uint16_t &y, const uint32_t 
 	}
 }
 
-const uint32_t GfxSurface::getPixel(const uint16_t &x, const uint16_t &y) {
+const uint32_t GfxSurface::getPixel(const uint16_t &x, const uint16_t &y) const {
+	assert(fb);
 	if (x >= width || y >= height)
 		return 0;
 
 	const size_t offset = (bitsDepth == ColorDepth_4) ?
 			(y*bytesPerLine + x/2) : (y*bytesPerLine + x*bytesPerPixel);
-	uint8_t *ptrRaw = &line[offset];
+	uint8_t *ptrRaw = &fb[offset];
 
 	switch (bitsDepth) {
 	case ColorDepth_4:
@@ -215,14 +214,27 @@ const uint32_t GfxSurface::getPixel(const uint16_t &x, const uint16_t &y) {
 	return 0;
 }
 
-void GfxSurface::create(void) {
+void GfxSurface::setFrameBuffer(uint8_t *fb) {
+	assert(fb);
+	MEMMAN_free(this->fb);
+	this->fb = fb;
+}
+
+void GfxSurface::create(const bool &creat) {
 	assert (bitsDepth <= 32);
+	MEMMAN_free(fb);
+	fb = NULL;
 	bytesPerPixel = bitsDepth/8;
 
 	bytesPerLine = (bitsDepth == ColorDepth_4) ?
 			width/2 + width%2 : width*bytesPerPixel /*+ width%(bitsDepth/8)*/;
-	line = (uint8_t*)MEMMAN_malloc(height * bytesPerLine);
-	if (line) {
+
+	if (!creat)
+		return;
+
+	fb = (uint8_t*)MEMMAN_malloc(height * bytesPerLine);
+	assert (fb);
+	if (fb) {
 		fill(0);
 	}
 }
