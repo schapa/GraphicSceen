@@ -35,11 +35,11 @@ void GfxLayer::deleteShape(GfxShape *shape) {
 		shapes.erase(position);
 }
 
-void GfxLayer::render() {
+void GfxLayer::render(const bool &force) {
 	bool isDrawn = false;
 	for (auto it = shapes.begin(); it != shapes.end(); it++)
 		isDrawn |= (*it)->Draw();
-	if (isDrawn)
+	if (isDrawn || force)
 		blend();
 }
 

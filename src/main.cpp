@@ -58,16 +58,20 @@ int main(int argc, char* argv[]) {
 	const PixelFormat pixfmt = PixelFormat_RGB565;
 #endif
 	GfxLayer *baseLayer = new GfxLayer(pixfmt, SCREEN_WIDTH, SCREEN_HEIGHT);
-	DiscoLCDInit(baseLayer->getFrameBuffer());
+	GfxLayer *discoScreenLayer = new GfxLayer(pixfmt, 240, SCREEN_HEIGHT);
+	GfxSurface *textSurface = new GfxSurface(PixelFormat_GrayScale, SCREEN_WIDTH, 30);
+
+	DiscoLCDInit(discoScreenLayer->getFrameBuffer());
 
 	TextWidget *text = new TextWidget(FONT_LIBEL_SUIT, 16);
-	text->setSurface(new GfxSurface(PixelFormat_GrayScale, SCREEN_WIDTH, 30));
+	text->setSurface(textSurface);
 	text->setX(10);
 	text->setY(10);
 	text->setVisible(true);
 	text->setText("Hello");
 
 	baseLayer->addShape(text);
+	discoScreenLayer->addShape(text);
 
 	s_accelTim = Timer_newArmed(BSP_TICKS_PER_SECOND/10, true, onTimerFire, &accel);
 
@@ -76,6 +80,7 @@ int main(int argc, char* argv[]) {
 		SSD1322_DrawSurface(baseLayer->getFrameBuffer(), baseLayer->getHeight(), baseLayer->getBytesPerLine());
 #endif
 		baseLayer->render();
+		discoScreenLayer->render(true);
 		Event_t event;
 		EventQueue_Pend(&event);
 		switch (event.type) {
