@@ -55,7 +55,7 @@ static void sendLcd(uint8_t val);
 
 static void initILI9341(void);
 
-static void initLayer(uint8_t *buff);
+static void initLayer(uint8_t layno, uint8_t *buff);
 
 static LTDC_HandleTypeDef s_ltdc;
 
@@ -63,7 +63,7 @@ static LTDC_HandleTypeDef s_ltdc;
 static const uint16_t s_lcdWidth = 240;
 static const uint16_t s_lcdHeight = 320;
 
-void DiscoLCDInit(uint8_t *buff) {
+void DiscoLCDInit(void) {
 
 	LTDC_InitTypeDef iface = {
 			LTDC_HSPOLARITY_AL,
@@ -98,7 +98,11 @@ void DiscoLCDInit(uint8_t *buff) {
 
 	HAL_LTDC_Init(&s_ltdc);
 	HAL_LTDC_EnableDither(&s_ltdc);
-	initLayer(buff);
+}
+
+void DiscoLCDInitLayer(uint8_t layno, uint8_t *buff)
+{
+	initLayer(layno, buff);
 }
 
 void DiscoLCD_setState(_Bool state) {
@@ -135,7 +139,7 @@ static void sendLcd(uint8_t val)  {
 	chipSelect(false);
 }
 
-static void initLayer(uint8_t *buff) {
+static void initLayer(uint8_t layno, uint8_t *buff) {
 	const uint16_t width = s_lcdWidth;
 	const uint16_t height = s_lcdHeight;
 
@@ -157,7 +161,7 @@ static void initLayer(uint8_t *buff) {
 			.Backcolor = s_ltdc.Init.Backcolor
 	};
 
-	HAL_LTDC_ConfigLayer(&s_ltdc, &layer, 0);
+	HAL_LTDC_ConfigLayer(&s_ltdc, &layer, layno);
 }
 
 static void initILI9341(void) {

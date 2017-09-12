@@ -39,7 +39,8 @@ static void onTimerFire(uint32_t id, void *data) {
 
 #include "layer.hpp"
 #include "widgetText.hpp"
-extern "C" void DiscoLCDInit(uint8_t *);
+extern "C" void DiscoLCDInit();
+extern "C" void DiscoLCDInitLayer(uint8_t layno, uint8_t *buff);
 
 int main(int argc, char* argv[]) {
 	(void)argc;
@@ -60,10 +61,11 @@ int main(int argc, char* argv[]) {
 #endif
 	GfxLayer *baseLayer = new GfxLayer(pixfmt, SCREEN_WIDTH, SCREEN_HEIGHT);
 	GfxLayer *discoScreenLayer = new GfxLayer(pixfmt, 240, 320, false);
-	discoScreenLayer->setFrameBuffer(BSP_SDRAM_GetBase());
+	discoScreenLayer->setFrameBuffer(BSP_SDRAM_GetBase() + discoScreenLayer->getFrameBufferSize());
 	GfxSurface *textSurface = new GfxSurface(PixelFormat_GrayScale, SCREEN_WIDTH, 30);
 
-	DiscoLCDInit(discoScreenLayer->getFrameBuffer());
+	DiscoLCDInit();
+	DiscoLCDInitLayer(0, BSP_SDRAM_GetBase());
 
 	TextWidget *text = new TextWidget(FONT_LIBEL_SUIT, 16);
 	text->setSurface(textSurface);
@@ -83,6 +85,7 @@ int main(int argc, char* argv[]) {
 #endif
 		baseLayer->render();
 		discoScreenLayer->render(true);
+		memcpy(BSP_SDRAM_GetBase(), discoScreenLayer->getFrameBuffer(), discoScreenLayer->getFrameBufferSize());
 		Event_t event;
 		EventQueue_Pend(&event);
 		switch (event.type) {
@@ -112,7 +115,6 @@ int main(int argc, char* argv[]) {
 		}
 		EventQueue_Dispose(&event);
 	}
-
 	return 0;
 }
 

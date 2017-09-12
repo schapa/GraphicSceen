@@ -18,9 +18,8 @@ ssize_t trace_write(const char* buf, size_t nbyte) {
 }
 
 
-void DiscoLCDInit(uint8_t *buff) {
-
-}
+void DiscoLCDInit(uint8_t *buff) {}
+void DiscoLCDInitLayer(void) {}
 
 
 _Bool CAN_write(const CanMsg_t *data) {
