@@ -21,7 +21,7 @@ static void readReg(I2C_HandleTypeDef *const handle, const uint8_t &adr, uint8_t
 }
 
 
-void STMPE811::init(void) {
+void STMPE811::init() {
 	writeReg(iface, 0x04, 0x0C);
 	writeReg(iface, 0x0A, 0x02);
 	writeReg(iface, 0x20, 0x40);

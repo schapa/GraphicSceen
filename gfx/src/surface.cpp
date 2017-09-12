@@ -11,7 +11,7 @@
 #include <assert.h>
 
 
-GfxSurface::GfxSurface(void) :
+GfxSurface::GfxSurface() :
 	fb(NULL),
 	bytesPerLine(0),
 	bytesPerPixel(0),
@@ -36,7 +36,7 @@ GfxSurface::GfxSurface(PixelFormat pixFormat, uint16_t width, uint16_t height, c
 	create(creat);
 }
 
-GfxSurface::~GfxSurface(void) {
+GfxSurface::~GfxSurface() {
 	MEMMAN_free(fb);
 	fb = NULL;
 }

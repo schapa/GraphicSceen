@@ -30,12 +30,12 @@ public:
 	virtual void createSurface() = 0;
 	GfxSurface *getSurface() { return this->surface; }
 
-	const uint16_t &getX(void) { return x; }
-	const uint16_t &getY(void) { return y; }
+	const uint16_t &getX() { return x; }
+	const uint16_t &getY() { return y; }
 	void setX(const uint16_t &x) {  this->x = x; }
 	void setY(const uint16_t &y) {  this->y = y; }
-	virtual const uint16_t getWidth(void) const { return surface->getWidth(); }
-	virtual const uint16_t getHeight(void) const { return surface->getHeight(); }
+	virtual const uint16_t getWidth() const { return surface->getWidth(); }
+	virtual const uint16_t getHeight() const { return surface->getHeight(); }
 
 	inline bool Draw() {
 		if (!visible || !dirty)

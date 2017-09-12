@@ -15,20 +15,21 @@
 
 class GfxSurface {
 private:
-	explicit GfxSurface(void);
+	explicit GfxSurface();
 public:
 	explicit GfxSurface(ColorDepth bitsDepth, uint16_t width, uint16_t height, const bool& create = true);
 	explicit GfxSurface(PixelFormat pixFormat, uint16_t width, uint16_t height, const bool& create = true);
-	virtual ~GfxSurface(void);
+	virtual ~GfxSurface();
 	void fill(uint32_t value);
 public:
 	void setFrameBuffer(uint8_t *fb);
-	uint8_t *getFrameBuffer(void) const { return fb; }
-	const uint16_t &getBytesPerLine(void) const { return bytesPerLine; }
-	const uint16_t &getWidth(void) const { return width; }
-	const uint16_t &getHeight(void) const { return height; }
-	const ColorDepth &getBitsDepth(void) const { return bitsDepth; }
-	const PixelFormat &getPixelFormat(void) const { return pixelFormat; }
+	uint8_t *getFrameBuffer() const { return fb; }
+	size_t getFrameBufferSize() const { return height * bytesPerLine; }
+	const uint16_t &getBytesPerLine() const { return bytesPerLine; }
+	const uint16_t &getWidth() const { return width; }
+	const uint16_t &getHeight() const { return height; }
+	const ColorDepth &getBitsDepth() const { return bitsDepth; }
+	const PixelFormat &getPixelFormat() const { return pixelFormat; }
 	const uint32_t getPixel(const uint16_t &x, const uint16_t &y) const ;
 
 	virtual void drawPixel(const uint16_t &x, const uint16_t &y, const uint32_t &argb, const PixelFormat &src);

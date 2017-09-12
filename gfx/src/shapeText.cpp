@@ -13,10 +13,10 @@
 #include "dbg_trace.h"
 #endif
 
-GfxTextShape::GfxTextShape(void) : font(FONT_LAST), textSize(0), spacing(0), text(NULL), negative(false) {
+GfxTextShape::GfxTextShape() : font(FONT_LAST), textSize(0), spacing(0), text(NULL), negative(false) {
 }
 
-GfxTextShape::~GfxTextShape(void) {
+GfxTextShape::~GfxTextShape() {
 
 }
 
@@ -112,7 +112,7 @@ bool GfxTextShape::Blend(GfxSurface *surface, const uint16_t& offX, const uint16
 	return true;
 }
 
-bool GfxTextShape::draw(void) {
+bool GfxTextShape::draw() {
 	if (!text)
 		return false;
 
