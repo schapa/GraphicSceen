@@ -13,12 +13,17 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include <unistd.h>
 #include <fcntl.h>
 
+#include "emu.h"
 #include "bsp.h"
 #include "system.h"
 #include "ssd1322.h"
@@ -30,7 +35,10 @@
 
 static void* sysTickThread (void *arg);
 static void* uiThread (void *arg);
+static void* eventThread (void *arg);
 
+
+static void startEventThread(void);
 static void startSysTickThread(void);
 static void startUiThread(void);
 
@@ -41,6 +49,11 @@ static struct {
 	_Bool ram;
 	_Bool mmaped;
 } s_lcd;
+
+static struct {
+	int listenSock;
+	int acceptSock;
+} s_sock;
 
 static uint8_t s_sdramBuff[8*0x400*0x400];
 
@@ -77,6 +90,7 @@ _Bool BSP_Init(void) {
 		return false;
 	}
 #endif
+	startEventThread();
 	startUiThread();
 	startSysTickThread();
 	System_setStatus(INFORM_IDLE);
@@ -116,6 +130,14 @@ void BSP_Gpio_SetPin(const Gpio_e pin, const _Bool val) {
 }
 const GpioCfg_t *const BSP_Gpio_CfgGet(const Gpio_e pin) {
 	return NULL;
+}
+
+static void startEventThread(void) {
+	pthread_t pid;
+	int result = pthread_create(&pid, NULL, eventThread, NULL);
+    if (result) {
+    		DBGMSG_ERR("pthread_create()");
+    }
 }
 
 static void startSysTickThread (void) {
@@ -203,5 +225,57 @@ static void* uiThread (void *arg) {
 	close(fd);
 	exit(0);
 	return NULL;
-
 }
+
+static void* eventThread (void *arg) {
+
+#ifdef LINUX
+	prctl(PR_SET_NAME, "eventThread");
+#endif
+
+	do {
+		s_sock.listenSock = socket(AF_INET, SOCK_STREAM, 0);
+		if (s_sock.listenSock < 0) {
+			DBGMSG_ERR("socket creation");
+			sleep(1);
+		}
+	} while (s_sock.listenSock < 0);
+
+	struct sockaddr_in addr;
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(BUTTONS_PORT);
+	addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	if (bind(s_sock.listenSock, (struct sockaddr *)&addr, sizeof(addr)) < 0){
+		DBGMSG_ERR("bind");
+		exit(-2);
+	}
+
+	if (listen(s_sock.listenSock, 1)){
+		DBGMSG_ERR("listen");
+		exit(-2);
+	}
+
+	while(1) {
+		s_sock.acceptSock = accept(s_sock.listenSock, NULL, NULL);
+		if (s_sock.acceptSock < 0) {
+			DBGMSG_ERR("accept");
+			continue;
+		}
+
+		while(1) {
+			char buf[1024];
+			int bytes_read = recv(s_sock.acceptSock, buf, 1024, 0);
+			if(bytes_read <= 0)
+				break;
+			buf[bytes_read] = '\0';
+			assert(bytes_read == 4);
+			uint32_t val = *((uint32_t*)buf);
+			EventQueue_Push(EVENT_EXTI, (void*)val, NULL);
+		}
+
+		close(s_sock.acceptSock);
+	}
+	return NULL;
+}
+
+

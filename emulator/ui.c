@@ -18,10 +18,14 @@
 #include <gtk/gtk.h>
 #include <glib.h>
 
+#include "emu.h"
 #include "bsp.h"
 
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -32,6 +36,8 @@ static void createWidgets(void);
 static void onButtonPresed(GtkWidget *widget, gpointer param1);
 static void onButtonReleased(GtkWidget *widget, gpointer param1);
 static gboolean onDrawEvent(GtkWidget *widget, cairo_t *cr, gpointer arg);
+
+static void sendButtonEvent(uint32_t message);
 
 static void* readerThread (void *arg);
 
@@ -96,14 +102,14 @@ static void createWidgets(void) {
 
 	btnPlus = gtk_button_new_with_label("+");
 	gtk_box_pack_start(GTK_BOX(vbox), btnPlus, FALSE, FALSE, 0);
-	g_signal_connect(btnPlus, "pressed",  G_CALLBACK(onButtonPresed),	(gpointer) true);
-	g_signal_connect(btnPlus, "released", G_CALLBACK(onButtonReleased), (gpointer) true);
+	g_signal_connect(btnPlus, "pressed",  G_CALLBACK(onButtonPresed),	(gpointer) '+');
+	g_signal_connect(btnPlus, "released", G_CALLBACK(onButtonReleased), (gpointer) '+');
 	gtk_widget_show(btnPlus);
 
 	btnMinus = gtk_button_new_with_label("-");
 	gtk_box_pack_start(GTK_BOX(vbox), btnMinus, FALSE, FALSE, 0);
-	g_signal_connect(btnMinus, "pressed",	G_CALLBACK(onButtonPresed),	 (gpointer) false);
-	g_signal_connect(btnMinus, "released", G_CALLBACK(onButtonReleased), (gpointer) false);
+	g_signal_connect(btnMinus, "pressed",	G_CALLBACK(onButtonPresed),	 (gpointer) '-');
+	g_signal_connect(btnMinus, "released", G_CALLBACK(onButtonReleased), (gpointer) '-');
 	gtk_widget_show(btnMinus);
 
 	gtk_window_set_resizable (GTK_WINDOW(window), FALSE);
@@ -122,16 +128,37 @@ static void createWidgets(void) {
 
 static void onButtonPresed(GtkWidget *widget, gpointer param1) {
 	uint32_t packed = (intptr_t)param1;
-	printf("Button %d\n", packed);
-//	packed = packed<<1 |0;
-//	EventQueue_Push(FSM_EXTI, (void*)(intptr_t)packed);
+	sendButtonEvent(packed << 1 | 1);
 }
 
 static void onButtonReleased(GtkWidget *widget, gpointer param1) {
 	uint32_t packed = (intptr_t)param1;
-	printf("Button %d\n", packed);
-//	packed = packed<<1 | 1;
-//	EventQueue_Push(FSM_EXTI, (void*)(intptr_t)packed);
+	sendButtonEvent(packed << 1 | 0);
+}
+
+static void sendButtonEvent(uint32_t message) {
+
+	int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_UDP & 0);
+	if (sock < 0) {
+		perror("socket");
+		exit(1);
+	}
+
+	struct sockaddr_in addr;
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(BUTTONS_PORT);
+	addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+	if (connect(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+		perror("connect");
+		exit(2);
+	}
+
+	int err = send(sock, &message, sizeof(message), 0);
+	if (err < 0) {
+		perror("send");
+		exit(2);
+	}
+	close(sock);
 }
 
 static gboolean onDrawEvent(GtkWidget *widget, cairo_t *cr, gpointer arg) {
