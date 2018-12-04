@@ -16,7 +16,6 @@ extern "C" {
 #include <stdbool.h>
 
 HAL_StatusTypeDef Trace_InitUSART1(USART_HandleTypeDef *handle, DMA_HandleTypeDef *txDmaHandle);
-_Bool Trace_onTxComplete(USART_HandleTypeDef *handle);
 void Trace_dataAsync(char *buff, size_t size);
 void Trace_dataAsyncFlush(void);
 void Trace_dataSync(const char *buff, size_t size);

@@ -18,22 +18,17 @@ typedef struct Node {
 
 struct {
 	Node_t *head;
+    Node_t *tail;
 } s_queue;
 
-static Node_t *newNode(EventTypes_e type, void *data, onEvtDispose_f dispose);
-static Node_t *getTail(Node_t *node);
+static inline Node_t *newNode(EventTypes_e type, void *data, onEvtDispose_f dispose);
 
 void EventQueue_Push(EventTypes_e type, void *data, onEvtDispose_f dispose) {
 	int primask = System_Lock();
 	if (!s_queue.head) {
-		s_queue.head = newNode(type, data, dispose);
+		s_queue.head = s_queue.tail = newNode(type, data, dispose);
 	} else {
-		Node_t *tail = getTail(s_queue.head);
-		if (tail) {
-			Node_t *node = newNode(type, data, dispose);
-			if (node)
-				tail->next = node;
-		}
+	    s_queue.tail->next = newNode(type, data, dispose);
 	}
 	System_Unlock(primask);
 }
@@ -48,6 +43,8 @@ void EventQueue_Pend(Event_t *event) {
 		*event = node->evt :
 		EventQueue_Dispose(&node->evt);
 	s_queue.head = node->next;
+	if (!s_queue.head)
+	    s_queue.tail = NULL;
 	MEMMAN_free(node);
 	System_Unlock(primask);
 }
@@ -64,17 +61,12 @@ void EventQueue_Dispose(Event_t *event) {
 
 static Node_t *newNode(EventTypes_e type, void *data, onEvtDispose_f dispose) {
 	Node_t *node = MEMMAN_malloc(sizeof(Node_t));
-	if (node){
-		node->evt.type = type;
-		node->evt.data = data;
-		node->evt.dispose = dispose;
-		node->next = NULL;
-	}
+	if (!node)
+	    return NULL;
+    node->evt.type = type;
+    node->evt.data = data;
+    node->evt.dispose = dispose;
+    node->next = NULL;
 	return node;
 }
 
-static Node_t *getTail(Node_t *node) {
-	while (node && node->next)
-		node = node->next;
-	return node;
-}

@@ -9,6 +9,7 @@
 #include "string.h"
 #include "bsp.h"
 #include "memman.h"
+#include <assert.h>
 
 typedef enum {
 	USART_EVENT_RX,
@@ -35,12 +36,14 @@ static USART_HandleTypeDef *s_tracerHandle = NULL;
 static DMA_HandleTypeDef *s_tracerTxDmaHandle = NULL;
 
 static HAL_StatusTypeDef initTracerTxDma(DMA_HandleTypeDef *txDmaHandle);
-static void sendNextItem(void);
+static inline void sendNextItem(void);
+
+static inline void onTxComplete(void);
 
 HAL_StatusTypeDef Trace_InitUSART1(USART_HandleTypeDef *handle, DMA_HandleTypeDef *txDmaHandle) {
 
 	HAL_StatusTypeDef result = HAL_ERROR;
-	USART_InitTypeDef ifaceParams = {
+	static const USART_InitTypeDef ifaceParams = {
 			115200,
 			USART_WORDLENGTH_8B,
 			USART_STOPBITS_1,
@@ -54,7 +57,6 @@ HAL_StatusTypeDef Trace_InitUSART1(USART_HandleTypeDef *handle, DMA_HandleTypeDe
 		memset(handle, 0, sizeof(*handle));
 		handle->Instance = USART1;
 		handle->Init = ifaceParams;
-
 		handle->hdmatx = txDmaHandle;
 		txDmaHandle->Parent = (void*)handle;
 
@@ -72,19 +74,21 @@ void Trace_dataAsync(char *buff, size_t size) {
 	uint32_t primask = __get_PRIMASK();
 	__disable_irq();
 
-	traceNode_p elt = (traceNode_p)MEMMAN_malloc(sizeof(traceNode_t));
-	if (elt) {
-		elt->next = NULL;
-		elt->string = buff;
-		elt->size = size;
-		if (!s_traceHead) {
-			s_traceHead = s_traceTail = elt;
-			send = true;
-		} else {
-			s_traceTail->next = elt;
-			s_traceTail = elt;
-		}
-	}
+	do {
+	    traceNode_p elt = (traceNode_p)MEMMAN_malloc(sizeof(traceNode_t));
+	    if (!elt)
+	        break;
+        elt->next = NULL;
+        elt->string = buff;
+        elt->size = size;
+        if (!s_traceHead) {
+            s_traceHead = s_traceTail = elt;
+            send = true;
+        } else {
+            s_traceTail->next = elt;
+            s_traceTail = elt;
+        }
+	} while (0);
 	if (!primask) {
 		__enable_irq();
 	}
@@ -114,33 +118,14 @@ void Trace_dataSync(const char *buff, size_t size) {
 	HAL_USART_Transmit(s_tracerHandle, (uint8_t*)buff, size, 0xFF);
 }
 
-_Bool Trace_onTxComplete(USART_HandleTypeDef *handle) {
-	_Bool handled = false;
-	if (handle == s_tracerHandle && s_traceHead) {
-		uint32_t primask = __get_PRIMASK();
-		__disable_irq();
-		traceNode_p cur = s_traceHead;
-		s_traceHead = cur->next;
-		MEMMAN_free(cur->string);
-		MEMMAN_free(cur);
-		if (!s_traceHead) {
-			s_traceTail = NULL;
-		}
-		if (!primask) {
-			__enable_irq();
-		}
-		sendNextItem();
-		handled = true;
-	}
-	return handled;
-}
-
 void USART1_IRQHandler(void) {
 	HAL_USART_IRQHandler(s_tracerHandle);
 }
 
 void HAL_USART_TxCpltCallback(USART_HandleTypeDef *husart) {
-	if (!Trace_onTxComplete(husart)) {
+    if (husart == s_tracerHandle)
+        onTxComplete();
+    else {
 		EventQueue_Push(
 				EVENT_USART,
 				NULL, //UsartMsg_t(USART_EVENT_TX, husart, ...)
@@ -153,8 +138,8 @@ void DMA2_Stream7_IRQHandler(void) {
 }
 
 static HAL_StatusTypeDef initTracerTxDma(DMA_HandleTypeDef *txDmaHandle) {
-	HAL_StatusTypeDef result = HAL_ERROR;
-	DMA_InitTypeDef ifaceParams = {
+    assert(txDmaHandle);
+	static const DMA_InitTypeDef ifaceParams = {
 			DMA_CHANNEL_4,
 			DMA_MEMORY_TO_PERIPH,
 			DMA_PINC_DISABLE,
@@ -168,21 +153,36 @@ static HAL_StatusTypeDef initTracerTxDma(DMA_HandleTypeDef *txDmaHandle) {
 			DMA_MBURST_SINGLE,
 			DMA_PBURST_SINGLE
 	};
-	if (txDmaHandle) {
-		txDmaHandle->Init = ifaceParams;
-		txDmaHandle->Instance = DMA2_Stream7;
-		result = HAL_DMA_Init(txDmaHandle);
-		HAL_NVIC_EnableIRQ(DMA2_Stream7_IRQn);
-	}
+    txDmaHandle->Init = ifaceParams;
+    txDmaHandle->Instance = DMA2_Stream7;
+    HAL_StatusTypeDef result = HAL_DMA_Init(txDmaHandle);
+    HAL_NVIC_EnableIRQ(DMA2_Stream7_IRQn);
 	return result;
 }
 
 static void sendNextItem(void) {
-	if (s_tracerHandle && s_traceHead) {
-		HAL_USART_StateTypeDef state = HAL_USART_GetState(s_tracerHandle);
-		if (state != HAL_USART_STATE_BUSY_TX || state != HAL_USART_STATE_BUSY_TX_RX) {
-			__HAL_UART_FLUSH_DRREGISTER(s_tracerHandle);
-			HAL_USART_Transmit_DMA(s_tracerHandle, (uint8_t*)s_traceHead->string, s_traceHead->size);
-		}
-	}
+    if (!s_traceHead)
+        return;
+    if (s_tracerHandle->State == HAL_USART_STATE_BUSY_TX || s_tracerHandle->State == HAL_USART_STATE_BUSY_TX_RX)
+        return;
+
+    __HAL_UART_FLUSH_DRREGISTER(s_tracerHandle);
+    HAL_USART_Transmit_DMA(s_tracerHandle, (uint8_t*)s_traceHead->string, s_traceHead->size);
+}
+
+static void onTxComplete(void) {
+    assert(s_traceHead);
+    uint32_t primask = __get_PRIMASK();
+    __disable_irq();
+    traceNode_p cur = s_traceHead;
+    s_traceHead = cur->next;
+    MEMMAN_free(cur->string);
+    MEMMAN_free(cur);
+    if (!s_traceHead) {
+        s_traceTail = NULL;
+    }
+    if (!primask) {
+        __enable_irq();
+    }
+    sendNextItem();
 }
