@@ -14,15 +14,14 @@ static struct {
 	uint32_t activeTime;
 	uint32_t passiveTime;
 } s_timing[] = {
-		[INFORM_INIT] = { 0.1*BSP_TICKS_PER_SECOND, 0.3*BSP_TICKS_PER_SECOND },
-		[INFORM_PREHEAT] = { 1*BSP_TICKS_PER_SECOND, 0.25*BSP_TICKS_PER_SECOND },
-		[INFORM_IDLE] = { 0.1*BSP_TICKS_PER_SECOND, BSP_TICKS_PER_SECOND },
-		[INFORM_SLEEP] = { 0.05*BSP_TICKS_PER_SECOND, 2*BSP_TICKS_PER_SECOND},
-		[INFORM_CONNECTION_LOST] = { 0.1*BSP_TICKS_PER_SECOND, 0.5*BSP_TICKS_PER_SECOND},
-		[INFORM_ERROR] = { 0.05*BSP_TICKS_PER_SECOND, 0.05*BSP_TICKS_PER_SECOND},
+		[INFORM_Ok] = { 0.1*TICKS_PER_SECOND, 0.3*TICKS_PER_SECOND },
+		[INFORM_LowBatt] = { 0.1*TICKS_PER_SECOND, TICKS_PER_SECOND },
+		[INFORM_Charging] = { 0.05*TICKS_PER_SECOND, 2*TICKS_PER_SECOND},
+		[INFORM_Writing] = { 0.1*TICKS_PER_SECOND, 0.5*TICKS_PER_SECOND},
+		[INFORM_Reading] = { 0.05*TICKS_PER_SECOND, 0.05*TICKS_PER_SECOND},
 };
 
-static systemStatus_t s_systemStatus = INFORM_ERROR;
+static systemStatus_t s_systemStatus = INFORM_Reading;
 static uint32_t s_systemStatusTimer = 0;
 static ledOutputControl_t s_systemLed = NULL;
 static volatile uint32_t s_delayDecrement = 0;
@@ -49,7 +48,7 @@ void SysTick_Handler(void) {
 	if (s_delayDecrement)
 		s_delayDecrement--;
 
-	if (!(s_uptimeTicks++ % BSP_TICKS_PER_SECOND)) {
+	if (!(s_uptimeTicks++ % TICKS_PER_SECOND)) {
 		s_uptimeSeconds++;
 		EventQueue_Push(EVENT_SYSTICK, (void*)s_uptimeSeconds, NULL);
 	}
@@ -68,5 +67,5 @@ uint32_t System_getUptime(void) {
 	return s_uptimeSeconds;
 }
 uint32_t System_getUptimeMs(void) {
-	return s_uptimeTicks%BSP_TICKS_PER_SECOND;
+	return s_uptimeTicks%TICKS_PER_SECOND;
 }

@@ -28,7 +28,7 @@ static void initI2C(I2C_HandleTypeDef *const handle, I2C_TypeDef *const inst);
 
 _Bool BSP_Init(void) {
 
-	System_setStatus(INFORM_IDLE);
+	System_setStatus(INFORM_LowBatt);
 	System_setLedControl(BSP_LedGreenSet);
 	BSP_Gpio_Init();
 	assert(BSP_SDRAM_Init());

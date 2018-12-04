@@ -17,12 +17,11 @@ extern "C" {
 #include <stdbool.h>
 
 typedef enum {
-	INFORM_INIT,
-	INFORM_PREHEAT,
-	INFORM_IDLE,
-	INFORM_SLEEP,
-	INFORM_CONNECTION_LOST,
-	INFORM_ERROR,
+	INFORM_Ok,
+	INFORM_LowBatt,
+	INFORM_Charging,
+	INFORM_Writing,
+	INFORM_Reading,
 	INFORM_LAST
 } systemStatus_t;
 

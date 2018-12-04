@@ -34,7 +34,7 @@ bool L3GD20::read() {
 	HAL_SPI_TransmitReceive(iface, buff, buff, sizeof(buff), 0x0F);
 	for (size_t i = 0 ; i < sizeof(buff); i++)
 		occup += snprintf(text + occup, sizeof(text) - occup, "%3d ", buff[i]);
-	DBGMSG_INFO("\n\r%s", text);
+//	DBGMSG_INFO("\n\r%s", text);
 	BSP_Gpio_SetPin(GPIO_MEMS_CS, true);
 	return true;
 }

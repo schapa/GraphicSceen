@@ -7,6 +7,7 @@
 
 #include "shapeText.hpp"
 #include <assert.h>
+#include <algorithm> //std::min
 
 #include "dbg_base.h"
 #if 0
@@ -106,9 +107,11 @@ bool GfxTextShape::Blend(GfxSurface *surface, const uint16_t& offX, const uint16
 	const uint16_t h = this->surface->getHeight();
 	DBGMSG_M("At %d:%d. Sz %dx%d", sx, sy, w, h);
 
-	for (size_t y = 0; y < h; y++)
+	for (size_t y = 0; y < h; y++) {
+		const uint16_t cooY = sy + y;
 		for (size_t x = 0; x < w; x++)
-			surface->drawPixel(sx + x, sy + y, this->surface->getPixel(x, y), PixelFormat_GrayScale);
+			surface->drawPixel(sx + x, cooY, this->surface->getPixel(x, y), PixelFormat_GrayScale);
+	}
 	return true;
 }
 
@@ -142,11 +145,13 @@ void GfxTextShape::renderGrayScale(fontItem_p font) {
 	const uint16_t &w = surface->getWidth();
 	while (*text) {
 		fontLookupItem_t character = lookup[(size_t)*text];
-	    for (uint16_t y = 0; (y < character.heigth) && (y < surface->getHeight()); ++y) {
-	    	const uint8_t *pixel = &font->pixelData[character.offset + y * character.width];
-		    for (uint16_t x = 0; (x < character.width) && (x < surface->getWidth()); ++x) {
-		    	const uint32_t pix = this->negative ? 0xFF - pixel[x] : pixel[x];
-		    	surface->drawPixel(x + xPos, y + character.top, pix, PixelFormat_L8);
+		uint16_t ymax = std::min((const uint16_t)character.heigth, surface->getHeight());
+		uint16_t xmax = std::min((const uint16_t)character.width, surface->getWidth());
+		for (uint16_t y = 0; y < ymax; ++y) {
+			const uint8_t *pixel = &font->pixelData[character.offset + y * character.width];
+			for (uint16_t x = 0; x < xmax; ++x) {
+				const uint32_t pix = this->negative ? 0xFF - pixel[x] : pixel[x];
+				surface->drawPixel(x + xPos, y + character.top, pix, PixelFormat_L8);
 		    }
 	    }
 	    xPos += character.advance - character.left + spacing;

@@ -54,7 +54,6 @@ int main(int argc, char* argv[]) {
 	touch.init();
 
 #ifdef EMULATOR
-
 	const PixelFormat pixfmt = PixelFormat_GrayScale;
 #else
 	const PixelFormat pixfmt = PixelFormat_RGB565;
@@ -77,7 +76,7 @@ int main(int argc, char* argv[]) {
 	baseLayer->addShape(text);
 	discoScreenLayer->addShape(text);
 
-	s_accelTim = Timer_newArmed(BSP_TICKS_PER_SECOND/3, true, onTimerFire, &accel);
+	s_accelTim = Timer_newArmed(TICKS_PER_SECOND/3, true, onTimerFire, &accel);
 
 	while(1) {
 #ifdef EMULATOR
@@ -99,8 +98,9 @@ int main(int argc, char* argv[]) {
 					touch.read();
 					char buff[256];
 					snprintf(buff, sizeof(buff), "X:Y  %d      %d", touch.getX(), touch.getY());
+					DBGMSG_INFO("EXTI: %s", buff);
 					text->setText(buff);
-				} //else
+				} else
 					DBGMSG_INFO("EXTI: %d %d", pin, state);
 				break;
 			}

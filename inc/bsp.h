@@ -17,7 +17,7 @@ extern "C" {
 #include "Queue.h"
 #include "stm32f4xx_hal.h"
 
-#define BSP_TICKS_PER_SECOND 1000
+#define TICKS_PER_SECOND 1000
 
 #define SCREEN_WIDTH 256
 #define SCREEN_HEIGHT 64

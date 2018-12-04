@@ -93,7 +93,7 @@ _Bool BSP_Init(void) {
 	startEventThread();
 	startUiThread();
 	startSysTickThread();
-	System_setStatus(INFORM_IDLE);
+	System_setStatus(INFORM_LowBatt);
 
 	return true;
 }
@@ -173,7 +173,7 @@ static void* sysTickThread (void *arg) {
 	while (true) {
 		extern void SysTick_Handler(void);
 		SysTick_Handler();
-		usleep((1000*1000) / BSP_TICKS_PER_SECOND);
+		usleep((1000*1000) / TICKS_PER_SECOND);
 	}
 	return NULL;
 }
