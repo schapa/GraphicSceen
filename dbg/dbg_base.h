@@ -47,7 +47,7 @@ extern "C" {
 #define DBGMSG_ERR(fmt, ...) \
 	dbgmsg(DBGMSG_ERR_COLOR, "ERR!", __FILE__, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
 
-void dbgmsg(const char *clr, const char *siv, const char *file, const char *func, int line, const char *fmt, ...);
+void dbgmsg(const char *clr, const char *siv, const char *file, const char *func, int line, const char *fmt, ...) __attribute__((format(printf, 6, 7)));
 
 #ifdef __cplusplus
 }

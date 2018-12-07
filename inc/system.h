@@ -35,9 +35,10 @@ uint32_t System_getUptimeMs(void);
 
 void System_delayMsDummy(uint32_t delay);
 
-int System_Lock(void);
-void System_Unlock(int primask);
+void System_Lock(void);
+void System_Unlock(void);
 void System_Poll(void);
+void System_Wakeup(void);
 
 #ifdef __cplusplus
 }

@@ -132,7 +132,7 @@ void CAN_handleEvent(const Event_t *event) {
 			break;
 		}
 		case CAN_EVENT_ERROR: {
-			DBGMSG_ERR("%d", evt->errCode);
+			DBGMSG_ERR("%lu", evt->errCode);
 			break;
 		}
 	}

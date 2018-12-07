@@ -24,7 +24,6 @@ static struct {
 static systemStatus_t s_systemStatus = INFORM_Reading;
 static uint32_t s_systemStatusTimer = 0;
 static ledOutputControl_t s_systemLed = NULL;
-static volatile uint32_t s_delayDecrement = 0;
 static volatile uint32_t s_uptimeSeconds = 0;
 static volatile uint32_t s_uptimeTicks = 1;
 
@@ -45,8 +44,6 @@ void SysTick_Handler(void) {
 	if (++s_systemStatusTimer > period) {
 		s_systemStatusTimer = 0;
 	}
-	if (s_delayDecrement)
-		s_delayDecrement--;
 
 	if (!(s_uptimeTicks++ % TICKS_PER_SECOND)) {
 		s_uptimeSeconds++;
@@ -59,8 +56,8 @@ void SysTick_Handler(void) {
 }
 
 void System_delayMsDummy(uint32_t delay) {
-	s_delayDecrement = delay;
-	while (s_delayDecrement);
+    delay += s_uptimeTicks;
+	while (delay > s_uptimeTicks);
 }
 
 uint32_t System_getUptime(void) {

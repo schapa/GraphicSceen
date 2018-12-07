@@ -21,22 +21,26 @@ struct {
     Node_t *tail;
 } s_queue;
 
-static inline Node_t *newNode(EventTypes_e type, void *data, onEvtDispose_f dispose);
+static inline Node_t *newNode(EventTypes_e type, void *data, onEvtDispose_f dispose) __attribute__((always_inline));
 
 void EventQueue_Push(EventTypes_e type, void *data, onEvtDispose_f dispose) {
-	int primask = System_Lock();
+    int wkup = 0;
+	System_Lock();
 	if (!s_queue.head) {
 		s_queue.head = s_queue.tail = newNode(type, data, dispose);
+		wkup = 1;
 	} else {
 	    s_queue.tail->next = newNode(type, data, dispose);
 	}
-	System_Unlock(primask);
+	System_Unlock();
+	if (wkup)
+	    System_Wakeup();
 }
 
 void EventQueue_Pend(Event_t *event) {
 	while (!s_queue.head)
 		System_Poll();
-	int primask = System_Lock();
+	System_Lock();
 	Node_t *node = s_queue.head;
 
 	event ?
@@ -46,17 +50,15 @@ void EventQueue_Pend(Event_t *event) {
 	if (!s_queue.head)
 	    s_queue.tail = NULL;
 	MEMMAN_free(node);
-	System_Unlock(primask);
+	System_Unlock();
 }
 
 void EventQueue_Dispose(Event_t *event) {
-	int primask = System_Lock();
 	if (event && event->dispose) {
 		event->dispose(event->data);
 		event->data = NULL;
 		event->dispose = NULL;
 	}
-	System_Unlock(primask);
 }
 
 static Node_t *newNode(EventTypes_e type, void *data, onEvtDispose_f dispose) {

@@ -21,7 +21,7 @@ static char s_buffer[MAX_TRACE_LEN + 1];
 void Trace_dataAsync(char *buff, size_t size);
 
 void dbgmsg(const char *color, const char *siverity, const char *file, const char *func, int line, const char *fmt, ...) {
-    uint32_t primask = System_Lock();
+    System_Lock();
 
     int occupied = 0;
     do {
@@ -54,6 +54,6 @@ void dbgmsg(const char *color, const char *siverity, const char *file, const cha
     if (buff)
         memcpy(buff, s_buffer, occupied);
 
-    System_Unlock(primask);
+    System_Unlock();
     Trace_dataAsync(buff, occupied);
 }

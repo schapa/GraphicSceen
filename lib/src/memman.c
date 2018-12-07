@@ -10,14 +10,14 @@
 #include "system.h"
 
 void *MEMMAN_malloc(size_t size) {
-	int primask = System_Lock();
+	System_Lock();
 	void *ptr = malloc(size);
-	System_Unlock(primask);
+	System_Unlock();
 	return ptr;
 }
 
 void MEMMAN_free(void *ptr) {
-	int primask = System_Lock();
+	System_Lock();
 	free (ptr);
-	System_Unlock(primask);
+	System_Unlock();
 }

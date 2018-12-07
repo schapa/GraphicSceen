@@ -57,7 +57,7 @@ uint32_t Timer_new(uint32_t tout, uint8_t isPeriodic, onTimerFire_t cb, void *cb
 	do {
 		handle = getNewHandle();
 	} while (!isTimerHandleUnique(handle));
-	uint32_t primask = System_Lock();
+	System_Lock();
 	for (uint32_t byte = 0; byte < LIB_TIMERS_COUNT/32; byte++) {
 		if (s_timers.occupied[byte] ^ ~0) {
 			// there is place for timer. Find it
@@ -78,7 +78,7 @@ uint32_t Timer_new(uint32_t tout, uint8_t isPeriodic, onTimerFire_t cb, void *cb
 			break;
 		}
 	}
-	System_Unlock(primask);
+	System_Unlock();
 	return result;
 }
 
@@ -93,58 +93,58 @@ uint32_t Timer_newArmed(uint32_t tout, uint8_t isPeriodic, onTimerFire_t cb, voi
 uint32_t Timer_getCnt(uint32_t id) {
 	if (id == INVALID_HANDLE)
 		return 0;
-	uint32_t primask = System_Lock();
+	System_Lock();
 	uint32_t position = findTimerById(id);
 	uint32_t result = 0;
 	if (position != LIB_TIMERS_COUNT)
 		result = s_timers.timer[position].cnt;
-	System_Unlock(primask);
+	System_Unlock();
 	return result;
 }
 
 void Timer_rearm(uint32_t id) {
 	if (id == INVALID_HANDLE || !s_timers.pushCb)
 		return;
-	uint32_t primask = System_Lock();
+	System_Lock();
 	uint32_t position = findTimerById(id);
 	if (position != LIB_TIMERS_COUNT) {
 		s_timers.timer[position].flags |= IS_ACTIVE;
 		s_timers.timer[position].cnt = s_timers.timer[position].timeout;
 	}
-	System_Unlock(primask);
+	System_Unlock();
 }
 
 void Timer_rearmTimeout(uint32_t id, uint32_t tout) {
 	if (id == INVALID_HANDLE || !s_timers.pushCb)
 		return;
-	uint32_t primask = System_Lock();
+	System_Lock();
 	uint32_t position = findTimerById(id);
 	if (position != LIB_TIMERS_COUNT) {
 		s_timers.timer[position].flags |= IS_ACTIVE;
 		s_timers.timer[position].timeout = tout;
 		s_timers.timer[position].cnt = s_timers.timer[position].timeout;
 	}
-	System_Unlock(primask);
+	System_Unlock();
 }
 
 void Timer_disarm(uint32_t id) {
 	if (id == INVALID_HANDLE)
 		return;
-	uint32_t primask = System_Lock();
+	System_Lock();
 	uint32_t position = findTimerById(id);
 	if (position != LIB_TIMERS_COUNT) {
 		s_timers.timer[position].flags &= ~IS_ACTIVE;
 	}
-	System_Unlock(primask);
+	System_Unlock();
 }
 
 void Timer_delete(uint32_t id) {
 	if (id == INVALID_HANDLE)
 		return;
 
-	uint32_t primask = System_Lock();
+	System_Lock();
 	freeTimer(findTimerById(id));
-	System_Unlock(primask);
+	System_Unlock();
 }
 
 void Timer_makeTick(void) {
@@ -152,13 +152,15 @@ void Timer_makeTick(void) {
 	if (!s_timers.pushCb)
 		return;
 
-	uint32_t primask = System_Lock();
+	System_Lock();
 	for (size_t i = 0; i < LIB_TIMERS_COUNT; i++) {
 		if (s_timers.occupied[i/TIMERS_BITS_COUNT] & 1<<(i%TIMERS_BITS_COUNT)) {
 			if ((s_timers.timer[i].flags & IS_ACTIVE) && !s_timers.timer[i].cnt--) {
 				// drop active flag. Set in callback
 				s_timers.timer[i].flags = IS_IN_CALLBACK | (s_timers.timer[i].flags & ~IS_ACTIVE);
+                System_Unlock();
 				s_timers.pushCb(s_timers.timer[i].id);
+                System_Lock();
 				if (s_timers.timer[i].flags & IS_PERIODIC) {
 					s_timers.timer[i].flags &= ~IS_IN_CALLBACK;
 					s_timers.timer[i].flags |= IS_ACTIVE;
@@ -167,18 +169,18 @@ void Timer_makeTick(void) {
 			}
 		}
 	}
-	System_Unlock(primask);
+	System_Unlock();
 }
 
 void Timer_onTimerCb(uint32_t id) {
 	if (id == INVALID_HANDLE)
 		return;
 
-	uint32_t primask = System_Lock();
+	System_Lock();
 	for (size_t i = 0; i < LIB_TIMERS_COUNT; i++) {
 		if (s_timers.timer[i].id == id) {
 			if (s_timers.timer[i].cb) {
-				System_Unlock(primask);
+				System_Unlock();
 				s_timers.timer[i].cb(id, s_timers.timer[i].cbData);
 				System_Lock();
 			}
@@ -189,7 +191,7 @@ void Timer_onTimerCb(uint32_t id) {
 			break;
 		}
 	}
-	System_Unlock(primask);
+	System_Unlock();
 }
 
 static uint32_t getNewHandle(void) {
