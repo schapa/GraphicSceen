@@ -32,7 +32,7 @@ void __initialize_hardware_early(void) {
 }
 
 void System_Poll(void) {
-    __WFI();
+    __WFE();
 }
 void System_Wakeup(void) {
     __SEV();

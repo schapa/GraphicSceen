@@ -9,6 +9,7 @@
 #include "system.h"
 #include "memman.h"
 
+#include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
@@ -19,18 +20,22 @@
 static char s_buffer[MAX_TRACE_LEN + 1];
 
 void Trace_dataAsync(char *buff, size_t size);
+void Trace_dataSync(const char *buff, size_t size) ;
 
 void dbgmsg(const char *color, const char *siverity, const char *file, const char *func, int line, const char *fmt, ...) {
     System_Lock();
+
+    const uint32_t sec = System_getUptime();
+    const uint32_t msec = System_getUptimeMs();
 
     int occupied = 0;
     do {
         if (line) {
             occupied = snprintf(s_buffer, MAX_TRACE_LEN, "[%4lu.%03lu] %s::%s (%d)%s %s: ",
-                    System_getUptime(), System_getUptimeMs(), file, func, line, color, siverity);
+            		sec, msec, file, func, line, color, siverity);
         } else {
             occupied = snprintf(s_buffer, MAX_TRACE_LEN, "[%4lu.%03lu] %s ",
-                    System_getUptime(), System_getUptimeMs(), color);
+                    sec, msec, color);
         }
 
         if (occupied > MAX_TRACE_LEN)
@@ -50,10 +55,15 @@ void dbgmsg(const char *color, const char *siverity, const char *file, const cha
         size_t size = strlen(trim) + 1;
         snprintf(s_buffer + MAX_TRACE_LEN - size, size, trim);
     }
+#if 0
+    Trace_dataSync(s_buffer, occupied);
+    System_Unlock();
+#else
     char *buff = MEMMAN_malloc(occupied);
     if (buff)
         memcpy(buff, s_buffer, occupied);
 
     System_Unlock();
     Trace_dataAsync(buff, occupied);
+#endif
 }

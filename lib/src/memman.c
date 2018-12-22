@@ -12,6 +12,13 @@
 void *MEMMAN_malloc(size_t size) {
 	System_Lock();
 	void *ptr = malloc(size);
+    extern char _Heap_Limit;
+    char _stack_Limit;
+    if ((ptr >= (void*)&_stack_Limit) || (ptr >= (void*)&_Heap_Limit)) {
+    	while(1) {
+    		System_Lock();
+    	}
+    }
 	System_Unlock();
 	return ptr;
 }

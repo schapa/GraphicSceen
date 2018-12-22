@@ -31,6 +31,7 @@ void EventQueue_Push(EventTypes_e type, void *data, onEvtDispose_f dispose) {
 		wkup = 1;
 	} else {
 	    s_queue.tail->next = newNode(type, data, dispose);
+	    s_queue.tail = s_queue.tail->next;
 	}
 	System_Unlock();
 	if (wkup)

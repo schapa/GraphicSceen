@@ -46,5 +46,5 @@ void System_Wakeup(void) {
 
 void Trace_dataAsync(char *buff, size_t size) {
 	write(STDOUT_FILENO, buff, size);
-	MEMMAN_free(buff);
+	free(buff);
 }

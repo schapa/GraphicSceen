@@ -6,9 +6,12 @@
  */
 
 #include "tracer.h"
-#include "string.h"
 #include "bsp.h"
+#include "system.h"
 #include "memman.h"
+
+#include <string.h>
+#include <stdlib.h>
 #include <assert.h>
 
 typedef enum {
@@ -69,11 +72,11 @@ HAL_StatusTypeDef Trace_InitUSART1(USART_HandleTypeDef *handle, DMA_HandleTypeDe
 }
 
 void Trace_dataAsync(char *buff, size_t size) {
+	if (!buff || !size)
+		return;
 	_Bool send = false;
 
-	uint32_t primask = __get_PRIMASK();
-	__disable_irq();
-
+    System_Lock();
 	do {
 	    traceNode_p elt = (traceNode_p)MEMMAN_malloc(sizeof(traceNode_t));
 	    if (!elt)
@@ -89,13 +92,11 @@ void Trace_dataAsync(char *buff, size_t size) {
             s_traceTail = elt;
         }
 	} while (0);
-	if (!primask) {
-		__enable_irq();
-	}
 
 	if (s_tracerHandle && send) {
 		sendNextItem();
 	}
+    System_Unlock();
 }
 
 void Trace_dataAsyncFlush(void) {
@@ -114,8 +115,10 @@ void Trace_dataAsyncFlush(void) {
 void Trace_dataSync(const char *buff, size_t size) {
 	if (!buff || !size)
 		return;
+    System_Lock();
 	Trace_dataAsyncFlush();
 	HAL_USART_Transmit(s_tracerHandle, (uint8_t*)buff, size, 0xFF);
+    System_Unlock();
 }
 
 void USART1_IRQHandler(void) {
@@ -172,8 +175,7 @@ static void sendNextItem(void) {
 
 static void onTxComplete(void) {
     assert(s_traceHead);
-    uint32_t primask = __get_PRIMASK();
-    __disable_irq();
+    System_Lock();
     traceNode_p cur = s_traceHead;
     s_traceHead = cur->next;
     MEMMAN_free(cur->string);
@@ -181,8 +183,6 @@ static void onTxComplete(void) {
     if (!s_traceHead) {
         s_traceTail = NULL;
     }
-    if (!primask) {
-        __enable_irq();
-    }
     sendNextItem();
+    System_Unlock();
 }
