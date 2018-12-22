@@ -22,7 +22,7 @@ public:
 	virtual ~GfxSurface();
 	void fill(uint32_t value);
 public:
-	void setFrameBuffer(uint8_t *fb);
+	void setFrameBuffer(uint8_t *fb, bool isHeap);
 	uint8_t *getFrameBuffer() const { return fb; }
 	size_t getFrameBufferSize() const { return height * bytesPerLine; }
 	const uint16_t &getBytesPerLine() const { return bytesPerLine; }
@@ -40,6 +40,7 @@ private:
 	const inline uint32_t convertPixel(const PixelFormat &src, const uint32_t &pix) const;
 private:
 	uint8_t *fb;
+	bool heapFb;
 	uint16_t bytesPerLine;
 	uint16_t bytesPerPixel;
 	uint16_t width;

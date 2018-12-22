@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <string>
+
 #include "shape.hpp"
 #include "fontPainter.h"
 
@@ -17,7 +19,7 @@ public:
 
 	const FontType &getFont() const { return font; }
 	const uint8_t &getFontSize() const { return textSize; }
-	const char *getText() const { return text; }
+	const char *getText() const { return text.c_str(); }
 	const size_t getTextWidth() const;
 	const size_t getTextHeight() const;
 
@@ -36,7 +38,7 @@ private:
 	FontType font;
 	uint8_t textSize;
 	uint8_t spacing;
-	const char *text;
+	std::string text;
 	bool negative;
 
 	virtual bool draw();

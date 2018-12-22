@@ -14,7 +14,7 @@
 #include "dbg_trace.h"
 #endif
 
-GfxTextShape::GfxTextShape() : font(FONT_LAST), textSize(0), spacing(0), text(NULL), negative(false) {
+GfxTextShape::GfxTextShape() : font(FONT_LAST), textSize(0), spacing(0), text(), negative(false) {
 }
 
 GfxTextShape::~GfxTextShape() {
@@ -22,41 +22,41 @@ GfxTextShape::~GfxTextShape() {
 }
 
 const size_t GfxTextShape::getTextWidth() const {
-	if (!text || !*text)
+	if (text.empty())
 		return 0;
 	const fontItem_p fontItem = FontPainter_SizeLookup(this->font, textSize);
 	if (!fontItem)
 		return 0;
 	const fontLookupItem_p& lookup = fontItem->lookup;
-	const char *text = this->text;
+	const char *str = this->text.c_str();
 	size_t width = 0;
-	DBGMSG_L("[%s]", text);
-	while (*text) {
-		fontLookupItem_t character = lookup[(size_t)*text];
+	DBGMSG_L("[%s]", str);
+	while (*str) {
+		fontLookupItem_t character = lookup[(size_t)*str];
 		width += character.advance - character.left + spacing;
-		DBGMSG_L("[%c] a:l:w %d %d %d", *text, character.advance, character.left, character.width);
-		text++;
+		DBGMSG_L("[%c] a:l:w %d %d %d", *str, character.advance, character.left, character.width);
+		str++;
 	}
 	DBGMSG_L("width %d", width);
 	return width;
 }
 
 const size_t GfxTextShape::getTextHeight() const {
-	if (!text || !*text)
+	if (text.empty())
 		return 0;
 	const fontItem_p fontItem = FontPainter_SizeLookup(this->font, textSize);
 	if (!fontItem)
 		return 0;
 	const fontLookupItem_p& lookup = fontItem->lookup;
-	const char *text = this->text;
+	const char *str = this->text.c_str();
 	size_t height = 0;
-	DBGMSG_L("[%s]", text);
-	while (*text) {
-		fontLookupItem_t character = lookup[(size_t)*text];
+	DBGMSG_L("[%s]", str);
+	while (*str) {
+		fontLookupItem_t character = lookup[(size_t)*str];
 		const size_t charHeight = character.heigth + character.top;
 		height = charHeight > height ? charHeight : height;
-		DBGMSG_L("[%c] t:h %d %d", *text, character.top, character.heigth);
-		text++;
+		DBGMSG_L("[%c] t:h %d %d", *str, character.top, character.heigth);
+		str++;
 	}
 	DBGMSG_L("height %d", height);
 	return height;
@@ -72,9 +72,9 @@ void GfxTextShape::setFontSize(const uint8_t &size) {
 	this->textSize = size;
 }
 
-void GfxTextShape::setText(const char *text) {
+void GfxTextShape::setText(const char *str) {
 	dirty = true;
-	this->text = text;
+	this->text.assign(str);
 }
 
 void GfxTextShape::setSpacing(const uint8_t &spacing) {
@@ -88,7 +88,7 @@ void GfxTextShape::setNegative(const bool &negative) {
 }
 
 void GfxTextShape::createSurface() {
-	if (!this->text)
+	if (this->text.empty())
 		return;
 	const size_t w = getTextWidth();
 	const size_t h = getTextHeight();
@@ -116,7 +116,7 @@ bool GfxTextShape::Blend(GfxSurface *surface, const uint16_t& offX, const uint16
 }
 
 bool GfxTextShape::draw() {
-	if (!text)
+	if (text.empty())
 		return false;
 
 	fontItem_p fontItem = FontPainter_SizeLookup(this->font, textSize);
@@ -140,11 +140,11 @@ void GfxTextShape::renderGrayScale(fontItem_p font) {
 	if (!font)
 		return;
 	uint16_t xPos = 0;
-	const char *text = this->text;
+	const char *str = this->text.c_str();
 	const fontLookupItem_p& lookup = font->lookup;
 	const uint16_t &w = surface->getWidth();
-	while (*text) {
-		fontLookupItem_t character = lookup[(size_t)*text];
+	while (*str) {
+		fontLookupItem_t character = lookup[(size_t)*str];
 		uint16_t ymax = std::min((const uint16_t)character.heigth, surface->getHeight());
 		uint16_t xmax = std::min((const uint16_t)character.width, surface->getWidth());
 		for (uint16_t y = 0; y < ymax; ++y) {
@@ -157,6 +157,6 @@ void GfxTextShape::renderGrayScale(fontItem_p font) {
 	    xPos += character.advance - character.left + spacing;
 	    if (xPos > w)
 	    	break;
-	    text++;
+	    str++;
 	}
 }
