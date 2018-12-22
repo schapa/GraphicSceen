@@ -34,11 +34,14 @@ void STMPE811::init() {
 	writeReg(iface, 0x40, 0x01);
 	writeReg(iface, 0x0B, 0xFF);
 	writeReg(iface, 0x09, 0x01);
+	read(true);
 }
 
-bool STMPE811::read() {
+bool STMPE811::read(bool force) {
 	uint8_t interup = 0;
 	readReg(iface, 0x0B, interup);
+	if (force)
+		interup = 0x03;
 	if (!interup)
 		return false;
 
@@ -62,23 +65,19 @@ bool STMPE811::read() {
 		x = mid_x / fifo;
 		y = mid_y / fifo;
 		z = mid_z / fifo;
-		writeReg(iface, 0x0B, interup);
-		return true;
 	}
-	if (interup & 0x04) {
-		// overflow
-		writeReg(iface, 0x0B, 0x04);
-	}
-	if (interup & 0x08) {
-		// fifo full
-		writeReg(iface, 0x0B, 0x08);
-	}
-	if (interup & 0x10) {
-		// fifo empty
-		writeReg(iface, 0x0B, 0x10);
-	}
-	if (interup & 0xE0) {
-		writeReg(iface, 0x0B, 0xE0);
-	}
+//	if (interup & 0x04) {
+//		// overflow
+//	}
+//	if (interup & 0x08) {
+//		// fifo full
+//	}
+//	if (interup & 0x10) {
+//		// fifo empty
+//	}
+//	if (interup & 0xE0) {
+//	}
+
+	writeReg(iface, 0x0B, interup);
 	return false;
 }

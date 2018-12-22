@@ -14,6 +14,7 @@
 #include "timers.h"
 #include "memman.h"
 
+#include "DiscoLcd_ili9341.h"
 #include "L3GD20.hpp"
 #include "STMPE811.hpp"
 #include "ssd1322.h"
@@ -39,8 +40,6 @@ static void onTimerFire(uint32_t id, void *data) {
 
 #include "layer.hpp"
 #include "widgetText.hpp"
-extern "C" void DiscoLCDInit();
-extern "C" void DiscoLCDInitLayer(uint8_t layno, uint8_t *buff);
 
 int main(int argc, char* argv[]) {
 	(void)argc;
@@ -60,11 +59,17 @@ int main(int argc, char* argv[]) {
 #endif
 	GfxLayer *baseLayer = new GfxLayer(pixfmt, SCREEN_WIDTH, SCREEN_HEIGHT);
 	GfxLayer *discoScreenLayer = new GfxLayer(pixfmt, 240, 320, false);
-	discoScreenLayer->setFrameBuffer(BSP_SDRAM_GetBase() + discoScreenLayer->getFrameBufferSize());
 	GfxSurface *textSurface = new GfxSurface(PixelFormat_GrayScale, SCREEN_WIDTH, 30);
 
+	uint8_t *fbs[] = {
+		BSP_SDRAM_GetBase(),
+		BSP_SDRAM_GetBase() + discoScreenLayer->getFrameBufferSize()
+	};
+	int layNo = 0;
+
 	DiscoLCDInit();
-	DiscoLCDInitLayer(0, BSP_SDRAM_GetBase());
+	DiscoLCDInitLayer(0, fbs[0]);
+	DiscoLCDInitLayer(1, fbs[1]);
 
 	TextWidget *text = new TextWidget(FONT_LIBEL_SUIT, 16);
 	text->setSurface(textSurface);
@@ -76,17 +81,46 @@ int main(int argc, char* argv[]) {
 	baseLayer->addShape(text);
 	discoScreenLayer->addShape(text);
 
+	TextWidget *info = new TextWidget(FONT_LIBEL_SUIT, 16);
+	info->setSurface(new GfxSurface(PixelFormat_GrayScale, SCREEN_WIDTH, 30));
+	info->setX(10);
+	info->setY(40);
+	info->setVisible(true);
+	info->setText("ssss");
+
+	baseLayer->addShape(info);
+	discoScreenLayer->addShape(info);
+
+
 	s_accelTim = Timer_newArmed(TICKS_PER_SECOND/3, true, onTimerFire, &accel);
+
+	size_t startS = 0;
+	size_t endS = 0;
 
 	while(1) {
 #ifdef EMULATOR
 		SSD1322_DrawSurface(baseLayer->getFrameBuffer(), baseLayer->getHeight(), baseLayer->getBytesPerLine());
 #endif
-		baseLayer->render();
-		discoScreenLayer->render(true);
-		memcpy(BSP_SDRAM_GetBase(), discoScreenLayer->getFrameBuffer(), discoScreenLayer->getFrameBufferSize());
+		discoScreenLayer->setFrameBuffer(fbs[layNo], false);
+		discoScreenLayer->render();
+		DiscoLCDSetActiveLayer(layNo);
+		layNo = !layNo;
+		baseLayer->render(true);
 		Event_t event;
+		startS = System_getUptime()*1000 + System_getUptimeMs();
+		size_t timeProcess = startS - endS;
 		EventQueue_Pend(&event);
+		endS = System_getUptime()*1000 + System_getUptimeMs();
+		size_t timePend = endS - startS;
+		int load = 100*timeProcess/(timeProcess + timePend);
+		{
+			char buff[256];
+			snprintf(buff, sizeof(buff), "Avg. Load %02d%%. Proc %d.%03d. Pend %d.%03d",
+					load, timeProcess/1000, timeProcess%1000, timePend/1000, timePend%1000);
+			text->setText(buff);
+			DBGMSG_INFO("%s",buff);
+		}
+
 		switch (event.type) {
 			case EVENT_SYSTICK: {
 				break;
@@ -99,7 +133,12 @@ int main(int argc, char* argv[]) {
 					char buff[256];
 					snprintf(buff, sizeof(buff), "X:Y  %d      %d", touch.getX(), touch.getY());
 					DBGMSG_INFO("EXTI: %s", buff);
-					text->setText(buff);
+					info->setText(buff);
+				} else if (pin == GPIO_KEY_WAKE_USER) {
+					static int val = 0;
+					char buff[256];
+					snprintf(buff, sizeof(buff), "EXTI %d", val++);
+					info->setText(buff);
 				} else
 					DBGMSG_INFO("EXTI: %d %d", pin, state);
 				break;

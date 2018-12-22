@@ -10,6 +10,7 @@
 #include <string.h>
 #include "system.h"
 #include "memman.h"
+#include "bspGpio.h"
 
 typedef struct Node {
 	struct Node *next;
@@ -39,8 +40,10 @@ void EventQueue_Push(EventTypes_e type, void *data, onEvtDispose_f dispose) {
 }
 
 void EventQueue_Pend(Event_t *event) {
+	BSP_Gpio_SetPin(GPIO_LED_RED, 0);
 	while (!s_queue.head)
 		System_Poll();
+	BSP_Gpio_SetPin(GPIO_LED_RED, 1);
 	System_Lock();
 	Node_t *node = s_queue.head;
 

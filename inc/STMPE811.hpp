@@ -16,7 +16,7 @@ public:
 
 public:
 	void init();
-	bool read();
+	bool read(bool force=0);
 
 	const uint16_t &getX() const { return x; }
 	const uint16_t &getY() const { return y; }

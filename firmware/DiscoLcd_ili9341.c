@@ -100,18 +100,23 @@ void DiscoLCDInit(void) {
 	HAL_LTDC_EnableDither(&s_ltdc);
 }
 
-void DiscoLCDInitLayer(uint8_t layno, uint8_t *buff)
-{
+void DiscoLCDInitLayer(uint8_t layno, uint8_t *buff) {
 	initLayer(layno, buff);
+}
+void DiscoLCDSetActiveLayer(uint8_t layno) {
+	__HAL_LTDC_LAYER_DISABLE(&s_ltdc, !layno);
+	__HAL_LTDC_LAYER_ENABLE(&s_ltdc, layno);
+	s_ltdc.Instance->SRCR = LTDC_SRCR_VBR;
 }
 
 void DiscoLCD_setState(_Bool state) {
-	if (state) {
-		HAL_LTDC_SetAlpha(&s_ltdc, 255, 0);
-	}
-	else {
-		HAL_LTDC_SetAlpha(&s_ltdc, 0, 0);
-	}
+
+//	if (state) {
+//		HAL_LTDC_SetAlpha(&s_ltdc, 255, 0);
+//	}
+//	else {
+//		HAL_LTDC_SetAlpha(&s_ltdc, 0, 0);
+//	}
 }
 
 static void chipSelect(_Bool mode) {
@@ -152,9 +157,9 @@ static void initLayer(uint8_t layno, uint8_t *buff) {
 			.WindowY1 = height - 1,
 			.PixelFormat = LTDC_PIXEL_FORMAT_RGB565,
 			.Alpha = 255,
-			.Alpha0 = 255,
-			.BlendingFactor1 = LTDC_BLENDING_FACTOR1_CA,
-			.BlendingFactor2 = LTDC_BLENDING_FACTOR2_CA,
+			.Alpha0 = 0,
+			.BlendingFactor1 = LTDC_BLENDING_FACTOR2_PAxCA,
+			.BlendingFactor2 = LTDC_BLENDING_FACTOR2_PAxCA,
 			.FBStartAdress = fb,
 			.ImageWidth = width,
 			.ImageHeight = height,
