@@ -8,7 +8,6 @@
 #include "tracer.h"
 #include "bsp.h"
 #include "system.h"
-#include "memman.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -78,7 +77,7 @@ void Trace_dataAsync(char *buff, size_t size) {
 
     System_Lock();
 	do {
-	    traceNode_p elt = (traceNode_p)MEMMAN_malloc(sizeof(traceNode_t));
+	    traceNode_p elt = (traceNode_p)malloc(sizeof(traceNode_t));
 	    if (!elt)
 	        break;
         elt->next = NULL;
@@ -106,8 +105,8 @@ void Trace_dataAsyncFlush(void) {
 			HAL_USART_Transmit(s_tracerHandle, (uint8_t*)s_traceHead->string, s_traceHead->size, 0xFF);
 			traceNode_p cur = s_traceHead;
 			s_traceHead = cur->next;
-			MEMMAN_free(cur->string);
-			MEMMAN_free(cur);
+			free(cur->string);
+			free(cur);
 		}
 	}
 }
@@ -178,8 +177,8 @@ static void onTxComplete(void) {
     System_Lock();
     traceNode_p cur = s_traceHead;
     s_traceHead = cur->next;
-    MEMMAN_free(cur->string);
-    MEMMAN_free(cur);
+    free(cur->string);
+    free(cur);
     if (!s_traceHead) {
         s_traceTail = NULL;
     }

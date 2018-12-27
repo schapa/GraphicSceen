@@ -48,6 +48,8 @@ bool STMPE811::read(bool force) {
 	if (interup & 0x03) {
 		uint8_t fifo = 0;
 		readReg(iface, 0x4C, fifo);
+		if (!fifo)
+		    fifo = 1;
 		const size_t size = fifo * 4;
 		uint8_t rawData[size];
 		uint32_t mid_x = 0;

@@ -11,7 +11,6 @@
 
 #include "canWrapper.h"
 #include "bsp.h"
-#include "memman.h"
 #include "dbg_base.h"
 #include "Queue.h"
 
@@ -56,8 +55,8 @@ _Bool CAN_init(void *data) {
 	};
 
 	if (handle) {
-		MEMMAN_free(handle->pRxMsg);
-		MEMMAN_free(handle->pTxMsg);
+		free(handle->pRxMsg);
+		free(handle->pTxMsg);
 		handle->pRxMsg = NULL;
 		handle->pTxMsg = NULL;
 		memset(handle, 0, sizeof(*handle));
@@ -71,7 +70,7 @@ _Bool CAN_init(void *data) {
 			HAL_NVIC_EnableIRQ(CAN1_RX0_IRQn);
 			HAL_NVIC_EnableIRQ(CAN1_RX1_IRQn);
 //			HAL_NVIC_EnableIRQ(CAN1_SCE_IRQn);
-			handle->pRxMsg = MEMMAN_malloc(sizeof(*handle->pRxMsg));
+			handle->pRxMsg = malloc(sizeof(*handle->pRxMsg));
 			result &= HAL_CAN_Receive_IT(handle, CAN_FIFO0);
 		}
 		s_can1Handle = handle;
@@ -97,8 +96,8 @@ _Bool CAN_write(const CanMsg_t *data) {
 		if (!s_can1Handle)
 			break;
 		memcpy(txMsg.Data, data->buff, txMsg.DLC);
-		MEMMAN_free(s_can1Handle->pTxMsg);
-		s_can1Handle->pTxMsg = MEMMAN_malloc(msgSize);
+		free(s_can1Handle->pTxMsg);
+		s_can1Handle->pTxMsg = malloc(msgSize);
 		if (!s_can1Handle->pTxMsg)
 			break;
 		memcpy(s_can1Handle->pTxMsg, &txMsg, msgSize);
@@ -193,18 +192,18 @@ void CAN1_SCE_IRQHandler(void) {
 
 
 static CanMgsEvent_t *newEvent(CanEventType_e type, CanMsg_t *msg, uint32_t errCode) {
-	CanMgsEvent_t *evt = MEMMAN_malloc(sizeof(CanMgsEvent_t));
+	CanMgsEvent_t *evt = malloc(sizeof(CanMgsEvent_t));
 	if (evt) {
 		evt->type = type;
 		if (type == CAN_EVENT_ERROR) {
 			evt->mgs = NULL;
 			evt->errCode = errCode;
 		} else {
-			evt->mgs = MEMMAN_malloc(sizeof(CanMsg_t));
+			evt->mgs = malloc(sizeof(CanMsg_t));
 			if (evt->mgs)
 				*evt->mgs = *msg;
 			else {
-				MEMMAN_free(evt);
+				free(evt);
 				evt = NULL;
 			}
 		}
@@ -214,8 +213,8 @@ static CanMgsEvent_t *newEvent(CanEventType_e type, CanMsg_t *msg, uint32_t errC
 
 static void onEventDispose(void *data) {
 	CanMgsEvent_t *arg = data;
-	MEMMAN_free(arg->mgs);
+	free(arg->mgs);
 	arg->mgs = NULL;
-	MEMMAN_free(arg);
+	free(arg);
 }
 

@@ -52,5 +52,8 @@ export SRC := \
 	$(wildcard ./gfx/sprites/*.cpp) \
 	$(wildcard ./gfx/fontPainter/fonts/*.c) \
 	./gfx/fontPainter/knownFonts.c \
-	
+
+LDFLAGS += \
+	-Wl,--wrap=malloc \
+	-Wl,--wrap=free \
 

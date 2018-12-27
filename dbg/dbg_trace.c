@@ -7,7 +7,6 @@
 
 #include "dbg_trace.h"
 #include "system.h"
-#include "memman.h"
 
 #include <stdlib.h>
 #include <stdarg.h>
@@ -59,7 +58,7 @@ void dbgmsg(const char *color, const char *siverity, const char *file, const cha
     Trace_dataSync(s_buffer, occupied);
     System_Unlock();
 #else
-    char *buff = MEMMAN_malloc(occupied);
+    char *buff = malloc(occupied);
     if (buff)
         memcpy(buff, s_buffer, occupied);
 

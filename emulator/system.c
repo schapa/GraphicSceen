@@ -9,7 +9,7 @@
 #include <pthread.h>
 #include <stdatomic.h>
 #include <stdio.h>
-#include "memman.h"
+#include <stdlib.h>
 
 static pthread_mutex_t s_sysMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t s_condMutex = PTHREAD_MUTEX_INITIALIZER;

@@ -12,7 +12,6 @@
 #include "Queue.h"
 #include "system.h"
 #include "timers.h"
-#include "memman.h"
 
 #include "DiscoLcd_ili9341.h"
 #include "L3GD20.hpp"

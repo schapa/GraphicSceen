@@ -6,7 +6,6 @@
  */
 
 #include "surface.hpp"
-#include "memman.h"
 #include <string.h>
 #include <assert.h>
 
@@ -39,7 +38,7 @@ GfxSurface::GfxSurface(PixelFormat pixFormat, uint16_t width, uint16_t height, c
 
 GfxSurface::~GfxSurface() {
 	if (heapFb)
-		MEMMAN_free(fb);
+		free(fb);
 	fb = NULL;
 }
 
@@ -219,14 +218,14 @@ const uint32_t GfxSurface::getPixel(const uint16_t &x, const uint16_t &y) const 
 void GfxSurface::setFrameBuffer(uint8_t *fb, bool isHeap) {
 	assert(fb);
 	if (this->heapFb)
-		MEMMAN_free(this->fb);
+		free(this->fb);
 	heapFb = isHeap;
 	this->fb = fb;
 }
 
 void GfxSurface::create(const bool &creat) {
 	assert (bitsDepth <= 32);
-	MEMMAN_free(fb);
+	free(fb);
 	fb = NULL;
 	bytesPerPixel = bitsDepth/8;
 
@@ -236,7 +235,7 @@ void GfxSurface::create(const bool &creat) {
 	if (!creat)
 		return;
 	heapFb = true;
-	fb = (uint8_t*)MEMMAN_malloc(height * bytesPerLine);
+	fb = (uint8_t*)malloc(height * bytesPerLine);
 	assert (fb);
 	if (fb) {
 		fill(0);

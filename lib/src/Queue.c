@@ -9,7 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "system.h"
-#include "memman.h"
 #include "bspGpio.h"
 
 typedef struct Node {
@@ -53,7 +52,7 @@ void EventQueue_Pend(Event_t *event) {
 	s_queue.head = node->next;
 	if (!s_queue.head)
 	    s_queue.tail = NULL;
-	MEMMAN_free(node);
+	free(node);
 	System_Unlock();
 }
 
@@ -66,7 +65,7 @@ void EventQueue_Dispose(Event_t *event) {
 }
 
 static Node_t *newNode(EventTypes_e type, void *data, onEvtDispose_f dispose) {
-	Node_t *node = MEMMAN_malloc(sizeof(Node_t));
+	Node_t *node = malloc(sizeof(Node_t));
 	if (!node)
 	    return NULL;
     node->evt.type = type;

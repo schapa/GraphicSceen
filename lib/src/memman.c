@@ -5,26 +5,27 @@
  *      Author: shapa
  */
 
-#include "memman.h"
 #include <stdlib.h>
 #include "system.h"
 
-void *MEMMAN_malloc(size_t size) {
+void * __real_malloc(size_t size);
+void __real_free(void *__ptr);
+
+void *__wrap_malloc(size_t size) {
 	System_Lock();
-	void *ptr = malloc(size);
+	void *ptr = __real_malloc(size);
+#ifndef EMULATOR
     extern char _Heap_Limit;
     char _stack_Limit;
-    if ((ptr >= (void*)&_stack_Limit) || (ptr >= (void*)&_Heap_Limit)) {
-    	while(1) {
-    		System_Lock();
-    	}
-    }
+	if ((ptr >= (void*)&_stack_Limit) || (ptr >= (void*)&_Heap_Limit))
+	    while(1);
+#endif
 	System_Unlock();
 	return ptr;
 }
 
-void MEMMAN_free(void *ptr) {
+void __wrap_free(void *ptr) {
 	System_Lock();
-	free (ptr);
+	__real_free(ptr);
 	System_Unlock();
 }
