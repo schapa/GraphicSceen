@@ -30,7 +30,7 @@ static const GpioCfg_t s_defCon[] = {
 	[GPIO_MEMS_INT_2] =
 		{ GPIOA, { GPIO_PIN_2, GPIO_MODE_IT_RISING_FALLING, GPIO_PULLDOWN, GPIO_SPEED_FREQ_MEDIUM, 0 } },
 	[GPIO_MEMS_CS] =
-		{ GPIOC, { GPIO_PIN_1, GPIO_MODE_AF_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_MEDIUM, GPIO_AF5_SPI5 } },
+		{ GPIOC, { GPIO_PIN_1, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_MEDIUM, GPIO_AF5_SPI5 } },
 	[GPIO_SPI5_SCK] =
 		{ GPIOF, { GPIO_PIN_7, GPIO_MODE_AF_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_VERY_HIGH, GPIO_AF5_SPI5 } },
 	[GPIO_SPI5_MISO] =
@@ -255,6 +255,9 @@ void BSP_Gpio_Init(void) {
 		if (itm->config.Mode & 0x10010000)
 			HAL_NVIC_EnableIRQ(pin2Exti(itm->config.Pin));
 	}
+
+    BSP_Gpio_SetPin(GPIO_MEMS_CS, true);
+    BSP_Gpio_SetPin(GPIO_USER_16, true);
 }
 
 void BSP_Gpio_Init_Pin(const Gpio_e pin) {

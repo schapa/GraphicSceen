@@ -18,6 +18,8 @@
 #include "STMPE811.hpp"
 #include "ssd1322.h"
 
+#include "w25q64.hpp"
+
 #include "dbg_base.h"
 #if 01
 #include "dbg_trace.h"
@@ -96,6 +98,8 @@ int main(int argc, char* argv[]) {
 	size_t startS = 0;
 	size_t endS = 0;
 
+	W25Q64 flash(BSP_GetHandleSpi_5(), (Gpio_e)GPIO_USER_16);
+
 	while(1) {
 #ifdef EMULATOR
 		SSD1322_DrawSurface(baseLayer->getFrameBuffer(), baseLayer->getHeight(), baseLayer->getBytesPerLine());
@@ -122,6 +126,24 @@ int main(int argc, char* argv[]) {
 
 		switch (event.type) {
 			case EVENT_SYSTICK: {
+			    static int i = 0;
+
+//			    for (int i = 0; i < 128; ++i)
+			    do {
+			        uint8_t buff[256];
+			        if (!flash.read(i * sizeof(buff), buff, sizeof(buff))) {
+			            DBGMSG_ERR("failed to read ");
+			            break;
+			        }
+			        char text[sizeof(buff) * 10 * 2];
+			        int occup = 0;
+			        for (size_t j = 0; j < sizeof(buff)/2; j += 2) {
+			            int16_t *ptr = (int16_t*)buff;
+			            occup += snprintf(text + occup, sizeof(text) - occup, "%d %d\n\r", ptr[j], ptr[j+1]);
+			        }
+			        DBGMSG_INFO("%d, (%d) \r\n%s", i, occup, text);
+			        i++;
+			    } while (0);
 				break;
 			}
 			case EVENT_EXTI: {

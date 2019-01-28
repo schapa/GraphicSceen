@@ -34,6 +34,8 @@ _Bool BSP_SDRAM_Init(void);
 uint8_t *BSP_SDRAM_GetBase(void);
 size_t BSP_SDRAM_GetSize(void);
 
+size_t BSP_Flash_Read(void *ptr, void *dest, size_t size);
+
 void BSP_LcdInit(void);
 void BSP_LcdReset(const _Bool state);
 void BSP_LcdCs(const _Bool state);

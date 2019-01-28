@@ -66,7 +66,9 @@ info:
 
 $(FIRMWARE): $(PROGNAME)
 	@echo " [FW] $< -> $@"
-	$(OBJCOPY) -O ihex "$(BUILD_ROOT)/$(PROGNAME)" "$(BUILD_ROOT)/$(PROGNAME).hex"
+	$(OBJCOPY) -O ihex "$(BUILD_ROOT)/$(PROGNAME)" "$(BUILD_ROOT)/$@"
+	@echo " [FW] $< -> $(PROGNAME).bin"
+	$(OBJCOPY) -O binary "$(BUILD_ROOT)/$(PROGNAME)" "$(BUILD_ROOT)/$(PROGNAME).bin"
 	@echo " [Size]"
 	$(SIZE) --format=berkeley "$(BUILD_ROOT)/$(PROGNAME)"
 
