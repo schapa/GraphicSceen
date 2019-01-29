@@ -18,9 +18,9 @@ public:
 	void init();
 	bool read(bool force=0);
 
-	const uint16_t &getX() const { return x; }
-	const uint16_t &getY() const { return y; }
-	const uint16_t &getZ() const { return z; }
+	uint16_t getX() const { return x; }
+	uint16_t getY() const { return y; }
+	uint16_t getZ() const { return z; }
 
 private:
 	I2C_HandleTypeDef *const iface;

@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
 	(void)argv;
 	Timer_init(onTimerPush);
 	_Bool status = BSP_Init();
-	DBGMSG_INFO("\nStart. Init %d", status);
+	DBGMSG_INFO("\nStart sss. Init %d", status);
 
 	STMPE811 touch(BSP_GetHandleI2C_3());
 	L3GD20 accel(BSP_GetHandleSpi_5());
@@ -100,19 +100,22 @@ int main(int argc, char* argv[]) {
 
 	W25Q64 flash(BSP_GetHandleSpi_5(), (Gpio_e)GPIO_USER_16);
 
+	bool rend = true;
 	while(1) {
+		if (rend) {
 #ifdef EMULATOR
 		SSD1322_DrawSurface(baseLayer->getFrameBuffer(), baseLayer->getHeight(), baseLayer->getBytesPerLine());
 #endif
-		discoScreenLayer->setFrameBuffer(fbs[layNo], false);
-		discoScreenLayer->render();
-		DiscoLCDSetActiveLayer(layNo);
-		layNo = !layNo;
-		baseLayer->render(true);
+			discoScreenLayer->setFrameBuffer(fbs[layNo], false);
+			discoScreenLayer->render();
+			DiscoLCDSetActiveLayer(layNo);
+			layNo = !layNo;
+			baseLayer->render(true);
+		}
 		Event_t event;
 		startS = System_getUptime()*1000 + System_getUptimeMs();
 		size_t timeProcess = startS - endS;
-		EventQueue_Pend(&event);
+		rend = EventQueue_Pend(&event);
 		endS = System_getUptime()*1000 + System_getUptimeMs();
 		size_t timePend = endS - startS;
 		int load = 100*timeProcess/(timeProcess + timePend);
@@ -153,7 +156,6 @@ int main(int argc, char* argv[]) {
 					touch.read();
 					char buff[256];
 					snprintf(buff, sizeof(buff), "X:Y  %d      %d", touch.getX(), touch.getY());
-					DBGMSG_INFO("EXTI: %s", buff);
 					info->setText(buff);
 				} else if (pin == GPIO_KEY_WAKE_USER) {
 					static int val = 0;
@@ -165,7 +167,16 @@ int main(int argc, char* argv[]) {
 				break;
 			}
 			case EVENT_TIMCALL:
-				Timer_onTimerCb((uint32_t)event.data);
+				if (s_accelTim == (uint32_t)event.data) {
+					accel.read();
+					char buff[256];
+//					snprintf(buff, sizeof(buff), "Acc \t\t %d \t\t %d \t\t %d",
+//							accel.getX(), accel.getY(), accel.getZ());
+					snprintf(buff, sizeof(buff), "Acc \t\t 0x%04X \t\t 0x%04X \t\t 0x%04X",
+							accel.getX(), accel.getY(), accel.getZ());
+					info->setText(buff);
+				} else
+					Timer_onTimerCb((uint32_t)event.data);
 				break;
 			case EVENT_CAN:
 				CAN_handleEvent(&event);

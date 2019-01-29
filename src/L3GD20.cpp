@@ -24,17 +24,18 @@ static void writeReg(SPI_HandleTypeDef *const handle, const uint8_t &adr, const 
 
 void L3GD20::init() {
 	writeReg(iface, 0, 0);
+	writeReg(iface, 0x20, 0x0F);
+	writeReg(iface, 0x23, 0x30);
 }
 
 bool L3GD20::read() {
-	uint8_t buff[8] = { 0x28 };
-	char text[256];
-	size_t occup = 0;
+	uint8_t buff[7] = { 0x28 |0xC0, 0x8F, 0x8F, 0x8F, 0x8F, 0x8F, 0x8F };
 	BSP_Gpio_SetPin(GPIO_MEMS_CS, false);
-	HAL_SPI_TransmitReceive(iface, buff, buff, sizeof(buff), 0x0F);
-	for (size_t i = 0 ; i < sizeof(buff); i++)
-		occup += snprintf(text + occup, sizeof(text) - occup, "%3d ", buff[i]);
-//	DBGMSG_INFO("\n\r%s", text);
+	HAL_SPI_TransmitReceive(iface, buff, buff, sizeof(buff), 0xFF);
+	int16_t *ptr = (int16_t*)(buff + 1);
+	x = ptr[0];
+	y = ptr[1];
+	z = ptr[2];
 	BSP_Gpio_SetPin(GPIO_MEMS_CS, true);
 	return true;
 }
