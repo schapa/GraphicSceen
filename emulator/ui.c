@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 
-static void* readerThread (void *arg) {
+static void* readerThread(void *arg) {
 	do {
 		if (s_drawPane) {
 			gdk_threads_enter();
@@ -84,7 +84,7 @@ static void createWidgets(void) {
 	GtkWidget *vbox = gtk_box_new(FALSE, 0);
 	GtkWidget *btnPlus, *btnMinus;
 
-	gtk_window_set_default_size(GTK_WINDOW(window), 400, 200);
+	gtk_window_set_default_size(GTK_WINDOW(window), SCREEN_WIDTH, SCREEN_HEIGHT);
 	gtk_window_set_keep_above(GTK_WINDOW(window), 1);
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
 
@@ -163,21 +163,24 @@ static void sendButtonEvent(uint32_t message) {
 
 static gboolean onDrawEvent(GtkWidget *widget, cairo_t *cr, gpointer arg) {
 
-	static uint8_t buffer[SCREEN_WIDTH*SCREEN_HEIGHT];
-	int stride = cairo_format_stride_for_width(CAIRO_FORMAT_A8, SCREEN_WIDTH);
+	int stride = cairo_format_stride_for_width(CAIRO_FORMAT_RGB24, SCREEN_WIDTH);
 	G_LOCK(s_lock);
+	static uint8_t *buffer = NULL;
+	if (!buffer) {
+		buffer = malloc(stride * SCREEN_HEIGHT);
+	}
 	if (s_fb) {
+		uint16_t *ptr = (uint16_t*)s_fb;
 		size_t k = 0;
-		memset(buffer, 0xFF, sizeof(buffer));
-		for (size_t i = 0; i < SCREEN_SIZE; i++) {
-			buffer[k] = 0xFF - (s_fb[i] & 0xF0);
-			buffer[k+1] = 0xFF - ((s_fb[i] & 0x0F) << 4);
-			k += 2;
-//			buffer[k++] = (s_fb[i] & 0xF0);
+		memset(buffer, 0x00, stride * SCREEN_HEIGHT);
+		for (size_t i = 0; i < SCREEN_SIZE/2; i++) {
+			buffer[k++] = (ptr[i] & 0x001F) << 3;
+			buffer[k++] = (ptr[i] & 0x07E0) >> 3;
+			buffer[k++] = (ptr[i] & 0xF100) >> 8;
+			buffer[k++] = 0x00;
 		}
 	}
-	cairo_surface_t *sf = cairo_image_surface_create_for_data(buffer,
-			CAIRO_FORMAT_A8, SCREEN_WIDTH, SCREEN_HEIGHT, stride);
+	cairo_surface_t *sf = cairo_image_surface_create_for_data(buffer, CAIRO_FORMAT_RGB24, SCREEN_WIDTH, SCREEN_HEIGHT, stride);
 	cairo_set_source_surface(cr, sf, 0, 0);
 	cairo_paint(cr);
 	cairo_fill(cr);

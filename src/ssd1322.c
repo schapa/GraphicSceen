@@ -89,7 +89,7 @@ void SSD1322_ClearDisplay(void) {
 	CS(false);
 }
 
-void SSD1322_DrawSurface(const uint8_t *line, const uint16_t height, const uint8_t bytesPerLine) {
+void SSD1322_DrawSurface(const uint8_t *line, const size_t height, const size_t bytesPerLine) {
     uint32_t i = 0;
     uint32_t j = 0;
     const uint8_t offset = 27;

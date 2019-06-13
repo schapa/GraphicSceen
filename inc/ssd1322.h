@@ -14,6 +14,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 typedef enum {
 	SSD1322_ENABLE_GRAYSCALE_TABLE = 0,
@@ -56,7 +57,7 @@ void SSD1322_SetCmdLock(_Bool state);
 void SSD1322_SetColumnRange(uint8_t start, uint8_t end);
 void SSD1322_SetRowRange(uint8_t start, uint8_t end);
 void SSD1322_ClearDisplay(void);
-void SSD1322_DrawSurface(const uint8_t *line, const uint16_t height, const uint8_t bytesPerLine);
+void SSD1322_DrawSurface(const uint8_t *line, const size_t height, const size_t bytesPerLine);
 
 #ifdef __cplusplus
 }

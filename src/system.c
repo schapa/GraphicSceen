@@ -9,6 +9,7 @@
 #include "system.h"
 #include "timers.h"
 #include "bsp.h"
+#include "lvgl.h"
 
 static struct {
 	uint32_t activeTime;
@@ -52,6 +53,7 @@ void SysTick_Handler(void) {
 #if defined(USE_HAL_DRIVER)
 	HAL_IncTick();
 #endif
+	lv_tick_inc(1);
 	Timer_makeTick();
 }
 

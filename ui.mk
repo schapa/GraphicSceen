@@ -22,8 +22,9 @@ CFLAGS += \
 	-Wall -Wformat=0 \
 	$(shell pkg-config --cflags gtk+-3.0) \
 
+LDFLAGS :=
 # emulator specific LIBS
-LDLIBS += \
+LDLIBS = \
 	-lc \
 	-lpthread \
 	$(shell pkg-config --libs gtk+-3.0) \

@@ -1,5 +1,4 @@
 
-
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,6 +24,7 @@
 #include "dbg_trace.h"
 #endif
 
+#include "lvgl.h"
 
 static void onTimerPush(uint32_t id) {
 	EventQueue_Push(EVENT_TIMCALL, (void*)id, NULL);
@@ -39,8 +39,28 @@ static void onTimerFire(uint32_t id, void *data) {
 	}
 }
 
-#include "layer.hpp"
-#include "widgetText.hpp"
+//static uint8_t s_fb[SCREEN_BYTES_PERLINE * SCREEN_HEIGHT];
+static uint8_t *s_fb;
+
+static void lvgl_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t *color_p) {
+	uint16_t *fb = (uint16_t*)s_fb;
+    for (int32_t y = y1; y <= y2; y++) {
+        for (int32_t x = x1; x <= x2; x++) {
+        	uint16_t *pt = (uint16_t*)color_p++;
+        	fb[y * SCREEN_WIDTH + x] = *pt;
+        }
+    }
+	lv_flush_ready();
+}
+
+static void guiInit(void) {
+	s_fb = BSP_SDRAM_GetBase();
+	lv_init();
+	lv_disp_drv_t disp_drv;
+	lv_disp_drv_init(&disp_drv);
+	disp_drv.disp_flush = lvgl_flush;
+	lv_disp_drv_register(&disp_drv);
+}
 
 int main(int argc, char* argv[]) {
 	(void)argc;
@@ -50,48 +70,11 @@ int main(int argc, char* argv[]) {
 	DBGMSG_INFO("\nStart sss. Init %d", status);
 
 	STMPE811 touch(BSP_GetHandleI2C_3());
-	L3GD20 accel(BSP_GetHandleSpi_5());
 	touch.init();
-
-#ifdef EMULATOR
-	const PixelFormat pixfmt = PixelFormat_GrayScale;
-#else
-	const PixelFormat pixfmt = PixelFormat_RGB565;
-#endif
-	GfxLayer *baseLayer = new GfxLayer(pixfmt, SCREEN_WIDTH, SCREEN_HEIGHT);
-	GfxLayer *discoScreenLayer = new GfxLayer(pixfmt, 240, 320, false);
-	GfxSurface *textSurface = new GfxSurface(PixelFormat_GrayScale, SCREEN_WIDTH, 30);
-
-	uint8_t *fbs[] = {
-		BSP_SDRAM_GetBase(),
-		BSP_SDRAM_GetBase() + discoScreenLayer->getFrameBufferSize()
-	};
-	int layNo = 0;
+	L3GD20 accel(BSP_GetHandleSpi_5());
 
 	DiscoLCDInit();
-	DiscoLCDInitLayer(0, fbs[0]);
-	DiscoLCDInitLayer(1, fbs[1]);
-
-	TextWidget *text = new TextWidget(FONT_LIBEL_SUIT, 16);
-	text->setSurface(textSurface);
-	text->setX(10);
-	text->setY(10);
-	text->setVisible(true);
-	text->setText("Hello");
-
-	baseLayer->addShape(text);
-	discoScreenLayer->addShape(text);
-
-	TextWidget *info = new TextWidget(FONT_LIBEL_SUIT, 16);
-	info->setSurface(new GfxSurface(PixelFormat_GrayScale, SCREEN_WIDTH, 30));
-	info->setX(10);
-	info->setY(40);
-	info->setVisible(true);
-	info->setText("ssss");
-
-	baseLayer->addShape(info);
-	discoScreenLayer->addShape(info);
-
+	DiscoLCDInitLayer(0, BSP_SDRAM_GetBase());
 
 	s_accelTim = Timer_newArmed(TICKS_PER_SECOND/3, true, onTimerFire, &accel);
 
@@ -100,17 +83,21 @@ int main(int argc, char* argv[]) {
 
 	W25Q64 flash(BSP_GetHandleSpi_5(), (Gpio_e)GPIO_USER_16);
 
+	guiInit();
+	lv_obj_t *label1 = lv_label_create(lv_scr_act(), NULL);
+	lv_obj_t *label2 = lv_label_create(lv_scr_act(), NULL);
+	lv_label_set_text(label1, "Hellos world!");
+	lv_label_set_text(label2, "sdf sdf!");
+	lv_obj_align(label1, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
+	lv_obj_align(label2, NULL, LV_ALIGN_CENTER, +50, 0);
+
 	bool rend = true;
 	while(1) {
+		lv_task_handler();
 		if (rend) {
 #ifdef EMULATOR
-		SSD1322_DrawSurface(baseLayer->getFrameBuffer(), baseLayer->getHeight(), baseLayer->getBytesPerLine());
+		SSD1322_DrawSurface(s_fb, SCREEN_HEIGHT, SCREEN_BYTES_PERLINE);
 #endif
-			discoScreenLayer->setFrameBuffer(fbs[layNo], false);
-			discoScreenLayer->render();
-			DiscoLCDSetActiveLayer(layNo);
-			layNo = !layNo;
-			baseLayer->render(true);
 		}
 		Event_t event;
 		startS = System_getUptime()*1000 + System_getUptimeMs();
@@ -123,7 +110,8 @@ int main(int argc, char* argv[]) {
 			char buff[256];
 			snprintf(buff, sizeof(buff), "Avg. Load %02d%%. Proc %d.%03d. Pend %d.%03d",
 					load, timeProcess/1000, timeProcess%1000, timePend/1000, timePend%1000);
-			text->setText(buff);
+//			text->setText(buff);
+	    	lv_label_set_text(label1, buff);
 			DBGMSG_INFO("%s",buff);
 		}
 
@@ -145,6 +133,7 @@ int main(int argc, char* argv[]) {
 			            occup += snprintf(text + occup, sizeof(text) - occup, "%d %d\n\r", ptr[j], ptr[j+1]);
 			        }
 			        DBGMSG_INFO("%d, (%d) \r\n%s", i, occup, text);
+
 			        i++;
 			    } while (0);
 				break;
@@ -156,12 +145,12 @@ int main(int argc, char* argv[]) {
 					touch.read();
 					char buff[256];
 					snprintf(buff, sizeof(buff), "X:Y  %d      %d", touch.getX(), touch.getY());
-					info->setText(buff);
+//					info->setText(buff);
 				} else if (pin == GPIO_KEY_WAKE_USER) {
 					static int val = 0;
 					char buff[256];
 					snprintf(buff, sizeof(buff), "EXTI %d", val++);
-					info->setText(buff);
+//					info->setText(buff);
 				} else
 					DBGMSG_INFO("EXTI: %d %d", pin, state);
 				break;
@@ -174,7 +163,7 @@ int main(int argc, char* argv[]) {
 //							accel.getX(), accel.getY(), accel.getZ());
 					snprintf(buff, sizeof(buff), "Acc \t\t 0x%04X \t\t 0x%04X \t\t 0x%04X",
 							accel.getX(), accel.getY(), accel.getZ());
-					info->setText(buff);
+//					info->setText(buff);
 				} else
 					Timer_onTimerCb((uint32_t)event.data);
 				break;

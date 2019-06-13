@@ -1,4 +1,7 @@
 
+LVGL_DIR = lvgl
+
+
 CFLAGS += \
 	-I./dbg \
 	-I./gfx \
@@ -9,6 +12,16 @@ CFLAGS += \
 	-I./lib \
 	-I./Queue \
 	-I./menu \
+	\
+	-I$(LVGL_DIR)/ \
+	-I$(LVGL_DIR)/lv_core \
+	-I$(LVGL_DIR)/lv_draw \
+	-I$(LVGL_DIR)/lv_fonts \
+	-I$(LVGL_DIR)/lv_hal \
+	-I$(LVGL_DIR)/lv_misc \
+	-I$(LVGL_DIR)/lv_objx \
+	-I$(LVGL_DIR)/lv_porting \
+	-I$(LVGL_DIR)/lv_themes \
 	
 CFLAGS += \
 	-DTRACE \
@@ -23,6 +36,8 @@ CFLAGS += \
 	-I./sdk/include/stm32f4-hal \
 	-ffunction-sections \
 	-fdata-sections \
+	\
+	-Wno-narrowing \
 	
 export SRC := \
 	./dbg/dbg_trace.c \
@@ -52,6 +67,15 @@ export SRC := \
 	$(wildcard ./gfx/sprites/*.cpp) \
 	$(wildcard ./gfx/fontPainter/fonts/*.c) \
 	./gfx/fontPainter/knownFonts.c \
+	\
+	$(wildcard $(LVGL_DIR)/lv_core/*.c*) \
+	$(wildcard $(LVGL_DIR)/lv_draw/*.c*) \
+	$(wildcard $(LVGL_DIR)/lv_fonts/*.c*) \
+	$(wildcard $(LVGL_DIR)/lv_hal/*.c*) \
+	$(wildcard $(LVGL_DIR)/lv_misc/*.c*) \
+	$(wildcard $(LVGL_DIR)/lv_objx/*.c*) \
+	$(wildcard $(LVGL_DIR)/lv_porting/*.c*) \
+	$(wildcard $(LVGL_DIR)/lv_themes/*.c*) \
 
 LDFLAGS += \
 	-Wl,--wrap=malloc \
