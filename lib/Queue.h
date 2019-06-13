@@ -32,7 +32,7 @@ void EventQueue_Push(EventTypes_e type, void *data, onEvtDispose_f dispose);
  *
  * \note uses Ql_OS_GetMessage when queue is empty, so could lock
  */
-void EventQueue_Pend(Event_t *event);
+int EventQueue_Pend(Event_t *event);
 
 /**
  * @brief Dispose event

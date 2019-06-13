@@ -38,7 +38,7 @@ void EventQueue_Push(EventTypes_e type, void *data, onEvtDispose_f dispose) {
 	    System_Wakeup();
 }
 
-void EventQueue_Pend(Event_t *event) {
+int EventQueue_Pend(Event_t *event) {
 	BSP_Gpio_SetPin(GPIO_LED_RED, 0);
 	while (!s_queue.head)
 		System_Poll();
@@ -54,6 +54,7 @@ void EventQueue_Pend(Event_t *event) {
 	    s_queue.tail = NULL;
 	free(node);
 	System_Unlock();
+	return !s_queue.head;
 }
 
 void EventQueue_Dispose(Event_t *event) {
