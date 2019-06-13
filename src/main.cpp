@@ -105,7 +105,8 @@ int main(int argc, char* argv[]) {
 		rend = EventQueue_Pend(&event);
 		endS = System_getUptime()*1000 + System_getUptimeMs();
 		size_t timePend = endS - startS;
-		int load = 100*timeProcess/(timeProcess + timePend);
+		size_t period = timeProcess + timePend;
+		int load = period ? 100*timeProcess/(timeProcess + timePend) : 100;
 		{
 			char buff[256];
 			snprintf(buff, sizeof(buff), "Avg. Load %02d%%. Proc %d.%03d. Pend %d.%03d",
@@ -139,8 +140,8 @@ int main(int argc, char* argv[]) {
 				break;
 			}
 			case EVENT_EXTI: {
-				const int pin = reinterpret_cast<int>(event.data) >> 1;
-				const bool state = reinterpret_cast<int>(event.data) & 1;
+				const int pin = reinterpret_cast<long>(event.data) >> 1;
+				const bool state = reinterpret_cast<long>(event.data) & 1;
 				if (pin == GPIO_TOUCH_INT) {
 					touch.read();
 					char buff[256];
@@ -156,7 +157,7 @@ int main(int argc, char* argv[]) {
 				break;
 			}
 			case EVENT_TIMCALL:
-				if (s_accelTim == (uint32_t)event.data) {
+				if (s_accelTim == (long)event.data) {
 					accel.read();
 					char buff[256];
 //					snprintf(buff, sizeof(buff), "Acc \t\t %d \t\t %d \t\t %d",
@@ -165,7 +166,7 @@ int main(int argc, char* argv[]) {
 							accel.getX(), accel.getY(), accel.getZ());
 //					info->setText(buff);
 				} else
-					Timer_onTimerCb((uint32_t)event.data);
+					Timer_onTimerCb((long)event.data);
 				break;
 			case EVENT_CAN:
 				CAN_handleEvent(&event);

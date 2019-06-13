@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include "system.h"
 
+#if __APPLE__
+#else
 void * __real_malloc(size_t size);
 void __real_free(void *__ptr);
 
@@ -29,3 +31,4 @@ void __wrap_free(void *ptr) {
 	__real_free(ptr);
 	System_Unlock();
 }
+#endif

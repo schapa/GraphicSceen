@@ -18,7 +18,7 @@ OBJ += $(ASM_SRC:.S=.o)
 DEP := $(OBJ:.o=.d)
 DEP := $(addprefix $(BUILD_DIR)/, $(DEP))
 
-VPATH = $(BUILD_DIR) $(BUILD_DIR)/..
+VPATH += $(BUILD_DIR) $(BUILD_DIR)/..
 
 $(PROGNAME): $(addprefix $(BUILD_DIR)/, $(OBJ))
 	@echo " [LD]" $(PROGNAME)

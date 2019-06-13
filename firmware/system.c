@@ -17,8 +17,6 @@ void System_Lock(void) {
     if (!lock) {
         __disable_irq();
     }
-
-//    int primask = __get_PRIMASK();
 }
 
 void System_Unlock(void) {

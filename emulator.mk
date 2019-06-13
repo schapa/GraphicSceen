@@ -21,18 +21,17 @@ SRC += \
 CFLAGS += \
 	-ggdb \
 	-O0 \
-	-m32 \
 	-DEMULATOR \
 	-U__STRICT_ANSI__ \
 	-U__weak \
 	-Wno-deprecated-declarations \
+	-Wno-int-to-pointer-cast \
 	-Wall -Wformat=0 \
 
 # emulator specific LIBS
 LDLIBS += \
 	-lc \
 	-lpthread \
-	-m32 \
 	-rdynamic \
 
 .PHONY: all clean info

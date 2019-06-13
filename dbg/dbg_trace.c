@@ -31,10 +31,10 @@ void dbgmsg(const char *color, const char *siverity, const char *file, const cha
     do {
         if (line) {
             occupied = snprintf(s_buffer, MAX_TRACE_LEN, "[%4lu.%03lu] %s::%s (%d)%s %s: ",
-            		sec, msec, file, func, line, color, siverity);
+            		sec, (unsigned long)msec, file, func, line, color, siverity);
         } else {
             occupied = snprintf(s_buffer, MAX_TRACE_LEN, "[%4lu.%03lu] %s ",
-                    sec, msec, color);
+                    sec, (unsigned long)msec, color);
         }
 
         if (occupied > MAX_TRACE_LEN)
