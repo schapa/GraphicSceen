@@ -38,7 +38,10 @@ CFLAGS += \
 	-fdata-sections \
 	\
 	-Wno-narrowing \
-	
+
+CCFLAGS += \
+	-Wno-pointer-to-int-cast \
+
 export SRC := \
 	./dbg/dbg_trace.c \
 	$(wildcard ./src/*.c) \
@@ -77,7 +80,10 @@ export SRC := \
 	$(wildcard $(LVGL_DIR)/lv_porting/*.c*) \
 	$(wildcard $(LVGL_DIR)/lv_themes/*.c*) \
 
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
 LDFLAGS += \
 	-Wl,--wrap=malloc \
-	-Wl,--wrap=free \
+	-Wl,--wrap=free
+endif
 
