@@ -48,6 +48,9 @@ static struct {
 	_Bool selected;
 	_Bool ram;
 	_Bool mmaped;
+
+	uint32_t touchX;
+	uint32_t touchY;
 } s_lcd;
 
 static struct {
@@ -57,13 +60,13 @@ static struct {
 
 static uint8_t s_sdramBuff[8*0x400*0x400];
 
-void BSP_LcdReset(const _Bool state) {
+extern "C" void BSP_LcdReset(const _Bool state) {
 
 }
-void BSP_LcdCs(const _Bool state) {
+extern "C" void BSP_LcdCs(const _Bool state) {
 	s_lcd.selected = state;
 }
-void BSP_LcdWrite(const uint8_t *buff, uint16_t size) {
+extern "C" void BSP_LcdWrite(const uint8_t *buff, uint16_t size) {
 	if (size < 4)
 		return;
 	if (s_lcd.mmaped && s_lcd.selected && s_lcd.ram) {
@@ -71,7 +74,7 @@ void BSP_LcdWrite(const uint8_t *buff, uint16_t size) {
 		s_lcd.offset += size;
 	}
 }
-void BSP_LcdCmd(const uint8_t val) {
+extern "C" void BSP_LcdCmd(const uint8_t val) {
 	if (val == SSD1322_WRITE_RAM) {
 		s_lcd.offset = 0;
 		s_lcd.ram = true;
@@ -79,7 +82,7 @@ void BSP_LcdCmd(const uint8_t val) {
 		s_lcd.ram = false;
 }
 
-_Bool BSP_Init(void) {
+extern "C" _Bool BSP_Init(void) {
 #if 0
 	static _Bool lock = false;
 	if (!lock) {
@@ -98,37 +101,37 @@ _Bool BSP_Init(void) {
 	return true;
 }
 
-SPI_HandleTypeDef *BSP_GetHandleSpi_5(void) {
+extern "C" SPI_HandleTypeDef *BSP_GetHandleSpi_5(void) {
 	static SPI_HandleTypeDef handle;
 	return &handle;
 }
 
-I2C_HandleTypeDef *BSP_GetHandleI2C_3(void) {
+extern "C" I2C_HandleTypeDef *BSP_GetHandleI2C_3(void) {
 	static I2C_HandleTypeDef handle;
 	return &handle;
 }
 
-uint8_t *BSP_SDRAM_GetBase(void) {
+extern "C" uint8_t *BSP_SDRAM_GetBase(void) {
 	return s_sdramBuff;
 }
 
-size_t BSP_SDRAM_GetSize(void) {
+extern "C" size_t BSP_SDRAM_GetSize(void) {
 	return sizeof(s_sdramBuff);
 }
 
-void BSP_Gpio_Init(void) {
+extern "C" void BSP_Gpio_Init(void) {
 
 }
-void BSP_Gpio_Init_Pin(const Gpio_e pin) {
+extern "C" void BSP_Gpio_Init_Pin(const Gpio_e pin) {
 
 }
-const _Bool BSP_Gpio_ReadPin(const Gpio_e pin) {
+extern "C" const _Bool BSP_Gpio_ReadPin(const Gpio_e pin) {
 	return true;
 }
-void BSP_Gpio_SetPin(const Gpio_e pin, const _Bool val) {
+extern "C" void BSP_Gpio_SetPin(const Gpio_e pin, const _Bool val) {
 
 }
-const GpioCfg_t *const BSP_Gpio_CfgGet(const Gpio_e pin) {
+extern "C" const GpioCfg_t *const BSP_Gpio_CfgGet(const Gpio_e pin) {
 	return NULL;
 }
 
@@ -164,6 +167,7 @@ static void startUiThread(void) {
 extern int usleep (long val);
 #endif
 
+extern "C" void SysTick_Handler(void);
 static void* sysTickThread (void *arg) {
 #ifdef LINUX
 	prctl(PR_SET_NAME, "sysTick");
@@ -171,7 +175,6 @@ static void* sysTickThread (void *arg) {
 	(void)arg;
 
 	while (true) {
-		extern void SysTick_Handler(void);
 		SysTick_Handler();
 		usleep((1000*1000) / TICKS_PER_SECOND);
 	}
@@ -268,14 +271,33 @@ static void* eventThread (void *arg) {
 			if(bytes_read <= 0)
 				break;
 			buf[bytes_read] = '\0';
-			assert(bytes_read == 4);
-			uint32_t val = *((uint32_t*)buf);
-			EventQueue_Push(EVENT_EXTI, (void*)val, NULL);
+			if (bytes_read == 4) {
+				uint32_t val = *((uint32_t*)buf);
+				EventQueue_Push(EVENT_EXTI, (void*)val, NULL);
+			} else if (bytes_read == 12) {
+				uint32_t *buff = (uint32_t*)buf; // 2 - press, 3 - release, 4 - drag, [1] - x, [2] - y
+
+				s_lcd.touchX = buff[1];
+				s_lcd.touchY = buff[2];
+				EventQueue_Push(EVENT_EXTI, (void*)(GPIO_TOUCH_INT << 1), NULL);
+			} else {
+				DBGMSG_ERR("read %d", bytes_read);
+			}
 		}
 
 		close(s_sock.acceptSock);
 	}
 	return NULL;
 }
+
+#include "STMPE811.hpp"
+void STMPE811::init() {(void)iface;}
+
+bool STMPE811::read(bool force) {
+	x = s_lcd.touchX;
+	y = s_lcd.touchY;
+	return false;
+}
+
 
 

@@ -31,6 +31,7 @@ static void onTimerPush(uint32_t id) {
 }
 
 static uint32_t s_accelTim = 0;
+static bool s_push = 0;
 
 static void onTimerFire(uint32_t id, void *data) {
 	if (id == s_accelTim) {
@@ -52,14 +53,30 @@ static void lvgl_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_
     }
 	lv_flush_ready();
 }
+static bool lvgl_accelRead(lv_indev_data_t *data) {
 
-static void guiInit(void) {
+	STMPE811 *touch = (STMPE811*)data->user_data;
+	data->point.x = touch->getX();
+	data->point.y = touch->getY();
+	data->state = s_push ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
+	s_push = false;
+	return false; /*No buffering so no more data read*/
+}
+
+static void guiInit(void *param) {
 	s_fb = BSP_SDRAM_GetBase();
 	lv_init();
 	lv_disp_drv_t disp_drv;
 	lv_disp_drv_init(&disp_drv);
 	disp_drv.disp_flush = lvgl_flush;
 	lv_disp_drv_register(&disp_drv);
+
+	lv_indev_drv_t indev_drv;
+	lv_indev_drv_init(&indev_drv);  /*Basic initialization*/
+	indev_drv.type = LV_INDEV_TYPE_POINTER;
+	indev_drv.read = lvgl_accelRead;
+	indev_drv.user_data = param;
+	lv_indev_drv_register(&indev_drv);  /*Register the driver in LittlevGL*/
 }
 
 int main(int argc, char* argv[]) {
@@ -83,13 +100,20 @@ int main(int argc, char* argv[]) {
 
 	W25Q64 flash(BSP_GetHandleSpi_5(), (Gpio_e)GPIO_USER_16);
 
-	guiInit();
+	guiInit(&touch);
 	lv_obj_t *label1 = lv_label_create(lv_scr_act(), NULL);
 	lv_obj_t *label2 = lv_label_create(lv_scr_act(), NULL);
-	lv_label_set_text(label1, "Hellos world!");
-	lv_label_set_text(label2, "sdf sdf!");
+	lv_label_set_text(label1, "label1");
+	lv_label_set_text(label2, "label2");
 	lv_obj_align(label1, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
-	lv_obj_align(label2, NULL, LV_ALIGN_CENTER, +50, 0);
+	lv_obj_align(label2, NULL, LV_ALIGN_IN_LEFT_MID, 0, 0);
+
+	lv_obj_t *btn = lv_btn_create(lv_scr_act(), NULL);
+	lv_cont_set_fit(btn, true, true);
+	lv_obj_align(btn, NULL, LV_ALIGN_IN_BOTTOM_LEFT, +10, 0);
+	lv_obj_set_free_num(btn, 1);
+	lv_obj_t *btlabel = lv_label_create(btn, NULL);
+	lv_label_set_text(btlabel, "Normal");
 
 	bool rend = true;
 	while(1) {
@@ -111,7 +135,6 @@ int main(int argc, char* argv[]) {
 			char buff[256];
 			snprintf(buff, sizeof(buff), "Avg. Load %02d%%. Proc %d.%03d. Pend %d.%03d",
 					load, timeProcess/1000, timeProcess%1000, timePend/1000, timePend%1000);
-//			text->setText(buff);
 	    	lv_label_set_text(label1, buff);
 			DBGMSG_INFO("%s",buff);
 		}
@@ -146,7 +169,8 @@ int main(int argc, char* argv[]) {
 					touch.read();
 					char buff[256];
 					snprintf(buff, sizeof(buff), "X:Y  %d      %d", touch.getX(), touch.getY());
-//					info->setText(buff);
+			    	lv_label_set_text(label2, buff);
+			    	s_push = true;
 				} else if (pin == GPIO_KEY_WAKE_USER) {
 					static int val = 0;
 					char buff[256];

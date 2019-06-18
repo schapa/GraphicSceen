@@ -30,20 +30,24 @@
 #include <fcntl.h>
 
 static GtkWidget* s_drawPane = NULL;
+static gboolean s_dragEnabled;
+static uint8_t *s_fb = NULL;
 G_LOCK_DEFINE_STATIC(s_lock);
 
 static void createWidgets(void);
 static void onButtonPresed(GtkWidget *widget, gpointer param1);
 static void onButtonReleased(GtkWidget *widget, gpointer param1);
+static gboolean onMousePressed(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
+static gboolean onMouseReleased(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
+static gboolean onMouseMove(GtkWidget *widget, GdkEventMotion *event);
 static gboolean onDrawEvent(GtkWidget *widget, cairo_t *cr, gpointer arg);
 
-static void sendButtonEvent(uint32_t message);
+static void sendEvent(void *ptr, size_t size);
 
 static void* readerThread (void *arg);
 
 static int mmapPerform(char *path);
 
-static uint8_t *s_fb = NULL;
 
 int main(int argc, char* argv[]) {
 	(void)argc;
@@ -96,8 +100,14 @@ static void createWidgets(void) {
 	gtk_widget_override_background_color(s_drawPane, GTK_STATE_FLAG_NORMAL, &white);
 	gtk_widget_set_size_request(s_drawPane, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-//	gtk_drawing_area_size (GTK_DRAWING_AREA (g_draw_widget), SCREEN_WIDTH, SCREEN_HEIGHT);
-	gtk_box_pack_start(GTK_BOX(vbox), s_drawPane, TRUE, TRUE, 0);
+	GtkWidget *evbox = gtk_event_box_new();
+	gtk_container_add(GTK_CONTAINER(evbox), s_drawPane);
+	gtk_widget_show (evbox);
+	gtk_box_pack_start(GTK_BOX(vbox), evbox, TRUE, TRUE, 0);
+	gtk_drag_dest_set_track_motion(evbox, TRUE);
+	g_signal_connect(evbox, "button-press-event", G_CALLBACK(onMousePressed), (gpointer) NULL);
+	g_signal_connect(evbox, "button-release-event", G_CALLBACK(onMouseReleased), (gpointer) NULL);
+	g_signal_connect(evbox, "motion-notify-event", G_CALLBACK(onMouseMove), (gpointer) NULL);
 	gtk_widget_show(s_drawPane);
 
 	btnPlus = gtk_button_new_with_label("+");
@@ -115,10 +125,8 @@ static void createWidgets(void) {
 	gtk_window_set_resizable (GTK_WINDOW(window), FALSE);
 	gtk_widget_show(window);
 
-	g_signal_connect(G_OBJECT(s_drawPane), "draw", G_CALLBACK(onDrawEvent),
-			NULL);
-	g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(gtk_main_quit),
-			NULL);
+	g_signal_connect(G_OBJECT(s_drawPane), "draw", G_CALLBACK(onDrawEvent), NULL);
+	g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
 	GThread *thread = g_thread_new("reader", readerThread, NULL);
 	if (!thread) {
@@ -128,15 +136,46 @@ static void createWidgets(void) {
 
 static void onButtonPresed(GtkWidget *widget, gpointer param1) {
 	uint32_t packed = (intptr_t)param1;
-	sendButtonEvent(packed << 1 | 1);
+	packed = packed << 1 | 1;
+	sendEvent(&packed, sizeof(packed));
 }
 
 static void onButtonReleased(GtkWidget *widget, gpointer param1) {
 	uint32_t packed = (intptr_t)param1;
-	sendButtonEvent(packed << 1 | 0);
+	packed = packed << 1 | 0;
+	sendEvent(&packed, sizeof(packed));
+}
+static gboolean onMousePressed(GtkWidget *widget, GdkEventButton *event, gpointer user_data) {
+	const int x = event->x;
+	const int y = event->y;
+	if (event->button == 1) {
+		s_dragEnabled = TRUE;
+		uint32_t buff[] = { 0x02, x, y, };
+		sendEvent(buff, sizeof(buff));
+	}
+	return FALSE;
+}
+static gboolean onMouseReleased(GtkWidget *widget, GdkEventButton *event, gpointer user_data) {
+	const int x = event->x;
+	const int y = event->y;
+	if (event->button == 1) {
+		s_dragEnabled = FALSE;
+		uint32_t buff[] = { 0x03, x, y, };
+		sendEvent(buff, sizeof(buff));
+	}
+	return FALSE;
+}
+static gboolean onMouseMove (GtkWidget *widget, GdkEventMotion *event) {
+	const int x = event->x;
+	const int y = event->y;
+	if (s_dragEnabled) {
+		uint32_t buff[] = { 0x04, x, y, };
+		sendEvent(buff, sizeof(buff));
+	}
+	return FALSE;
 }
 
-static void sendButtonEvent(uint32_t message) {
+static void sendEvent(void *ptr, size_t size) {
 
 	int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_UDP & 0);
 	if (sock < 0) {
@@ -149,14 +188,16 @@ static void sendButtonEvent(uint32_t message) {
 	addr.sin_port = htons(BUTTONS_PORT);
 	addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 	if (connect(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-		perror("connect");
-		exit(2);
+//		perror("connect");
+		close(sock);
+		return;
 	}
 
-	int err = send(sock, &message, sizeof(message), 0);
+	int err = send(sock, ptr, size, 0);
 	if (err < 0) {
 		perror("send");
-		exit(2);
+		close(sock);
+		return;
 	}
 	close(sock);
 }
@@ -198,6 +239,7 @@ static int mmapPerform(char *path) {
 		fd = open(path, O_RDONLY);
 		printf("Open [%s] fd %d\n", path, fd);
 		if (fd < 0) {
+			return 0;
 			usleep((1000*1000));
 			continue;
 		}

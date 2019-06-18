@@ -82,8 +82,8 @@ export SRC := \
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
-LDFLAGS += \
-	-Wl,--wrap=malloc \
-	-Wl,--wrap=free
+	LDFLAGS += \
+		-Wl,--wrap=malloc \
+		-Wl,--wrap=free
 endif
 
