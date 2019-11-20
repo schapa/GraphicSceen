@@ -14,14 +14,14 @@ CFLAGS += \
 	-I./menu \
 	\
 	-I$(LVGL_DIR)/ \
-	-I$(LVGL_DIR)/lv_core \
-	-I$(LVGL_DIR)/lv_draw \
-	-I$(LVGL_DIR)/lv_fonts \
-	-I$(LVGL_DIR)/lv_hal \
-	-I$(LVGL_DIR)/lv_misc \
-	-I$(LVGL_DIR)/lv_objx \
-	-I$(LVGL_DIR)/lv_porting \
-	-I$(LVGL_DIR)/lv_themes \
+	-I$(LVGL_DIR)/src/lv_core \
+	-I$(LVGL_DIR)/src/lv_draw \
+	-I$(LVGL_DIR)/src/lv_font \
+	-I$(LVGL_DIR)/src/lv_hal \
+	-I$(LVGL_DIR)/src/lv_misc \
+	-I$(LVGL_DIR)/src/lv_objx \
+	-I$(LVGL_DIR)/src/lv_porting \
+	-I$(LVGL_DIR)/src/lv_themes \
 	
 CFLAGS += \
 	-DTRACE \
@@ -38,6 +38,7 @@ CFLAGS += \
 	-fdata-sections \
 	\
 	-Wno-narrowing \
+	-Wno-sign-compare \
 
 CCFLAGS += \
 	-Wno-pointer-to-int-cast \
@@ -71,14 +72,14 @@ export SRC := \
 	$(wildcard ./gfx/fontPainter/fonts/*.c) \
 	./gfx/fontPainter/knownFonts.c \
 	\
-	$(wildcard $(LVGL_DIR)/lv_core/*.c*) \
-	$(wildcard $(LVGL_DIR)/lv_draw/*.c*) \
-	$(wildcard $(LVGL_DIR)/lv_fonts/*.c*) \
-	$(wildcard $(LVGL_DIR)/lv_hal/*.c*) \
-	$(wildcard $(LVGL_DIR)/lv_misc/*.c*) \
-	$(wildcard $(LVGL_DIR)/lv_objx/*.c*) \
-	$(wildcard $(LVGL_DIR)/lv_porting/*.c*) \
-	$(wildcard $(LVGL_DIR)/lv_themes/*.c*) \
+	$(wildcard $(LVGL_DIR)/src/lv_core/*.c*) \
+	$(wildcard $(LVGL_DIR)/src/lv_draw/*.c*) \
+	$(wildcard $(LVGL_DIR)/src/lv_font/*.c*) \
+	$(wildcard $(LVGL_DIR)/src/lv_hal/*.c*) \
+	$(wildcard $(LVGL_DIR)/src/lv_misc/*.c*) \
+	$(wildcard $(LVGL_DIR)/src/lv_objx/*.c*) \
+	$(wildcard $(LVGL_DIR)/src/lv_porting/*.c*) \
+	$(wildcard $(LVGL_DIR)/src/lv_themes/*.c*) \
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)

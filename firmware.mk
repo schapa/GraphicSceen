@@ -12,7 +12,7 @@ MAP_FILE := $(BUILD_ROOT)/$(PROGNAME).map
 export ASM_SRC := 
 
 SRC += \
-	$(wildcard ./firmware/*.c) \
+	$(wildcard ./firmware/*.c*) \
 	
 SRC += \
 	./sdk/src/cortexm/exception_handlers.c \

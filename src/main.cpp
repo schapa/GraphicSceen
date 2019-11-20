@@ -43,19 +43,18 @@ static void onTimerFire(uint32_t id, void *data) {
 //static uint8_t s_fb[SCREEN_BYTES_PERLINE * SCREEN_HEIGHT];
 static uint8_t *s_fb;
 
-static void lvgl_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t *color_p) {
+static void lvgl_flush(struct _disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p) {
 	uint16_t *fb = (uint16_t*)s_fb;
-    for (int32_t y = y1; y <= y2; y++) {
-        for (int32_t x = x1; x <= x2; x++) {
+    for (int32_t y = area->y1; y <= area->y2; y++) {
+        for (int32_t x = area->x1; x <= area->x2; x++) {
         	uint16_t *pt = (uint16_t*)color_p++;
         	fb[y * SCREEN_WIDTH + x] = *pt;
         }
     }
-	lv_flush_ready();
+    lv_disp_flush_ready(disp_drv);
 }
-static bool lvgl_accelRead(lv_indev_data_t *data) {
-
-	STMPE811 *touch = (STMPE811*)data->user_data;
+static bool lvgl_accelRead(struct _lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
+	STMPE811 *touch = (STMPE811*)indev_drv->user_data;
 	data->point.x = touch->getX();
 	data->point.y = touch->getY();
 	data->state = s_push ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
@@ -64,17 +63,24 @@ static bool lvgl_accelRead(lv_indev_data_t *data) {
 }
 
 static void guiInit(void *param) {
+
 	s_fb = BSP_SDRAM_GetBase();
 	lv_init();
+
+	static lv_disp_buf_t disp_buf;
+	static lv_color_t buf[LV_HOR_RES_MAX * 10];
+	lv_disp_buf_init(&disp_buf, buf, NULL, LV_HOR_RES_MAX * 10);
+
 	lv_disp_drv_t disp_drv;
 	lv_disp_drv_init(&disp_drv);
-	disp_drv.disp_flush = lvgl_flush;
+	disp_drv.buffer = &disp_buf;
+	disp_drv.flush_cb = lvgl_flush;
 	lv_disp_drv_register(&disp_drv);
 
 	lv_indev_drv_t indev_drv;
 	lv_indev_drv_init(&indev_drv);  /*Basic initialization*/
 	indev_drv.type = LV_INDEV_TYPE_POINTER;
-	indev_drv.read = lvgl_accelRead;
+	indev_drv.read_cb = lvgl_accelRead;
 	indev_drv.user_data = param;
 	lv_indev_drv_register(&indev_drv);  /*Register the driver in LittlevGL*/
 }
@@ -109,11 +115,11 @@ int main(int argc, char* argv[]) {
 	lv_obj_align(label2, NULL, LV_ALIGN_IN_LEFT_MID, 0, 0);
 
 	lv_obj_t *btn = lv_btn_create(lv_scr_act(), NULL);
-	lv_cont_set_fit(btn, true, true);
+	lv_cont_set_fit(btn, true);
 	lv_obj_align(btn, NULL, LV_ALIGN_IN_BOTTOM_LEFT, +10, 0);
-	lv_obj_set_free_num(btn, 1);
+//	lv_obj_set_free_num(btn, 1);
 	lv_obj_t *btlabel = lv_label_create(btn, NULL);
-	lv_label_set_text(btlabel, "Normal");
+	lv_label_set_text(btlabel, "Normal²");
 
 	bool rend = true;
 	while(1) {
