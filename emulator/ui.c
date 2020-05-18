@@ -53,10 +53,6 @@ int main(int argc, char* argv[]) {
 	(void)argc;
 	(void)argv;
 
-	if (!g_thread_supported())
-		g_thread_init(NULL);
-	gdk_threads_init();
-	gdk_threads_enter();
 	gtk_init(NULL, NULL);
 
 	int fb = mmapPerform(argv[1]);
@@ -66,7 +62,6 @@ int main(int argc, char* argv[]) {
 	createWidgets();
 
 	gtk_main();
-	gdk_threads_leave();
 
 	return 0;
 }
@@ -74,9 +69,7 @@ int main(int argc, char* argv[]) {
 static void* readerThread(void *arg) {
 	do {
 		if (s_drawPane) {
-			gdk_threads_enter();
 			gtk_widget_queue_draw(s_drawPane);
-			gdk_threads_leave();
 		}
 		usleep((1000));
 	} while (1);
@@ -96,8 +89,8 @@ static void createWidgets(void) {
 	gtk_widget_show(vbox);
 
 	s_drawPane = gtk_drawing_area_new();
-	GdkRGBA white = {1.0, 1.0, 1.0, 1.0};
-	gtk_widget_override_background_color(s_drawPane, GTK_STATE_FLAG_NORMAL, &white);
+//	GdkRGBA white = {1.0, 1.0, 1.0, 1.0};
+//	gtk_widget_override_background_color(s_drawPane, GTK_STATE_FLAG_NORMAL, &white);
 	gtk_widget_set_size_request(s_drawPane, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	GtkWidget *evbox = gtk_event_box_new();

@@ -18,7 +18,6 @@ CFLAGS += \
 	-ggdb \
 	-O0 \
 	-DEMULATOR \
-	-Wno-deprecated-declarations \
 	-Wall -Wformat=0 \
 	$(shell pkg-config --cflags gtk+-3.0) \
 
