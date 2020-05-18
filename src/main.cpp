@@ -31,7 +31,6 @@ static void onTimerPush(uint32_t id) {
 }
 
 static uint32_t s_accelTim = 0;
-static bool s_push = 0;
 
 static void onTimerFire(uint32_t id, void *data) {
 	if (id == s_accelTim) {
@@ -57,8 +56,7 @@ static bool lvgl_accelRead(struct _lv_indev_drv_t *indev_drv, lv_indev_data_t *d
 	STMPE811 *touch = (STMPE811*)indev_drv->user_data;
 	data->point.x = touch->getX();
 	data->point.y = touch->getY();
-	data->state = s_push ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
-	s_push = false;
+	data->state = touch->getTouching() ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
 	return false; /*No buffering so no more data read*/
 }
 
@@ -176,7 +174,6 @@ int main(int argc, char* argv[]) {
 					char buff[256];
 					snprintf(buff, sizeof(buff), "X:Y  %d      %d", touch.getX(), touch.getY());
 			    	lv_label_set_text(label2, buff);
-			    	s_push = true;
 				} else if (pin == GPIO_KEY_WAKE_USER) {
 					static int val = 0;
 					char buff[256];

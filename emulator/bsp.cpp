@@ -51,6 +51,7 @@ static struct {
 
 	uint32_t touchX;
 	uint32_t touchY;
+	bool touching;
 } s_lcd;
 
 static struct {
@@ -277,6 +278,7 @@ static void* eventThread (void *arg) {
 			} else if (bytes_read == 12) {
 				uint32_t *buff = (uint32_t*)buf; // 2 - press, 3 - release, 4 - drag, [1] - x, [2] - y
 
+                s_lcd.touching = buff[0] != 3;
 				s_lcd.touchX = buff[1];
 				s_lcd.touchY = buff[2];
 				EventQueue_Push(EVENT_EXTI, (void*)(GPIO_TOUCH_INT << 1), NULL);
@@ -296,6 +298,7 @@ void STMPE811::init() {(void)iface;}
 bool STMPE811::read(bool force) {
 	x = s_lcd.touchX;
 	y = s_lcd.touchY;
+	touching = s_lcd.touching;
 	return false;
 }
 

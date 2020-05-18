@@ -11,7 +11,7 @@
 
 class STMPE811 {
 public:
-	explicit STMPE811(I2C_HandleTypeDef *const itm) : iface(itm), x(0), y(0), z(0) {};
+	explicit STMPE811(I2C_HandleTypeDef *const itm) : iface(itm), x(0), y(0), z(0), touching(false) {};
 	~STMPE811() {}
 
 public:
@@ -21,10 +21,12 @@ public:
 	uint16_t getX() const { return x; }
 	uint16_t getY() const { return y; }
 	uint16_t getZ() const { return z; }
+	bool getTouching() const { return touching; }
 
 private:
 	I2C_HandleTypeDef *const iface;
 	uint16_t x;
 	uint16_t y;
 	uint16_t z;
+    bool touching;
 };
